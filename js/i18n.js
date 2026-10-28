@@ -6,6 +6,7 @@ const STRINGS = {
   en: {
     title: "HABITS",
     tagline: "Chapter by chapter, one habit at a time.",
+    play: "Play",
     export: "Export",
     import: "Import",
     reset: "Reset to sheet",
@@ -38,6 +39,7 @@ const STRINGS = {
   pt: {
     title: "HABITS",
     tagline: "Capítulo a capítulo, um hábito de cada vez.",
+    play: "Jogar",
     export: "Exportar",
     import: "Importar",
     reset: "Voltar à planilha",
