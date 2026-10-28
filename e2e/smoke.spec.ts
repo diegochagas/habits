@@ -12,7 +12,7 @@ function collectErrors(page: Page): string[] {
 test("loads the sheet list, adds an item with a URL, filters and survives a reload", async ({ page }, testInfo) => {
   const errors = collectErrors(page);
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("MANGA HABITS");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("HABITS");
   await expect(page.locator("article.card").first()).toBeVisible();
   await expect(page.locator("#counter")).toContainText("310 of 310");
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home.png`, fullPage: false });

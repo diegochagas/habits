@@ -6,7 +6,7 @@ import { applyTranslations, nextLang, translate } from "./i18n.js";
 import { createItem, createItemStore, parseItemList, removeItem, toggleDone } from "./items-store.js";
 import { renderCategoryOptions, renderCategoryTabs, renderItemGrid } from "./render-items.js";
 
-const LANG_KEY = "manga-habits:lang";
+const LANG_KEY = "habits:lang";
 const SEED_URL = "data/seed.json";
 
 const store = createItemStore(localStorage);

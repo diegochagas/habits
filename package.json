@@ -1,7 +1,7 @@
 {
-  "name": "manga-habits",
+  "name": "habits",
   "version": "1.0.0",
-  "description": "Black-and-white manga style list of things to read, watch, build and keep up with. No build step.",
+  "description": "Black-and-white ink style list of things to read, watch, build and keep up with. No build step.",
   "private": true,
   "type": "module",
   "scripts": {

@@ -1,6 +1,6 @@
-# Manga Habits
+# Habits
 
-A black-and-white, manga-styled list of the things I want to read, watch, build and keep
+A black-and-white, ink-styled list of the things I want to read, watch, build and keep
 doing. It started as the "ToDo List" Google Sheet (Date, Task, Notes, Source, Done) and
 now lives as a static site: add an item with a name, a category and a description where
 URLs become links; mark it done; filter by category, search, export or import JSON.
@@ -28,7 +28,7 @@ npm run e2e          # Playwright smoke, desktop + mobile, screenshots in e2e/sc
 ## Architecture
 
 ```
-index.html ─── css/manga.css (ink, halftone, speed lines, bubble, stamps)
+index.html ─── css/ink.css (ink, halftone, speed lines, bubble, stamps)
     │
     └─ js/app.js (state + DOM events)
          ├─ items-store.js   parse/create/toggle/remove + localStorage wrapper
@@ -41,7 +41,7 @@ index.html ─── css/manga.css (ink, halftone, speed lines, bubble, stamps)
 data/seed.json  snapshot of the sheet (310 items), copied into localStorage on first visit
 ```
 
-Flow: first visit → `fetch(data/seed.json)` → `localStorage["manga-habits:v1"]`.
+Flow: first visit → `fetch(data/seed.json)` → `localStorage["habits:v1"]`.
 Every change → pure function returns a new list → `store.save` → `render()`.
 
 ## Categories

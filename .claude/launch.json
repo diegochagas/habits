@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "manga-habits",
+      "name": "habits",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "4180", "--no-clipboard", "."],
       "port": 4180

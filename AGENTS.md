@@ -1,4 +1,4 @@
-# Manga Habits: agent notes
+# Habits: agent notes
 
 Static site, vanilla ES modules, no build. The seed in `data/seed.json` is a snapshot of
 the "ToDo List" Google Sheet (2026-10-28); the live list is the browser's localStorage.

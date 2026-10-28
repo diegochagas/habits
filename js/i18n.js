@@ -4,7 +4,7 @@
 
 const STRINGS = {
   en: {
-    title: "MANGA HABITS",
+    title: "HABITS",
     tagline: "Chapter by chapter, one habit at a time.",
     export: "Export",
     import: "Import",
@@ -36,7 +36,7 @@ const STRINGS = {
     categoryPersonal: "Personal",
   },
   pt: {
-    title: "MANGA HABITS",
+    title: "HABITS",
     tagline: "Capítulo a capítulo, um hábito de cada vez.",
     export: "Exportar",
     import: "Importar",

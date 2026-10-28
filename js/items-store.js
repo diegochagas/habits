@@ -15,7 +15,7 @@ import { isCategory } from "./categories.js";
  * @property {string} createdAt ISO timestamp
  */
 
-export const STORAGE_KEY = "manga-habits:v1";
+export const STORAGE_KEY = "habits:v1";
 
 /**
  * Validate one raw object into a HabitItem, or explain why it isn't one.
