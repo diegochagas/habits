@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Single validation gate (dev-playbook): format, unit tests, clean-code audit.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+npx prettier --check . >/dev/null && echo "prettier: ok"
+node --test "tests/*.test.mjs"
+scripts/clean-code-audit --strict

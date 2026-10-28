@@ -1,0 +1,19 @@
+{
+  "name": "manga-habits",
+  "version": "1.0.0",
+  "description": "Black-and-white manga style list of things to read, watch, build and keep up with. No build step.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "e2e": "playwright test",
+    "check": "scripts/check",
+    "format": "prettier --write .",
+    "serve": "serve -l 4180 --no-clipboard ."
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "prettier": "^3.6.2",
+    "serve": "^14.2.4"
+  }
+}

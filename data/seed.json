@@ -1,0 +1,2792 @@
+[
+  {
+    "id": "sheet-001",
+    "name": "Devotional",
+    "category": "Personal",
+    "description": "Fazer uma oração concentrado ao acordar",
+    "date": "2026-10-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-002",
+    "name": "Duolingo",
+    "category": "Personal",
+    "description": "Fazer 1 lição no Duolingo",
+    "date": "2026-10-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-003",
+    "name": "Finances",
+    "category": "Personal",
+    "description": "Assistir 1 aula da AUVP",
+    "date": "2026-10-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-004",
+    "name": "Replace my blog posts with tutorials",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2026-10-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-005",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Golden Age 11: p238-254",
+    "date": "2026-10-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-006",
+    "name": "Bleach: Thousand-Year Blood War",
+    "category": "Watch",
+    "description": "",
+    "date": "2026-10-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-007",
+    "name": "Tokyo Revengers S4",
+    "category": "Watch",
+    "description": "",
+    "date": "2026-10-31",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-008",
+    "name": "One Piece",
+    "category": "Read",
+    "description": "Chapter 1197",
+    "date": "2026-11-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-009",
+    "name": "Extract content of Saint Seiya OMega - Ultimate Cosmo, similar to Saint Seiya Online",
+    "category": "Read",
+    "description": "",
+    "date": "2026-10-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-010",
+    "name": "Use when I buy a xteink",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2026-11-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-011",
+    "name": "Code: https://youtu.be/ZWj8o692qGY?si=NBGojacSEyBFYZ51&t=2036",
+    "category": "Side Hustle",
+    "description": "Assistir 1 aula / Fazer 1 exercício de programação",
+    "date": "2026-11-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-012",
+    "name": "Comic Market Brasil",
+    "category": "Read",
+    "description": "Makiwara",
+    "date": "2026-12-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-013",
+    "name": "Intercâmbio",
+    "category": "Side Hustle",
+    "description": "Assistir 1 aula do M60",
+    "date": "2026-12-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-014",
+    "name": "Japanese",
+    "category": "Side Hustle",
+    "description": "Assistir 1 aula / Fazer 1 Exercício",
+    "date": "2027-01-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-015",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Soul of Gold (2026 folder)",
+    "date": "2027-01-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-016",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Mushrambo (Shinzo) - Volume 01",
+    "date": "2027-02-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-017",
+    "name": "Add Cloth objects from the game",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-02-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-018",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Doujinshi - Heaven Chapter Overture x Hades Chapter Personal Magazine (2004)",
+    "date": "2027-03-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-019",
+    "name": "CRIE Seu Próprio Servidor de E-mail e NUNCA MAIS Dependa do Gmail!",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-03-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-020",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Saint Seiya Doujinshi - 诸神的黄昏战神篇 (Ragnarok - God of War Chapter)",
+    "date": "2027-03-31",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-021",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "THE LOST CANVAS Meiou Shinwa - The Crimson That Sinks Into the Underworld",
+    "date": "2027-04-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-022",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "CLAMP BOOKS 12 - Yoroiden Samurai Troopers",
+    "date": "2027-04-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-023",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Shurato - (1989-1991) Novels",
+    "date": "2027-05-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-024",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Shurato - LOVE SONG Memorial Book (Art book)",
+    "date": "2027-05-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-025",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Shurato - Setting Material Collection (Visual Mook)",
+    "date": "2027-06-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-026",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Shurato - Laugh Out Loud Novel (1991)",
+    "date": "2027-06-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-027",
+    "name": "Send Chapter to Sarah",
+    "category": "Side Hustle",
+    "description": "Samurai Troopers Novel - Armor True Legend 1: Kenkon Chapter",
+    "date": "2027-07-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-028",
+    "name": "Anotar todas as historias novas de Saint Seiya Online para salvar como se fosse um light novel com imagens dos cavaleiros e das armaduras",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-07-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-029",
+    "name": "Com seu SALÁRIO, quanto você pode FINANCIAR? (Valor da PARCELA e do IMÓVEL)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-08-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-030",
+    "name": "Add Chespirito Series to my Jellyfin (with all lost episodes)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-08-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-031",
+    "name": "Comprar uma casa, financiar um carro ou montar uma reserva de emergência?",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-09-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-032",
+    "name": "Finish generated comics",
+    "category": "Personal",
+    "description": "Digimon Adventure MIllenium Bug 2, Megaman, Cavaleiros do Zodíaco",
+    "date": "2027-09-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-033",
+    "name": "Como meditar na palavra de Deus",
+    "category": "Personal",
+    "description": "- Orar diariamente a todo momento\n - Fazer devocional às 22h (10pm) e Deixar despertador para as 6:30am\n. Usar Anki para decorar e meditar em pelo menos dois versículos lidos no dia",
+    "date": "2027-09-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-034",
+    "name": "Anthropic Courses",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-10-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-035",
+    "name": "Algortimos e estruturas de dados",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-10-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-036",
+    "name": "4 robôs que criam vídeos no YouTube",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-11-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-037",
+    "name": "Ingresso - Vibe Coding - Curso em Vídeo",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-11-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-038",
+    "name": "Primeiro Jogo Multiplayer - YouTube",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-12-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-039",
+    "name": "Do in Japanese course, Find a way to add only the Hiragana of the exercises for me to study everyday on Anki",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2027-12-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-040",
+    "name": "Usar Anki para flashcards de Japonês",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-01-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-041",
+    "name": "Curso de Java #01 - História do Java - Gustavo Guanabara",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-01-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-042",
+    "name": "One Piece",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-02-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-043",
+    "name": "Construção do tabnews.com.br - YouTube",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-02-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-044",
+    "name": "The Legend of Vox Machina S5",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-03-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-045",
+    "name": "https://capco.udemy.com/home/my-courses/learning/",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-03-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-046",
+    "name": "https://capco.udemy.com/course/spring-hibernate-tutorial/",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-03-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-047",
+    "name": "As Melhores Historias da Mitologia Africana",
+    "category": "Read",
+    "description": "",
+    "date": "2028-04-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-048",
+    "name": "https://capco.udemy.com/course/nodejs-the-complete-guide/",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-04-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-049",
+    "name": "One Punch Man S3",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-05-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-050",
+    "name": "https://capco.udemy.com/course/docker-mastery/",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-05-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-051",
+    "name": "Fate: Strange Fake",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-06-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-052",
+    "name": "As Melhores Histórias Da Mitologia Chinesa",
+    "category": "Read",
+    "description": "",
+    "date": "2028-06-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-053",
+    "name": "Rurouni Kenshin S3",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-07-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-054",
+    "name": "As Melhores Histórias Da Mitologia Japonesa",
+    "category": "Read",
+    "description": "",
+    "date": "2028-07-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-055",
+    "name": "O Livro De Ouro Da Mitologia Histórias De Deuses E Heróis",
+    "category": "Read",
+    "description": "",
+    "date": "2028-08-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-056",
+    "name": "Chapolin Branca de Neve 3 Episódios",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-08-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-057",
+    "name": "As Melhores Historias Da Mitologia Hindu",
+    "category": "Read",
+    "description": "",
+    "date": "2028-08-30",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-058",
+    "name": "Samurai Troopers em português brasileiro - Crunchyroll",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-09-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-059",
+    "name": "Clássicos Japoneses Sobrenaturais",
+    "category": "Read",
+    "description": "",
+    "date": "2028-09-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-060",
+    "name": "Samurai Troopers (Ronin Warriors): Gaiden",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-10-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-061",
+    "name": "Saint Seiya: Final Edition",
+    "category": "Read",
+    "description": "",
+    "date": "2028-10-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-062",
+    "name": "EW Academy",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-11-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-063",
+    "name": "Samurai Troopers (Ronin Warriors): Legend of the Inferno Armor",
+    "category": "Watch",
+    "description": "",
+    "date": "2028-11-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-064",
+    "name": "Next Dimension",
+    "category": "Read",
+    "description": "",
+    "date": "2028-12-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-065",
+    "name": "The Ultimate Claude Code Guide | MCP, Skills & More",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2028-12-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-066",
+    "name": "Samurai Troopers (Ronin Warriors): Message",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-01-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-067",
+    "name": "Saint Mariya",
+    "category": "Read",
+    "description": "",
+    "date": "2029-01-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-068",
+    "name": "Yoroi-Shinden Samurai Troopers em português brasileiro - Crunchyroll",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-01-31",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-069",
+    "name": "Os segredos da mente milionária (na estante)",
+    "category": "Read",
+    "description": "",
+    "date": "2029-02-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-070",
+    "name": "Por que aprender Marketing? - Marketing Digital #00",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2029-02-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-071",
+    "name": "Shurato",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-03-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-072",
+    "name": "Dom Quixote",
+    "category": "Read",
+    "description": "",
+    "date": "2029-03-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-073",
+    "name": "O Desafio Prático de 7 Dias: Do Zero à Produção",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2029-04-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-074",
+    "name": "SHurato OVAs and Movies",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-04-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-075",
+    "name": "O homem mais rico da babilonia (na estante)",
+    "category": "Read",
+    "description": "",
+    "date": "2029-05-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-076",
+    "name": "Nórdicos das Eddas e Sagas",
+    "category": "Read",
+    "description": "",
+    "date": "2029-05-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-077",
+    "name": "Record of Ragnarok S3",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-06-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-078",
+    "name": "Atlântida e Outros Mundos Perdidos",
+    "category": "Read",
+    "description": "",
+    "date": "2029-06-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-079",
+    "name": "Besouro Movie",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-07-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-080",
+    "name": "Biblioteca Nórdica - Box com 3 Livros",
+    "category": "Read",
+    "description": "",
+    "date": "2029-07-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-081",
+    "name": "Supabase",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2029-08-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-082",
+    "name": "Power Stone Legendado (Jellyfin)",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-08-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-083",
+    "name": "Code with Antonio",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2029-08-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-084",
+    "name": "The Chosen S5",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-09-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-085",
+    "name": "Shield Hero S5",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-09-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-086",
+    "name": "Box O grande livro da Mitologia",
+    "category": "Read",
+    "description": "",
+    "date": "2029-10-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-087",
+    "name": "Leetcode for Beginners: 30 Leetcode Challenge",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2029-10-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-088",
+    "name": "Assista Justice Society: World War II | HBO Max",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-11-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-089",
+    "name": "Elric",
+    "category": "Read",
+    "description": "",
+    "date": "2029-11-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-090",
+    "name": "The Coding Interview Bootcamp: Algorithms + Data Structures",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2029-12-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-091",
+    "name": "Atlas: The Animated Movie - Official Release",
+    "category": "Watch",
+    "description": "",
+    "date": "2029-12-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-092",
+    "name": "Elric Videos Pipoca & Nanquim",
+    "category": "Read",
+    "description": "",
+    "date": "2030-01-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-093",
+    "name": "Master the Coding Interview: Data Structures + Algorithms",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2030-01-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-094",
+    "name": "(Se Deus quiser que eu fique rico) Pagar faxineira para minha mãe",
+    "category": "Watch",
+    "description": "",
+    "date": "2030-01-30",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-095",
+    "name": "(Scanear e editar Time Odyssey Collector Editio) Saint Seiya: Odisseia do Tempo",
+    "category": "Read",
+    "description": "",
+    "date": "2030-02-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-096",
+    "name": "Lugares para visitar na Grécia",
+    "category": "Watch",
+    "description": "",
+    "date": "2030-02-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-097",
+    "name": "Saint Seiya Zeus Chapter",
+    "category": "Read",
+    "description": "",
+    "date": "2030-03-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-098",
+    "name": "AFTER I be fluent in Japanese, do a Spanish course",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2030-03-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-099",
+    "name": "Deltarune",
+    "category": "Watch",
+    "description": "",
+    "date": "2030-04-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-100",
+    "name": "Saint Seiya Chaos Chapter",
+    "category": "Read",
+    "description": "",
+    "date": "2030-04-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-101",
+    "name": "Curso Grátis de IA: Módulo 2",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2030-05-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-102",
+    "name": "COMO FAZER BOX PARA SUA COLEÇÃO",
+    "category": "Watch",
+    "description": "",
+    "date": "2030-05-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-103",
+    "name": "Saint Seiya Heaven Chapter Overture x Hades Chapter Personal Magazine",
+    "category": "Read",
+    "description": "",
+    "date": "2030-06-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-104",
+    "name": "ESLvideo.com",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2030-06-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-105",
+    "name": "Bran Mak Morn O Último Rei Dos Pictos (epub)",
+    "category": "Read",
+    "description": "",
+    "date": "2030-07-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-106",
+    "name": "Ex-Programador fala várias verdades sobre startup - YouTube",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2030-07-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-107",
+    "name": "SPY x FAMILY S4",
+    "category": "Watch",
+    "description": "",
+    "date": "2030-07-31",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-108",
+    "name": "Mais obras do criador de Conan no Brasil: RED SONJA e BRAN MAK MORN | Pipoca e Nanquim 420 - YouTube",
+    "category": "Read",
+    "description": "",
+    "date": "2030-08-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-109",
+    "name": "Learn English with INSIDE OUT — The Five Emotions",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2030-08-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-110",
+    "name": "Ranma 1/2 S3",
+    "category": "Watch",
+    "description": "",
+    "date": "2030-09-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-111",
+    "name": "Solomon Kane (epub)",
+    "category": "Read",
+    "description": "",
+    "date": "2030-09-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-112",
+    "name": "React Native",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2030-10-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-113",
+    "name": "I am Number 4",
+    "category": "Watch",
+    "description": "",
+    "date": "2030-10-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-114",
+    "name": "SOLOMON KANE, a primeira série de Espada e Feitiçaria! Do criador de CONAN!! | Pipoca e Nanquim 499 - YouTube",
+    "category": "Read",
+    "description": "",
+    "date": "2030-11-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-115",
+    "name": "Linux Survival",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2030-11-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-116",
+    "name": "Attack on Titan: O Último Ataque",
+    "category": "Watch",
+    "description": "",
+    "date": "2030-12-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-117",
+    "name": "Rei Kull (epub)",
+    "category": "Read",
+    "description": "",
+    "date": "2030-12-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-118",
+    "name": "Notação Posicional - Bases Numéricas #01",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-01-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-119",
+    "name": "Los Colorado",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-01-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-120",
+    "name": "REI KULL, livro completo do bárbaro antepassado do Conan! | Pipoca e Nanquim 538 - YouTube",
+    "category": "Read",
+    "description": "",
+    "date": "2031-01-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-121",
+    "name": "https://capco.udemy.com/course/complete-linux-training-course-to-get-your-dream-it-job/",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-02-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-122",
+    "name": "A Week Away: The Series | Watch Online For Free | Angel",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-02-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-123",
+    "name": "https://tapas.io/series/Los-Caballeros-del-Zodiaco---Saint-Seiya---El-Inicio--KOTZ/info",
+    "category": "Read",
+    "description": "",
+    "date": "2031-03-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-124",
+    "name": "Useful Linux Commands Hidden On Every System",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-03-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-125",
+    "name": "Invencible S4",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-04-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-126",
+    "name": "Mangá Jibaku-kun",
+    "category": "Read",
+    "description": "",
+    "date": "2031-04-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-127",
+    "name": "GitHub - ChrisTitusTech/winutil: Chris Titus Tech's Windows Utility - Install Programs, Tweaks, Fixes, and Updates",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-05-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-128",
+    "name": "MUITO DIFERENTE! A HISTÓRIA ORIGINAL DE BUCKY - Resumo do mangá de Bucky (Jibaku-kun)",
+    "category": "Read",
+    "description": "",
+    "date": "2031-05-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-129",
+    "name": "ChatGPT + Perssua para aprender Inglês (ou qualquer idioma)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-06-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-130",
+    "name": "Overlord (Movies)",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-06-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-131",
+    "name": "Mangá Shurato",
+    "category": "Read",
+    "description": "",
+    "date": "2031-07-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-132",
+    "name": "Como Eu Removi as BigTechs do Meu Celular (e você também deveria)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-07-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-133",
+    "name": "Its A Wonderful life",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-07-30",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-134",
+    "name": "Mangá Samurai Warriors",
+    "category": "Read",
+    "description": "",
+    "date": "2031-08-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-135",
+    "name": "Como Eu Estou Me Protegendo das BigTechs (e você também deveria)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-08-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-136",
+    "name": "Ragnarok Anime",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-09-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-137",
+    "name": "Silent Knight Sho",
+    "category": "Read",
+    "description": "",
+    "date": "2031-09-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-138",
+    "name": "É Possível Se Proteger das BigTechs?",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-10-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-139",
+    "name": "Frieren S3",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-10-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-140",
+    "name": "Mushoku Tensei S4",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-11-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-141",
+    "name": "B't X",
+    "category": "Read",
+    "description": "",
+    "date": "2031-11-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-142",
+    "name": "Bloqueie anúncios em TODOS os DISPOSITIVOS! (Smart TV, Celular e PC)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-12-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-143",
+    "name": "My Hero Academia: Vigilantes S3",
+    "category": "Watch",
+    "description": "",
+    "date": "2031-12-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-144",
+    "name": "DITCH Big Tech? The 50 BEST Open Source Apps (Windows/MacOS/Linux)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2031-12-31",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-145",
+    "name": "Prime Video: Zathura: A Space Adventure",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-01-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-146",
+    "name": "https://capco.udemy.com/organization/search/?src=ukw&q=SQl",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2032-01-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-147",
+    "name": "One Piece Netflix S3",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-02-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-148",
+    "name": "Santo Guerreiro - Roma Invicta (Eduardo Spohr) | Tatiana Feltrin",
+    "category": "Read",
+    "description": "",
+    "date": "2032-02-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-149",
+    "name": "https://capco.udemy.com/organization/search/?src=ukw&q=cloud",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2032-03-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-150",
+    "name": "The Digimon Multiverse & Timeline(s) - An 11 HOURS IN-DEPTH ANALYSIS [Digimon Conversation #104]",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-03-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-151",
+    "name": "Ventos do Norte - Santo Guerreiro Vol.2 (Eduardo Spohr) | Tatiana Feltrin - YouTube",
+    "category": "Read",
+    "description": "",
+    "date": "2032-04-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-152",
+    "name": "https://capco.udemy.com/organization/search/?src=ukw&q=kubernetes",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2032-04-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-153",
+    "name": "HAKUREN | SAINT SEIYA: THE CYGNUS STORY - NATASSIA DEL REINO HELADO",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-05-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-154",
+    "name": "Santo Guerreiro: O Império do Leste (No Kindle)",
+    "category": "Read",
+    "description": "",
+    "date": "2032-05-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-155",
+    "name": "https://capco.udemy.com/course/machinelearning/",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2032-06-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-156",
+    "name": "Watch Summer Time Rendering | Full episodes | Disney+",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-06-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-157",
+    "name": "Ação Magazine",
+    "category": "Read",
+    "description": "",
+    "date": "2032-06-30",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-158",
+    "name": "https://capco.udemy.com/organization/search/?src=ukw&q=rust",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2032-07-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-159",
+    "name": "Clevatess em português brasileiro - Crunchyroll",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-07-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-160",
+    "name": "The Lost Canvas: Extra",
+    "category": "Read",
+    "description": "",
+    "date": "2032-08-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-161",
+    "name": "https://capco.udemy.com/organization/search/?src=ukw&q=go",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2032-08-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-162",
+    "name": "X-Men ’97 | Season 2 Coming in 2026 | Disney+",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-09-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-163",
+    "name": "Saint Seiya Arbooks (Cloth Mythology, Saintia Sho, Omega, The Lost Canvas, etc)",
+    "category": "Read",
+    "description": "",
+    "date": "2032-09-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-164",
+    "name": "https://capco.udemy.com/organization/search/?src=ukw&q=kotlin",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2032-10-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-165",
+    "name": "Watch A Marvel Television Special Presentation — The Punisher: One Last Kill | Disney+",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-10-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-166",
+    "name": "Episode G Requiem",
+    "category": "Read",
+    "description": "",
+    "date": "2032-11-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-167",
+    "name": "https://www.netflix.com/browse/my-list",
+    "category": "Watch",
+    "description": "",
+    "date": "2032-11-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-168",
+    "name": "Meiou Iden - Dark Wing",
+    "category": "Read",
+    "description": "Volume 6",
+    "date": "2032-12-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-169",
+    "name": "Linux File System Structure Explained: From / to /usr | Linux Basics",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2032-12-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-170",
+    "name": "Saint Seiya: Rerise of Poseidon",
+    "category": "Read",
+    "description": "Volume 5",
+    "date": "2032-12-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-171",
+    "name": "Quick tips to improve Linux Security on your desktop, laptop, or server (hardening for beginners)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2033-01-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-172",
+    "name": "Saintia Shô Memories",
+    "category": "Read",
+    "description": "",
+    "date": "2033-01-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-173",
+    "name": "Prime Video: Ted Lasso - Season 1",
+    "category": "Watch",
+    "description": "",
+    "date": "2033-02-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-174",
+    "name": "Saint Seiya Asgard Manga",
+    "category": "Read",
+    "description": "",
+    "date": "2033-02-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-175",
+    "name": "Linux journey or Capco Udemy Linux Course",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2033-03-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-176",
+    "name": "Tomb Raider King S2",
+    "category": "Watch",
+    "description": "",
+    "date": "2033-03-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-177",
+    "name": "Dragon Ball Manga",
+    "category": "Read",
+    "description": "",
+    "date": "2033-04-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-178",
+    "name": "Dragon Ball Super Manga",
+    "category": "Read",
+    "description": "",
+    "date": "2033-04-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-179",
+    "name": "Re:ZERO S4",
+    "category": "Watch",
+    "description": "",
+    "date": "2033-05-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-180",
+    "name": "ANALISANDO A MELHOR SAGA DE DRAGON BALL SUPER (SAGA MORO)",
+    "category": "Read",
+    "description": "",
+    "date": "2033-05-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-181",
+    "name": "Manga Dragon Ball Fusions",
+    "category": "Read",
+    "description": "",
+    "date": "2033-06-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-182",
+    "name": "Dragon Ball Heroes Manga",
+    "category": "Read",
+    "description": "",
+    "date": "2033-06-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-183",
+    "name": "Check Proton Mail Alias",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2033-06-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-184",
+    "name": "DRAGON BALL HEROES A HISTÓRIA COMPLETA",
+    "category": "Read",
+    "description": "",
+    "date": "2033-07-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-185",
+    "name": "The Best Local Agentic Coding Workflow (Complete Guide)",
+    "category": "Side Hustle",
+    "description": "https://www.youtube.com/results?search_query=Arquitetura+distribu%C3%ADda",
+    "date": "2033-07-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-186",
+    "name": "TRUNKS VS BARDOCK O INÍCIO INSANO DE DRAGON BALL HEROES",
+    "category": "Read",
+    "description": "",
+    "date": "2033-08-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-187",
+    "name": "https://www.youtube.com/live/msivZdPxw7Q",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2033-08-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-188",
+    "name": "Criando uma Rede Segura | Introdução a Redes Parte 6 - VPN e NAS",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2033-09-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-189",
+    "name": "Mangá Dragon Ball: Galaxy Touring",
+    "category": "Read",
+    "description": "",
+    "date": "2033-09-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-190",
+    "name": "Filhos do Éden: Heróis & Soldados (ler no iPad)",
+    "category": "Read",
+    "description": "",
+    "date": "2033-10-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-191",
+    "name": "(na estante) Epopeia da criação: Enūma Eliš - Jacyntho Lins Brandão (Tradutor)",
+    "category": "Read",
+    "description": "",
+    "date": "2033-10-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-192",
+    "name": "Saint Seiya Hades Inferno \"Capítulos Perdidos\"",
+    "category": "Read",
+    "description": "",
+    "date": "2033-11-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-193",
+    "name": "Saint Seiya: Tenkai-hen Joso Overture",
+    "category": "Read",
+    "description": "",
+    "date": "2033-11-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-194",
+    "name": "Saint Seiya: 25th Years Encyclopedia",
+    "category": "Read",
+    "description": "",
+    "date": "2033-11-30",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-195",
+    "name": "Saint Seiya: E se...Cassius não aparecesse?",
+    "category": "Read",
+    "description": "",
+    "date": "2033-12-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-196",
+    "name": "https://www.youtube.com/results?search_query=Arquitetura+distribu%C3%ADda",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2033-12-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-197",
+    "name": "(VER DESCRIÇÃO PARA VER O QUE ESTUDAR DE REDES E OUTRAS ÁREAS)Como COMEÇAR no Hacking (da forma certa 😉)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2034-01-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-198",
+    "name": "42 anos de CHAVES no Brasil: a abertura original que era LENDA apareceu!",
+    "category": "Watch",
+    "description": "",
+    "date": "2034-01-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-199",
+    "name": "🔴SAINT SEIYA: Todos sus SECRETOS 40 años después❗| Documental 40º aniversario",
+    "category": "Watch",
+    "description": "",
+    "date": "2034-02-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-200",
+    "name": "A Saga dos Deuses - Encadernado",
+    "category": "Read",
+    "description": "",
+    "date": "2034-02-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-201",
+    "name": "Dragon Ball: Aquela Vez que Reencarnei como Yamcha",
+    "category": "Read",
+    "description": "",
+    "date": "2034-03-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-202",
+    "name": "Zero Hora",
+    "category": "Read",
+    "description": "",
+    "date": "2034-03-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-203",
+    "name": "Watching Avatar as an ADULT is… different",
+    "category": "Watch",
+    "description": "",
+    "date": "2034-04-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-204",
+    "name": "Homem-Aranha 2099",
+    "category": "Read",
+    "description": "",
+    "date": "2034-04-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-205",
+    "name": "X-men 2099",
+    "category": "Read",
+    "description": "",
+    "date": "2034-05-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-206",
+    "name": "Neter Aaru",
+    "category": "Read",
+    "description": "",
+    "date": "2034-05-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-207",
+    "name": "Bakuman",
+    "category": "Read",
+    "description": "",
+    "date": "2034-05-31",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-208",
+    "name": "Jump Comics Selection: Ougon Densetsu Hen (Guia Oficial)",
+    "category": "Read",
+    "description": "",
+    "date": "2034-06-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-209",
+    "name": "1 FOR ALL - The Show | Ep 1: The Awful Ones",
+    "category": "Watch",
+    "description": "",
+    "date": "2034-06-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-210",
+    "name": "Saint Seiya: Praise of Foolish Gods",
+    "category": "Read",
+    "description": "",
+    "date": "2034-07-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-211",
+    "name": "5 things to practise every day to improve your English communication skills",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2034-07-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-212",
+    "name": "Cosmo Special",
+    "category": "Read",
+    "description": "",
+    "date": "2034-08-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-213",
+    "name": "Jump Gold Selection",
+    "category": "Read",
+    "description": "",
+    "date": "2034-08-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-214",
+    "name": "Saint Seiya Japanese Pamphlets",
+    "category": "Read",
+    "description": "",
+    "date": "2034-09-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-215",
+    "name": "vibe coding: o prompt que audita seu saas sozinho (v2)",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2034-09-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-216",
+    "name": "Tudo sobre as MÍDIAS PERDIDAS da Turma da Mônica",
+    "category": "Watch",
+    "description": "",
+    "date": "2034-10-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-217",
+    "name": "Saint Seiya - Sora Illustrations",
+    "category": "Read",
+    "description": "",
+    "date": "2034-10-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-218",
+    "name": "Saint Seiya Tenkai-hen Josô - Overture",
+    "category": "Read",
+    "description": "",
+    "date": "2034-11-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-219",
+    "name": "Saint Seiya Mithology God Edition",
+    "category": "Read",
+    "description": "",
+    "date": "2034-11-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-220",
+    "name": "Saint Seiya Mithology One Thounsad Wars Edition",
+    "category": "Read",
+    "description": "",
+    "date": "2034-11-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-221",
+    "name": "Power Rangers Sierra Force | Episode 4 | Sierra Leone Film",
+    "category": "Watch",
+    "description": "",
+    "date": "2034-12-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-222",
+    "name": "Saint Seiya Mithology",
+    "category": "Read",
+    "description": "",
+    "date": "2034-12-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-223",
+    "name": "The Manga Bible - Siku",
+    "category": "Read",
+    "description": "",
+    "date": "2035-01-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-224",
+    "name": "Mystical Places - Sarah Baxter",
+    "category": "Read",
+    "description": "",
+    "date": "2035-01-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-225",
+    "name": "The Spider-Queen - Austin McConnell",
+    "category": "Read",
+    "description": "",
+    "date": "2035-02-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-226",
+    "name": "Brain Boy - Austin McConnell",
+    "category": "Read",
+    "description": "",
+    "date": "2035-02-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-227",
+    "name": "Spider-man - Legend of The Spider-Clan",
+    "category": "Read",
+    "description": "",
+    "date": "2035-03-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-228",
+    "name": "Teenage Mutant Ninja Turtles X Naruto",
+    "category": "Read",
+    "description": "",
+    "date": "2035-03-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-229",
+    "name": "Spider-men Worlds Collide",
+    "category": "Read",
+    "description": "",
+    "date": "2035-04-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-230",
+    "name": "Doctor Strange by Donny Cates",
+    "category": "Read",
+    "description": "",
+    "date": "2035-04-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-231",
+    "name": "How To Train Your Dragon - The Complete Series - Cressida Cowell",
+    "category": "Read",
+    "description": "",
+    "date": "2035-05-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-232",
+    "name": "A Trilogia Batman Vampiro",
+    "category": "Read",
+    "description": "",
+    "date": "2035-05-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-233",
+    "name": "Gothan 1889",
+    "category": "Read",
+    "description": "",
+    "date": "2035-05-30",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-234",
+    "name": "Saint Seiya Doujinshis",
+    "category": "Read",
+    "description": "",
+    "date": "2035-06-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-235",
+    "name": "Rei Artur",
+    "category": "Read",
+    "description": "",
+    "date": "2035-06-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-236",
+    "name": "(2015) Saint Seiya꞉ Shura vs Tenma vs Shoko!! Shugeki Battle Royale Hen",
+    "category": "Read",
+    "description": "",
+    "date": "2035-07-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-237",
+    "name": "Clamp books",
+    "category": "Read",
+    "description": "",
+    "date": "2035-07-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-238",
+    "name": "O Conde de Monte Cristo",
+    "category": "Read",
+    "description": "",
+    "date": "2035-08-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-239",
+    "name": "Caverna do Dragão: Aventuras de Sábado Pela Manhã",
+    "category": "Read",
+    "description": "",
+    "date": "2035-08-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-240",
+    "name": "Dark Agnes",
+    "category": "Read",
+    "description": "",
+    "date": "2035-09-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-241",
+    "name": "Conan O Bárbaro, Novelização oficial do filme",
+    "category": "Read",
+    "description": "",
+    "date": "2035-09-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-242",
+    "name": "Mangás Chrono Triger",
+    "category": "Read",
+    "description": "",
+    "date": "2035-10-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-243",
+    "name": "Calaméo - Vestigia",
+    "category": "Read",
+    "description": "",
+    "date": "2035-10-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-244",
+    "name": "Digimon Adventure Manhua",
+    "category": "Read",
+    "description": "",
+    "date": "2035-10-31",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-245",
+    "name": "Mangá Prólogo do Céu",
+    "category": "Read",
+    "description": "",
+    "date": "2035-11-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-246",
+    "name": "Mangá Hajime no Ippo",
+    "category": "Read",
+    "description": "",
+    "date": "2035-11-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-247",
+    "name": "Download Doujinshis",
+    "category": "Read",
+    "description": "",
+    "date": "2035-12-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-248",
+    "name": "https://www.amilova.com/en/search.html?search=SAINT+SEIYA",
+    "category": "Read",
+    "description": "",
+    "date": "2035-12-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-249",
+    "name": "Download Doujinshis 2",
+    "category": "Read",
+    "description": "",
+    "date": "2036-01-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-250",
+    "name": "Download Dragon Ball mangás",
+    "category": "Read",
+    "description": "",
+    "date": "2036-01-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-251",
+    "name": "Editar telenovela da revista Dorothée",
+    "category": "Read",
+    "description": "",
+    "date": "2036-02-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-252",
+    "name": "Deus entre Deuses",
+    "category": "Read",
+    "description": "",
+    "date": "2036-02-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-253",
+    "name": "Crônicas de Wesley",
+    "category": "Read",
+    "description": "",
+    "date": "2036-03-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-254",
+    "name": "Hyper Comix",
+    "category": "Read",
+    "description": "",
+    "date": "2036-03-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-255",
+    "name": "Black Lady (Hyper Comix)",
+    "category": "Read",
+    "description": "",
+    "date": "2036-04-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-256",
+    "name": "Novas Aventuras de Megaman",
+    "category": "Read",
+    "description": "",
+    "date": "2036-04-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-257",
+    "name": "Aniparo",
+    "category": "Read",
+    "description": "",
+    "date": "2036-04-30",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-258",
+    "name": "Power Comics",
+    "category": "Read",
+    "description": "",
+    "date": "2036-05-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-259",
+    "name": "Enciclopédia Saint Seiya - Volume 1 [SSFÓRUM]",
+    "category": "Read",
+    "description": "",
+    "date": "2036-05-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-260",
+    "name": "Pokémon Mangá",
+    "category": "Read",
+    "description": "",
+    "date": "2036-06-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-261",
+    "name": "Death and Return of Superman Omnibus (na estante)",
+    "category": "Read",
+    "description": "",
+    "date": "2036-06-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-262",
+    "name": "Lanterna Verde - Crepúsculo Esmeralda/Novo Amanhecer",
+    "category": "Read",
+    "description": "",
+    "date": "2036-07-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-263",
+    "name": "A Lenda de Ruff Ghanor Vol. 4 - Asas de Abutre (No PC)",
+    "category": "Read",
+    "description": "",
+    "date": "2036-07-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-264",
+    "name": "Zoeiros Gold",
+    "category": "Read",
+    "description": "",
+    "date": "2036-08-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-265",
+    "name": "A Psicologia Financeira",
+    "category": "Read",
+    "description": "",
+    "date": "2036-08-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-266",
+    "name": "Hakuren studios manga (Prelúdio de Pégaso)",
+    "category": "Read",
+    "description": "",
+    "date": "2036-09-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-267",
+    "name": "Revista MAD Cavaleiros",
+    "category": "Read",
+    "description": "",
+    "date": "2036-09-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-268",
+    "name": "Kurumada Suikoden - Hero of Heroes",
+    "category": "Read",
+    "description": "",
+    "date": "2036-10-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-269",
+    "name": "Hora de Brincar Kids 04 - Jovens Cavaleiros",
+    "category": "Read",
+    "description": "",
+    "date": "2036-10-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-270",
+    "name": "Anime Planet n° 1 - Os Cavaleiros da Magia",
+    "category": "Read",
+    "description": "",
+    "date": "2036-10-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-271",
+    "name": "Saint Seiya God of War Manhua",
+    "category": "Read",
+    "description": "",
+    "date": "2036-11-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-272",
+    "name": "Saint Seiya Soul of Gold Manhua",
+    "category": "Read",
+    "description": "",
+    "date": "2036-11-26",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-273",
+    "name": "Saint Seiya Golden Age Manhua",
+    "category": "Read",
+    "description": "",
+    "date": "2036-12-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-274",
+    "name": "Maxwell",
+    "category": "Read",
+    "description": "",
+    "date": "2036-12-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-275",
+    "name": "Spectreman",
+    "category": "Read",
+    "description": "",
+    "date": "2037-01-07",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-276",
+    "name": "Dojinshi",
+    "category": "Read",
+    "description": "",
+    "date": "2037-01-21",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-277",
+    "name": "O Máskara 2",
+    "category": "Read",
+    "description": "",
+    "date": "2037-02-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-278",
+    "name": "O menino que queria ser Deus | Amazon.com.br",
+    "category": "Read",
+    "description": "",
+    "date": "2037-02-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-279",
+    "name": "Entendendo Algoritmos - Adiya Y",
+    "category": "Read",
+    "description": "",
+    "date": "2037-03-04",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-280",
+    "name": "código - A Vida Secreta dos Computadores - Charles",
+    "category": "Read",
+    "description": "",
+    "date": "2037-03-18",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-281",
+    "name": "Refatoração - Martin Fowler",
+    "category": "Read",
+    "description": "",
+    "date": "2037-04-01",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-282",
+    "name": "Arquitetura Limpa - Robert C. Martin",
+    "category": "Read",
+    "description": "",
+    "date": "2037-04-15",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-283",
+    "name": "O Programador Pragmático - Andrew Hunt",
+    "category": "Read",
+    "description": "",
+    "date": "2037-04-29",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-284",
+    "name": "The Odd 1s Out - New Books",
+    "category": "Read",
+    "description": "",
+    "date": "2037-05-13",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-285",
+    "name": "Dragon Ball Pé no Chão - Saga Pilaf - Wattpad",
+    "category": "Read",
+    "description": "",
+    "date": "2037-05-27",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-286",
+    "name": "https://fliptru.com.br/comic/bell-ringer-trdd?origin=search&extra=Bell+ri+ger",
+    "category": "Read",
+    "description": "",
+    "date": "2037-06-10",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-287",
+    "name": "T-HUNTERS | WEBTOON",
+    "category": "Read",
+    "description": "",
+    "date": "2037-06-24",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-288",
+    "name": "Como ter domínio próprio | Estudo Fruto do Espírito",
+    "category": "Watch",
+    "description": "",
+    "date": "2037-07-08",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-289",
+    "name": "https://www.instagram.com/reels/Da5-L1ZSk19/",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2037-07-22",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-290",
+    "name": "PewDiePie usando Linux? O que está acontecendo? - Diocast",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2037-08-05",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-291",
+    "name": "Sites para estudar Eletrônicas",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2037-08-19",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-292",
+    "name": "Pirates! - Ler online | Fliptru",
+    "category": "Read",
+    "description": "",
+    "date": "2037-09-02",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-293",
+    "name": "QUADRINHOS | Lucas Eklipse",
+    "category": "Read",
+    "description": "",
+    "date": "2037-09-16",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-294",
+    "name": "10 coisas que não valem mais a pena gastar o seu dinheiro",
+    "category": "Watch",
+    "description": "",
+    "date": "2037-09-30",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-295",
+    "name": "Buy one that walks, and can have Agumon acessories and voice",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2037-10-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-296",
+    "name": "Assistir um vídeo do AKita por dia",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2037-10-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-297",
+    "name": "Claude Code 101",
+    "category": "Side Hustle",
+    "description": "https://anthropic.skilljar.com/claude-code-101",
+    "date": "2037-11-11",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-298",
+    "name": "Introduction to Model Context Protocol",
+    "category": "Side Hustle",
+    "description": "https://anthropic.skilljar.com/introduction-to-model-context-protocol",
+    "date": "2037-11-25",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-299",
+    "name": "Introduction to agent skills",
+    "category": "Side Hustle",
+    "description": "https://anthropic.skilljar.com/introduction-to-agent-skills",
+    "date": "2037-12-09",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-300",
+    "name": "Introduction to subagents",
+    "category": "Side Hustle",
+    "description": "https://anthropic.skilljar.com/introduction-to-subagents",
+    "date": "2037-12-23",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-301",
+    "name": "AI Fluency: Framework & Foundations",
+    "category": "Side Hustle",
+    "description": "Anthropic Academy certificate",
+    "date": "2038-01-06",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-302",
+    "name": "Claude Code in Action",
+    "category": "Side Hustle",
+    "description": "Anthropic Academy certificate",
+    "date": "2038-01-20",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-303",
+    "name": "Google AI Professional Certificate",
+    "category": "Side Hustle",
+    "description": "Certificate sent in AI Certificates email",
+    "date": "2038-02-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-304",
+    "name": "Capco Udemy courses",
+    "category": "Side Hustle",
+    "description": "Certificate sent in AI Certificates email",
+    "date": "2038-02-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-305",
+    "name": "Personagens de Chaves que apareceram FORA de Chaves",
+    "category": "Watch",
+    "description": "",
+    "date": "2038-03-03",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-306",
+    "name": "Restore old photos on Immich with AI",
+    "category": "Side Hustle",
+    "description": "",
+    "date": "2038-03-17",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-307",
+    "name": "Dusk Maiden Vol. I",
+    "category": "Read",
+    "description": "Ricardo Mango (MPEG Originais)",
+    "date": "2038-03-31",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-308",
+    "name": "Jesus",
+    "category": "Read",
+    "description": "Yoshikazu Yasuhiro (Comix Zone)",
+    "date": "2038-04-14",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-309",
+    "name": "Betiger Vol. 1",
+    "category": "Read",
+    "description": "Hataoh (MPEG Originais)",
+    "date": "2038-04-28",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  },
+  {
+    "id": "sheet-310",
+    "name": "Guia Não Oficial de Jogos dos Cavaleiros do Zodíaco",
+    "category": "Read",
+    "description": "Muito além dos videogames (prefácio por Diego Maryo)",
+    "date": "2038-05-12",
+    "done": false,
+    "createdAt": "2026-10-28T00:00:00.000Z"
+  }
+]

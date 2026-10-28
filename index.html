@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manga Habits</title>
+    <meta
+      name="description"
+      content="A black-and-white manga style list of things to read, watch, build and keep up with."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/manga.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Crect x='3' y='3' width='26' height='26' fill='none' stroke='%23000' stroke-width='4'/%3E%3Cpath d='M9 16l5 5 9-11' fill='none' stroke='%23000' stroke-width='4'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div class="speed-lines" aria-hidden="true"></div>
+
+    <header class="masthead panel">
+      <h1 class="masthead-title" data-i18n="title">MANGA HABITS</h1>
+      <p class="masthead-tagline" data-i18n="tagline">Chapter by chapter, one habit at a time.</p>
+      <div class="masthead-tools">
+        <button type="button" class="stamp" id="lang-toggle" aria-label="Toggle language">PT</button>
+        <button type="button" class="stamp" id="export-button" data-i18n="export">Export</button>
+        <label class="stamp" for="import-input" data-i18n="import">Import</label>
+        <input type="file" id="import-input" accept="application/json" hidden />
+        <button type="button" class="stamp stamp-danger" id="reset-button" data-i18n="reset">Reset to sheet</button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="panel panel-tilt-left add-panel" aria-labelledby="add-title">
+        <h2 id="add-title" class="panel-title" data-i18n="addTitle">New item!</h2>
+        <form id="add-form" class="bubble" novalidate>
+          <label class="field">
+            <span data-i18n="fieldName">Name</span>
+            <input type="text" name="name" required maxlength="200" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span data-i18n="fieldCategory">Category</span>
+            <select name="category" id="category-select"></select>
+          </label>
+          <label class="field">
+            <span data-i18n="fieldDescription">Description (URLs become links)</span>
+            <textarea name="description" rows="3" maxlength="2000"></textarea>
+          </label>
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+          <button type="submit" class="stamp stamp-big" data-i18n="addButton">ADD!</button>
+        </form>
+      </section>
+
+      <section class="panel panel-tilt-right filters-panel" aria-label="Filters">
+        <div class="category-tabs" id="category-tabs" role="tablist"></div>
+        <div class="filters-row">
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            data-i18n-placeholder="searchPlaceholder"
+            placeholder="Search..."
+          />
+          <select id="status-select" class="status-select">
+            <option value="all" data-i18n="statusAll">All</option>
+            <option value="todo" data-i18n="statusTodo">To do</option>
+            <option value="done" data-i18n="statusDone">Done</option>
+          </select>
+        </div>
+        <p class="counter" id="counter"></p>
+      </section>
+
+      <section class="items-grid" id="items-grid" aria-live="polite"></section>
+      <p class="empty-state panel" id="empty-state" hidden data-i18n="empty">Nothing here... yet.</p>
+    </main>
+
+    <footer class="colophon">
+      <span data-i18n="footer">Saved in this browser only. Export to keep a copy.</span>
+    </footer>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

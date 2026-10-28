@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Idempotent bootstrap: dev dependencies (tests/e2e only; the site itself needs nothing) and git hooks.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+npm install
+npx playwright install chromium
+git config core.hooksPath .githooks
+echo "setup: done. Run scripts/check, then npm run serve and open http://localhost:4180"
