@@ -185,19 +185,24 @@ body::before {
   background: var(--paper);
 }
 
+/* Tail: an ink triangle hanging from the outer border edge, with a smaller paper triangle
+   over it that also covers the border, so the balloon opens into the tail (it used to float
+   9px below the border, Diego 2026-10-29). */
 .bubble::after,
 .bubble::before {
   content: "";
   position: absolute;
   left: 44px;
-  bottom: -26px;
+  bottom: -17px;
   border: 14px solid transparent;
   border-top-color: var(--ink);
   border-bottom: 0;
 }
 
 .bubble::after {
-  bottom: -21px;
+  left: 47px;
+  bottom: -12px;
+  border-width: 11px;
   border-top-color: var(--paper);
 }
 
