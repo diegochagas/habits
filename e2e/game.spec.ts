@@ -1,7 +1,9 @@
 // e2e/game.spec.ts: the play page: locked without free time; with it, walk the first Arca RPG
 // Maker style, bump into the enemy, fight, continue, and leave with PV restored.
 import { test, expect } from "@playwright/test";
-import { collectErrors, grantFreeTime } from "./helpers";
+import { collectErrors, freshStateBeforeEach, grantFreeTime } from "./helpers";
+
+freshStateBeforeEach();
 
 test("without free time the play page is locked behind the Pomodoro notice", async ({ page }, testInfo) => {
   const errors = collectErrors(page);

@@ -1,0 +1,14 @@
+# Habits on ZimaOS: one container, the PostgreSQL CasaOS app next to it (reached through the
+# host's published 5432). DATABASE_URL lives in .env.docker (gitignored, written by
+# scripts/setup-zimaos-db.sh). Push-to-deploy rebuilds this stack after every `git push`.
+services:
+  habits:
+    build: .
+    container_name: habits
+    restart: unless-stopped
+    ports:
+      - "4180:4180"
+    env_file:
+      - .env.docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

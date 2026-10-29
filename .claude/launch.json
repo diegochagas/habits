@@ -3,8 +3,12 @@
   "configurations": [
     {
       "name": "habits",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "-l", "4180", "--no-clipboard", "."],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server/main.js"],
+      "env": {
+        "HABITS_STORE": "memory",
+        "PORT": "4180"
+      },
       "port": 4180
     }
   ]

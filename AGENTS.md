@@ -1,7 +1,12 @@
 # Habits: agent notes
 
-Static site, vanilla ES modules, no build. The seed in `data/seed.json` is a snapshot of
-the "ToDo List" Google Sheet (2026-10-28); the live list is the browser's localStorage.
+Vanilla ES-module pages, no build, plus `server/` (node:http + `pg`, the one runtime
+dependency, behind `server/state-postgres.js`): it serves the pages and keeps every saved
+document in one PostgreSQL table (`/api/state/<key>`, see `js/state-storage.js`; the pages fall
+back to localStorage when served as plain files). The seed in `data/seed.json` is a snapshot of
+the "ToDo List" Google Sheet (2026-10-28). Items have `doneAt` and an optional `daily` flag:
+`rollDailyItems` brings daily items back every morning; cards edit in place
+(`js/render-item-editor.js`). Deployed on the home server by push (docker compose, see README).
 `game.html` + `js/game/` is the 3DeT Victory game (see README "Architecture"); combat and
 progression are pure functions that take an injected `rollDie`, so tests use scripted dice and
 the page accepts `?seed=N`. Keep game strings in `js/game/game-i18n.js` (EN + PT). Stage maps are
@@ -23,7 +28,9 @@ This repo follows the dev-playbook (`~/.claude/skills/dev-playbook/PLAYBOOK.md`)
 - Never weaken, skip or delete a test to make it pass.
 - UI changes: run `npm run e2e` and attach desktop (1280) + mobile (375)
   screenshots of every changed screen to the PR or final message.
-- Risk class for this repo: none (browser-only data; Export is the user's backup).
+- Risk class for this repo: low (the server's PostgreSQL holds the state; Export is the manual backup).
+- e2e runs the real server with `HABITS_STORE=memory` (one worker, state wiped per spec via
+  `DELETE /api/state`, which only the memory store allows).
 - No real paths, IPs, passwords or tokens in code, tests, fixtures or docs.
 - Before finishing: run `/code-review` on the diff, then give the evidence package:
   summary, risk class, test results, screenshots, rollback steps.
@@ -43,8 +50,11 @@ Language: vanilla JS ES modules. Formatter: prettier; `scripts/check` runs it, d
 - Comments: keep the ones you find, they carry intent. Write WHY, cite issue numbers / SHAs.
   Docstring + one usage example on public functions. Never `// increment i`.
 - Dependencies injected via parameters: `createItemStore(storage)`, `createItem(fields, clock)`;
-  tests use named fakes (`FakeStorage`), not inline stubs. No third-party runtime libs.
-- Logging: none; this is a static page.
-- Defensive code this repo needs: none beyond input validation (`parseItem`, `parseItemList`).
+  tests use named fakes (`FakeStorage`), not inline stubs. The only third-party runtime lib is
+  `pg`, used in `server/state-postgres.js` alone.
+- Logging: the server prints one JSON object per line; the pages log nothing.
+- Defensive code this repo needs: input validation (`parseItem`, `parseItemList`, the server's
+  key/body checks); the server's connect-with-retry at start (Postgres may still be booting
+  after a host reboot); the pages' write queue retrying failed PUTs (`state-storage.js`).
 - README has an "Architecture" section; update it when the shape changes.
 - `scripts/setup` bootstraps a clean machine idempotently; `scripts/check` is the single validation command.

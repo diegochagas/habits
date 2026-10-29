@@ -1,12 +1,24 @@
 // app.js: wires DOM events to the pure modules on the habits page: the list (filters, add,
-// done/remove, import/export), the hero's Today and Sheet tabs, and the Pomodoro.
-// State lives here; everything else is a function.
+// edit, done/remove, import/export), the hero's Today and Sheet tabs, and the Pomodoro.
+// State lives here; everything else is a function. The saved state comes from the server
+// (state-storage.js) when there is one, from localStorage otherwise.
 
 import { downloadItemsJson, readItemsJson } from "./export-import.js";
 import { DEFAULT_FILTER, countByCategory, visibleItems } from "./filters.js";
 import { applyTranslations, nextLang, translate } from "./i18n.js";
-import { createItem, createItemStore, parseItemList, removeItem, toggleDone } from "./items-store.js";
+import { bindHomeToolbar, toggleSyncPanel } from "./home-toolbar.js";
+import {
+  createItem,
+  createItemStore,
+  parseItemList,
+  removeItem,
+  rollDailyItems,
+  toggleDone,
+  updateItem,
+} from "./items-store.js";
+import { itemFieldsFromForm, renderItemEditor } from "./render-item-editor.js";
 import { renderCategoryOptions, renderCategoryTabs, renderItemGrid } from "./render-items.js";
+import { connectStateStorage } from "./state-storage.js";
 import { applyGameTranslations, gameText } from "./game/game-i18n.js";
 import { createHeroController } from "./game/hero-controller.js";
 import { createHeroStore } from "./game/hero-store.js";
@@ -23,14 +35,24 @@ import { createSyncStore } from "./sync/sync-store.js";
 const LANG_KEY = "habits:lang";
 const TAB_KEY = "habits:home-tab";
 const SEED_URL = "data/seed.json";
+const DAILY_ROLL_MS = 60_000;
 const params = new URLSearchParams(location.search);
 
-const store = createItemStore(localStorage);
+// The server's state when served by server/, this browser's localStorage otherwise.
+const storage = await connectStateStorage({ document });
+const store = createItemStore(storage);
 const sounds = createSoundBoard(() => new AudioContext(), localStorage);
 /** @returns {string} */
 const today = () => new Date().toISOString().slice(0, 10);
-/** @type {{ items: import("./items-store.js").HabitItem[], filter: import("./filters.js").ListFilter, lang: import("./i18n.js").Lang, tab: string, notice: string }} */
-const state = { items: [], filter: { ...DEFAULT_FILTER }, lang: loadLang(), tab: loadTab(), notice: "" };
+/** @type {{ items: import("./items-store.js").HabitItem[], filter: import("./filters.js").ListFilter, lang: import("./i18n.js").Lang, tab: string, notice: string, editingId: string | null }} */
+const state = {
+  items: [],
+  filter: { ...DEFAULT_FILTER },
+  lang: loadLang(),
+  tab: loadTab(),
+  notice: "",
+  editingId: null,
+};
 
 const grid = /** @type {HTMLElement} */ (document.getElementById("items-grid"));
 const tabs = /** @type {HTMLElement} */ (document.getElementById("category-tabs"));
@@ -43,7 +65,7 @@ const notice = /** @type {HTMLElement} */ (document.getElementById("game-notice"
 const heroMain = /** @type {HTMLElement} */ (document.getElementById("hero-main"));
 
 const hero = createHeroController({
-  store: createHeroStore(localStorage),
+  store: createHeroStore(storage),
   sounds,
   today,
   lang: () => state.lang,
@@ -54,7 +76,7 @@ const hero = createHeroController({
 const pomodoro = startPomodoro({
   root: /** @type {HTMLElement} */ (document.getElementById("pomodoro-body")),
   videoRoot: /** @type {HTMLElement} */ (document.getElementById("pomodoro-video")),
-  store: createPomodoroStore(localStorage),
+  store: createPomodoroStore(storage),
   sounds,
   lang: () => state.lang,
   items: () => state.items,
@@ -67,10 +89,11 @@ const pomodoro = startPomodoro({
 });
 
 const sync = startSheetSync({
-  store: createSyncStore(localStorage),
+  store: createSyncStore(storage),
   panel: /** @type {HTMLElement} */ (document.getElementById("sync-panel")),
   items: () => state.items,
   lang: () => state.lang,
+  today,
   applyItems: (items, renamed) => {
     pomodoro.renameItems(renamed);
     state.items = items;
@@ -109,9 +132,12 @@ function say(message) {
 
 function render() {
   const shown = visibleItems(state.items, state.filter);
+  const editing = state.items.find((item) => item.id === state.editingId);
   grid.innerHTML = renderItemGrid(shown, state.lang, {
     pomodoros: pomodoro.state.pomodoros,
     pomodoroLabel: pomodoroText(state.lang, "startPomodoro"),
+    editingId: state.editingId,
+    editor: editing ? renderItemEditor(editing, state.lang) : "",
   });
   tabs.innerHTML = renderCategoryTabs(countByCategory(state.items), state.filter.category, state.lang);
   emptyState.hidden = shown.length > 0;
@@ -164,20 +190,38 @@ function renderSoundToggle() {
 /** @param {SubmitEvent} event */
 function onAddSubmit(event) {
   event.preventDefault();
-  const fields = new FormData(form);
-  const result = createItem(
-    {
-      name: String(fields.get("name") ?? ""),
-      category: String(fields.get("category") ?? ""),
-      description: String(fields.get("description") ?? ""),
-    },
-    { id: () => `item-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, now: () => new Date() },
-  );
+  const result = createItem(itemFieldsFromForm(form), {
+    id: () => `item-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+    now: () => new Date(),
+  });
   if ("error" in result) return showFormError(translate(state.lang, result.error));
   showFormError("");
   form.reset();
   sounds.play("decision");
   commit([result.item, ...state.items]);
+}
+
+/** The inline editor of a card was submitted. @param {SubmitEvent} event */
+function onEditSubmit(event) {
+  const editor = /** @type {HTMLFormElement} */ (event.target);
+  if (editor.dataset.form !== "edit-item" || !state.editingId) return;
+  event.preventDefault();
+  const result = updateItem(state.items, state.editingId, itemFieldsFromForm(editor));
+  const error = /** @type {HTMLElement | null} */ (editor.querySelector("[data-edit-error]"));
+  if ("error" in result) {
+    if (error) error.textContent = translate(state.lang, result.error);
+    if (error) error.hidden = false;
+    return;
+  }
+  state.editingId = null;
+  sounds.play("decision");
+  commit(result.items);
+}
+
+/** Daily items done on an earlier day come back; runs at start, every minute and on return. */
+function rollDaily() {
+  const rolled = rollDailyItems(state.items, today());
+  if (rolled.changed > 0) commit(rolled.items);
 }
 
 /** @param {string} message empty string hides the error */
@@ -192,9 +236,15 @@ function onGridClick(event) {
   const card = button?.closest("article[data-id]");
   if (!button || !card) return;
   const id = card.getAttribute("data-id") ?? "";
-  if (button.dataset.action === "pomodoro") return pomodoro.startOn(id);
-  if (button.dataset.action === "toggle") return commit(toggleDone(state.items, id));
-  if (confirm(translate(state.lang, "removeConfirm"))) commit(removeItem(state.items, id));
+  const action = button.dataset.action;
+  if (action === "pomodoro") return pomodoro.startOn(id);
+  if (action === "toggle") return commit(toggleDone(state.items, id, today()));
+  if (action === "edit" || action === "cancel-edit") {
+    state.editingId = action === "edit" ? id : null;
+    sounds.play("cursor");
+    return render();
+  }
+  if (action === "remove" && confirm(translate(state.lang, "removeConfirm"))) commit(removeItem(state.items, id));
 }
 
 /** @param {MouseEvent} event */
@@ -226,13 +276,9 @@ function onHeroClick(event) {
   hero.handleAction(button);
 }
 
-/** @param {Event} event */
-async function onImportChange(event) {
-  const input = /** @type {HTMLInputElement} */ (event.target);
-  const file = input.files?.[0];
-  if (!file) return;
+/** @param {File} file */
+async function onImport(file) {
   const result = await readItemsJson(file);
-  input.value = "";
   if ("error" in result) return alert(`${translate(state.lang, "importError")}\n${result.error}`);
   commit(result.items);
 }
@@ -246,6 +292,7 @@ async function onReset() {
 function bindEvents() {
   form.addEventListener("submit", onAddSubmit);
   grid.addEventListener("click", onGridClick);
+  grid.addEventListener("submit", onEditSubmit);
   tabs.addEventListener("click", onTabClick);
   document.addEventListener("click", onSectionTabClick);
   heroMain.addEventListener("click", onHeroClick);
@@ -267,28 +314,25 @@ function bindEvents() {
 }
 
 function bindToolbar() {
-  document.getElementById("lang-toggle")?.addEventListener("click", () => {
-    state.lang = nextLang(state.lang);
-    localStorage.setItem(LANG_KEY, state.lang);
-    renderLanguage();
+  bindHomeToolbar(document, {
+    onLanguage: () => {
+      state.lang = nextLang(state.lang);
+      localStorage.setItem(LANG_KEY, state.lang);
+      renderLanguage();
+    },
+    onSound: () => {
+      sounds.toggle();
+      sounds.play("decision");
+      renderSoundToggle();
+    },
+    onSyncToggle: () => {
+      toggleSyncPanel(document);
+      sync.render();
+    },
+    onExport: () => downloadItemsJson(state.items, document),
+    onImport,
+    onReset,
   });
-  document.getElementById("sound-toggle")?.addEventListener("click", () => {
-    sounds.toggle();
-    sounds.play("decision");
-    renderSoundToggle();
-  });
-  document.getElementById("sync-toggle")?.addEventListener("click", () => {
-    const panel = /** @type {HTMLElement} */ (document.getElementById("sync-panel"));
-    panel.hidden = !panel.hidden;
-    /** @type {HTMLElement} */ (document.getElementById("sync-toggle")).setAttribute(
-      "aria-expanded",
-      String(!panel.hidden),
-    );
-    sync.render();
-  });
-  document.getElementById("export-button")?.addEventListener("click", () => downloadItemsJson(state.items, document));
-  document.getElementById("import-input")?.addEventListener("change", onImportChange);
-  document.getElementById("reset-button")?.addEventListener("click", onReset);
 }
 
 let tick = 0;
@@ -300,11 +344,15 @@ function animate() {
 
 async function start() {
   bindEvents();
+  if (storage.kind === "server") document.querySelector(".colophon span")?.setAttribute("data-i18n", "footerServer");
   renderLanguage();
   state.items = store.load() ?? (await fetchSeed());
   store.save(state.items);
   hero.creditList(state.items);
   render();
+  rollDaily();
+  setInterval(rollDaily, DAILY_ROLL_MS);
+  document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && rollDaily());
   animate();
   sync.syncNow();
 }

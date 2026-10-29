@@ -1,7 +1,9 @@
 // e2e/home.spec.ts: the habits page's hero side: Today habits move XP, the Sheet sells with track
 // XP, the hero survives a reload; and the Pomodoro (fast mode) earns free time on a list item.
 import { test, expect } from "@playwright/test";
-import { collectErrors } from "./helpers";
+import { collectErrors, freshStateBeforeEach } from "./helpers";
+
+freshStateBeforeEach();
 
 test("habits move XP, the sheet sells with track XP, and the hero survives a reload", async ({ page }, testInfo) => {
   const errors = collectErrors(page);

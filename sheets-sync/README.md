@@ -25,19 +25,19 @@ edit → version: New version → Deploy** (the URL stays the same).
 
 ## What syncs
 
-| On the site           | In the sheet                                  |
-| --------------------- | --------------------------------------------- |
-| Done or Remove        | the row is deleted                            |
-| Undo before next sync | the row is written back                       |
-| Add item              | a row is appended (Date, Task, Notes, Source) |
-| Row deleted in sheet  | the item disappears on next sync              |
-| Row added or edited   | the item appears / updates on next sync       |
-| Done on a daily row   | its Done checkbox is ticked (row kept)        |
+| On the site           | In the sheet                                                              |
+| --------------------- | ------------------------------------------------------------------------- |
+| Done or Remove        | the row is deleted                                                        |
+| Undo before next sync | the row is written back                                                   |
+| Add or edit an item   | a row is appended / rewritten (Date, Task, Notes, Source, daily checkbox) |
+| Row deleted in sheet  | the item disappears on next sync                                          |
+| Row added or edited   | the item appears / updates on next sync                                   |
+| Done on a daily row   | its Done checkbox is ticked (row kept)                                    |
 
-A **daily row** is one whose Done cell is a checkbox (E7:E9 today: Devotional, Duolingo,
-Finances). The sheet's own "Daily Checklist Reset" trigger unticks them every night, so the
-items come back as to-do on the site at the next sync, and each day's Done pays +1 XP again.
-The script lives in that same bound project (file `HabitsSync.gs` next to its `Code.gs`).
+A **daily row** is one whose Done cell is a checkbox: the site's "every day" flag puts it there
+(and removes it when the flag is cleared). Done ticks it; the site brings the item back the next
+morning and unticks the row, so no nightly trigger is needed in the sheet. Each day's Done pays
++1 XP again. The script lives in the sheet's bound project as `HabitsSync.gs`.
 
 The site syncs on load, every five minutes, and right after each change; changes made while
 offline wait in a queue. Rows whose Source is not Read, Watch, Side Hustle or Personal are

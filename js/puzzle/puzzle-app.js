@@ -4,6 +4,7 @@
 import { createSoundBoard } from "../game/sound.js";
 import { seededRandom } from "../game/rules.js";
 import { nextLang } from "../i18n.js";
+import { connectStateStorage } from "../state-storage.js";
 import { startFreeTimeGate } from "../pomodoro/free-time-gate.js";
 import { applyPomodoroTranslations } from "../pomodoro/pomodoro-i18n.js";
 import { createPomodoroStore } from "../pomodoro/pomodoro-store.js";
@@ -14,9 +15,11 @@ import { canPour, generateSortPuzzle, isSolved, levelSpec, pour, undoPour } from
 
 const LANG_KEY = "habits:lang";
 const params = new URLSearchParams(location.search);
+// The server's state when served by server/, this browser's localStorage otherwise.
+const storage = await connectStateStorage({ document });
 const random = params.get("seed") ? seededRandom(Number(params.get("seed"))) : Math.random;
 const sounds = createSoundBoard(() => new AudioContext(), localStorage);
-const store = createPuzzleStore(localStorage);
+const store = createPuzzleStore(storage);
 const main = /** @type {HTMLElement} */ (document.getElementById("puzzle-main"));
 /** @returns {string} */
 const today = () => new Date().toISOString().slice(0, 10);
@@ -28,7 +31,7 @@ const state = {
 };
 
 const gate = startFreeTimeGate({
-  store: createPomodoroStore(localStorage),
+  store: createPomodoroStore(storage),
   badge: /** @type {HTMLElement} */ (document.getElementById("free-time")),
   overlay: /** @type {HTMLElement} */ (document.getElementById("free-time-over")),
   lang: () => state.lang,

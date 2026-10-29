@@ -1,7 +1,9 @@
 // e2e/sync.spec.ts: the Google Sheets sync against a stubbed Apps Script endpoint: connect,
 // pull the sheet's rows, mark one done (a delete op is posted), add one (an upsert is posted).
 import { test, expect, type Route } from "@playwright/test";
-import { collectErrors } from "./helpers";
+import { collectErrors, freshStateBeforeEach } from "./helpers";
+
+freshStateBeforeEach();
 
 const SCRIPT_URL = "https://script.google.com/macros/s/TEST123/exec";
 

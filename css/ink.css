@@ -414,6 +414,32 @@ body::before {
   gap: 6px;
 }
 
+.item-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.item-editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.field-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+}
+
+.field-check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--ink);
+}
+
 .card-done {
   background: repeating-linear-gradient(45deg, var(--paper) 0 6px, var(--paper-grey) 6px 8px);
 }

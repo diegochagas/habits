@@ -31,10 +31,13 @@ import { startFreeTimeGate } from "../pomodoro/free-time-gate.js";
 import { applyPomodoroTranslations } from "../pomodoro/pomodoro-i18n.js";
 import { createPomodoroStore } from "../pomodoro/pomodoro-store.js";
 import { nextLang } from "../i18n.js";
+import { connectStateStorage } from "../state-storage.js";
 
 const LANG_KEY = "habits:lang";
 const TAB_KEY = "habits:game-tab";
 const params = new URLSearchParams(location.search);
+// The server's state when served by server/, this browser's localStorage otherwise.
+const storage = await connectStateStorage({ document });
 const rollDie = dieFromRandom(params.get("seed") ? seededRandom(Number(params.get("seed"))) : Math.random);
 const sounds = createSoundBoard(() => new AudioContext(), localStorage);
 
@@ -53,7 +56,7 @@ const input = createDirectionInput(document, () => state.tab === "battle" && sta
 const main = /** @type {HTMLElement} */ (document.getElementById("game-main"));
 const notice = /** @type {HTMLElement} */ (document.getElementById("game-notice"));
 const hero = createHeroController({
-  store: createHeroStore(localStorage),
+  store: createHeroStore(storage),
   sounds,
   today,
   lang: () => state.lang,
@@ -65,7 +68,7 @@ const hero = createHeroController({
   confirmReset: (message) => confirm(message),
 });
 const gate = startFreeTimeGate({
-  store: createPomodoroStore(localStorage),
+  store: createPomodoroStore(storage),
   badge: /** @type {HTMLElement} */ (document.getElementById("free-time")),
   overlay: /** @type {HTMLElement} */ (document.getElementById("free-time-over")),
   lang: () => state.lang,

@@ -1,6 +1,7 @@
 // items-store.js: the list itself. Pure functions over an array of items plus a thin
-// localStorage wrapper. The seed (data/seed.json) is copied into storage on first visit
-// so sheet items and user items are edited the same way.
+// storage wrapper (the server's state or localStorage, see state-storage.js). The seed
+// (data/seed.json) is copied into storage on first visit so sheet items and user items are
+// edited the same way.
 
 import { isCategory } from "./categories.js";
 
@@ -12,9 +13,12 @@ import { isCategory } from "./categories.js";
  * @property {string} description
  * @property {string} date  ISO yyyy-mm-dd (sheet queue date, or the day it was added)
  * @property {boolean} done
+ * @property {string} doneAt yyyy-mm-dd of the last Done ("" while to do); daily items reset the next day
  * @property {string} createdAt ISO timestamp
- * @property {true} [daily] a sheet row with a checkbox in Done: done resets every night, XP once a day
+ * @property {true} [daily] comes back every morning (rollDailyItems); XP once a day
  */
+
+/** @typedef {{ name: string, category: string, description: string, date?: string, daily?: boolean }} ItemFields */
 
 export const STORAGE_KEY = "habits:v1";
 
@@ -48,6 +52,7 @@ function normalizeItem(candidate) {
     description: typeof candidate.description === "string" ? candidate.description : "",
     date: typeof candidate.date === "string" ? candidate.date : "",
     done: candidate.done === true,
+    doneAt: typeof candidate.doneAt === "string" ? candidate.doneAt : "",
     createdAt: typeof candidate.createdAt === "string" ? candidate.createdAt : "",
     ...(candidate.daily === true ? { daily: true } : {}),
   };
@@ -70,36 +75,90 @@ export function parseItemList(raw) {
 }
 
 /**
- * Build a new item from the add form.
- * @param {{ name: string, category: string, description: string }} fields
- * @param {{ id: () => string, now: () => Date }} clock injected so tests are deterministic
- * @returns {{ item: HabitItem } | { error: "errorName" | "errorCategory" }}
+ * The add/edit form's fields, trimmed and checked.
+ * @param {ItemFields} fields
+ * @returns {{ fields: ItemFields } | { error: "errorName" | "errorCategory" | "errorDate" }}
  */
-export function createItem(fields, clock) {
+export function checkItemFields(fields) {
   const name = fields.name.trim();
   if (!name) return { error: "errorName" };
   if (!isCategory(fields.category)) return { error: "errorCategory" };
+  const date = (fields.date ?? "").trim();
+  if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "errorDate" };
+  const checked = { name, category: fields.category, description: fields.description.trim(), date };
+  return { fields: fields.daily ? { ...checked, daily: true } : checked };
+}
+
+/**
+ * Build a new item from the add form.
+ * @param {ItemFields} fields
+ * @param {{ id: () => string, now: () => Date }} clock injected so tests are deterministic
+ * @returns {{ item: HabitItem } | { error: "errorName" | "errorCategory" | "errorDate" }}
+ * @example createItem({ name: "Bleach", category: "Watch", description: "" }, { id: () => "x", now: () => new Date() })
+ */
+export function createItem(fields, clock) {
+  const checked = checkItemFields(fields);
+  if ("error" in checked) return checked;
   const now = clock.now();
-  return {
-    item: {
-      id: clock.id(),
-      name,
-      category: fields.category,
-      description: fields.description.trim(),
-      date: now.toISOString().slice(0, 10),
-      done: false,
-      createdAt: now.toISOString(),
-    },
+  const base = {
+    id: clock.id(),
+    name: checked.fields.name,
+    category: /** @type {import("./categories.js").Category} */ (checked.fields.category),
+    description: checked.fields.description,
+    date: checked.fields.date || now.toISOString().slice(0, 10),
+    done: false,
+    doneAt: "",
+    createdAt: now.toISOString(),
   };
+  return { item: checked.fields.daily ? { ...base, daily: true } : base };
+}
+
+/**
+ * Replace an item's editable fields (name, category, description, date, daily).
+ * @param {HabitItem[]} items
+ * @param {string} id
+ * @param {ItemFields} fields
+ * @returns {{ items: HabitItem[] } | { error: "errorName" | "errorCategory" | "errorDate" }}
+ * @example updateItem(items, "a", { name: "Bleach", category: "Watch", description: "", daily: true })
+ */
+export function updateItem(items, id, fields) {
+  const checked = checkItemFields(fields);
+  if ("error" in checked) return checked;
+  return {
+    items: items.map((item) => {
+      if (item.id !== id) return item;
+      const { daily: _wasDaily, ...rest } = item;
+      const next = { ...rest, ...checked.fields, date: checked.fields.date || item.date };
+      return /** @type {HabitItem} */ (checked.fields.daily ? { ...next, daily: true } : next);
+    }),
+  };
+}
+
+/**
+ * Daily items marked done on an earlier day come back as to do.
+ * @param {HabitItem[]} items
+ * @param {string} today yyyy-mm-dd
+ * @returns {{ items: HabitItem[], changed: number }}
+ * @example rollDailyItems(items, "2026-10-30").changed // 3
+ */
+export function rollDailyItems(items, today) {
+  let changed = 0;
+  const rolled = items.map((item) => {
+    if (!item.daily || !item.done || item.doneAt === today) return item;
+    changed += 1;
+    return { ...item, done: false, doneAt: "" };
+  });
+  return { items: rolled, changed };
 }
 
 /**
  * @param {HabitItem[]} items
  * @param {string} id
+ * @param {string} [today] yyyy-mm-dd stamped as doneAt
  * @returns {HabitItem[]}
  */
-export function toggleDone(items, id) {
-  return items.map((item) => (item.id === id ? { ...item, done: !item.done } : item));
+export function toggleDone(items, id, today = "") {
+  return items.map((item) => (item.id === id ? { ...item, done: !item.done, doneAt: item.done ? "" : today } : item));
 }
 
 /**

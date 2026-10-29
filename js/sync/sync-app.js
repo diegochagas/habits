@@ -16,6 +16,7 @@ const PULL_EVERY_MS = 5 * 60 * 1000;
  * @property {(items: import("../items-store.js").HabitItem[], renamed: Record<string, string>) => void} applyItems
  *   the page replaces its list without pushing again
  * @property {() => "en" | "pt"} lang
+ * @property {() => string} today yyyy-mm-dd
  * @property {typeof fetch} [fetchFn]
  */
 
@@ -80,6 +81,7 @@ export function startSheetSync(deps) {
       deps.items(),
       result.rows,
       settings.queue.filter((op) => !sent.includes(op)),
+      deps.today(),
     );
     commit({
       ...settings,

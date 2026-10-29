@@ -1,0 +1,9 @@
+node_modules
+.git
+e2e
+tests
+test-results
+playwright-report
+sheets-sync
+.env
+.env.docker

@@ -4,31 +4,44 @@ import { CATEGORIES, categoryI18nKey, categorySlug, categoryStamp } from "./cate
 import { translate } from "./i18n.js";
 import { escapeHtml, linkifyDescription } from "./linkify.js";
 
-/** @typedef {{ pomodoros?: Record<string, number>, pomodoroLabel?: string }} CardExtras */
+/** @typedef {{ pomodoros?: Record<string, number>, pomodoroLabel?: string, editingId?: string | null, editor?: string }} CardExtras */
 
 /**
  * @param {import("./items-store.js").HabitItem} item
  * @param {import("./i18n.js").Lang} lang
- * @param {CardExtras} [extras] finished Pomodoros per item and the label of the "start one" button
+ * @param {CardExtras} [extras] finished Pomodoros per item, the label of the "start one" button,
+ *   and the card being edited (its editor HTML replaces the body)
  * @returns {string}
  */
 export function renderItemCard(item, lang, extras = {}) {
   const doneClass = item.done ? " card-done" : "";
-  const count = extras.pomodoros?.[item.id] ?? 0;
+  const editing = extras.editingId === item.id && extras.editor;
   return `<article class="card panel category-${categorySlug(item.category)}${doneClass}" data-id="${escapeHtml(item.id)}">
   <span class="card-stamp" aria-hidden="true">${categoryStamp(item.category)}</span>
   <span class="card-category">${translate(lang, categoryI18nKey(item.category))}</span>
-  <h3 class="card-name">${escapeHtml(item.name)}${item.daily ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁</span>` : ""}</h3>
+  ${editing ? extras.editor : renderCardBody(item, lang, extras)}
+</article>`;
+}
+
+/**
+ * @param {import("./items-store.js").HabitItem} item
+ * @param {import("./i18n.js").Lang} lang
+ * @param {CardExtras} extras
+ * @returns {string}
+ */
+function renderCardBody(item, lang, extras) {
+  const count = extras.pomodoros?.[item.id] ?? 0;
+  return `<h3 class="card-name">${escapeHtml(item.name)}${item.daily ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁</span>` : ""}</h3>
   ${renderDescription(item.description)}
   <footer class="card-footer">
     <time class="card-date" datetime="${escapeHtml(item.date)}">${formatDate(item.date)}</time>${count > 0 ? `<span class="card-pomodoros" title="Pomodoros">🍅 ${count}</span>` : ""}
     <span class="card-actions">
       ${item.done || !extras.pomodoroLabel ? "" : `<button type="button" class="stamp stamp-small" data-action="pomodoro">🍅 ${escapeHtml(extras.pomodoroLabel)}</button>`}
       <button type="button" class="stamp stamp-small" data-action="toggle">${translate(lang, item.done ? "markTodo" : "markDone")}</button>
+      <button type="button" class="stamp stamp-small" data-action="edit">${translate(lang, "edit")}</button>
       <button type="button" class="stamp stamp-small stamp-danger" data-action="remove">${translate(lang, "remove")}</button>
     </span>
-  </footer>
-</article>`;
+  </footer>`;
 }
 
 /**
@@ -89,10 +102,12 @@ function renderTab(category, count, active, lang) {
 
 /**
  * @param {import("./i18n.js").Lang} lang
+ * @param {string} [selected] the category to mark selected
  * @returns {string}
  */
-export function renderCategoryOptions(lang) {
+export function renderCategoryOptions(lang, selected = "") {
   return CATEGORIES.map(
-    (category) => `<option value="${category}">${translate(lang, categoryI18nKey(category))}</option>`,
+    (category) =>
+      `<option value="${category}"${category === selected ? " selected" : ""}>${translate(lang, categoryI18nKey(category))}</option>`,
   ).join("");
 }

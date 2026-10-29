@@ -1,7 +1,9 @@
 // e2e/smoke.spec.ts: the site loads the seed, adds an item with a link, filters, toggles
 // language and keeps data across reloads, with no console errors. Screenshots are the evidence.
 import { test, expect } from "@playwright/test";
-import { collectErrors } from "./helpers";
+import { collectErrors, freshStateBeforeEach } from "./helpers";
+
+freshStateBeforeEach();
 
 test("loads the sheet list, adds an item with a URL, filters and survives a reload", async ({ page }, testInfo) => {
   const errors = collectErrors(page);

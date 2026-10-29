@@ -12,6 +12,7 @@ const item = (fields) => ({
   description: "",
   date: "2026-10-29",
   done: false,
+  doneAt: "",
   createdAt: "",
   ...fields,
 });
@@ -28,9 +29,10 @@ test("sheet rows become items: dd/mm/yyyy → ISO, unknown Source rows are skipp
   assert.equal(rowToItem({ ...row, source: "Legend:" }), null);
   assert.equal(rowToItem({ ...row, task: "" }), null);
   assert.equal(rowToItem({ ...row, id: "" }), null);
-  const daily = rowToItem({ ...row, daily: true, done: true });
+  const daily = rowToItem({ ...row, daily: true, done: true }, "2026-10-29");
   assert.equal(daily?.daily, true);
   assert.equal(daily?.done, true, "a ticked daily row is done");
+  assert.equal(daily?.doneAt, "2026-10-29");
   assert.equal(rowToItem({ ...row, daily: false, done: true })?.done, false, "only a checkbox counts");
 });
 
@@ -43,6 +45,11 @@ test("ops between two lists: Done/Remove delete, Undo/Add upsert, untouched item
   assert.deepEqual(opsBetween([{ ...a, done: true }], [a]), [upsertOp(a)]);
   assert.deepEqual(opsBetween([a, b], [a, b]), []);
   assert.deepEqual(opsBetween([{ ...a, done: true }], []), [], "removing a done item: the row is already gone");
+  const edited = { ...a, name: "Edited", daily: /** @type {const} */ (true) };
+  assert.deepEqual(opsBetween([a, b], [edited, b]), [upsertOp(edited)], "an edit writes the row back");
+  assert.equal(upsertOp(edited).daily, true);
+  assert.equal(upsertOp(a).daily, false);
+  assert.deepEqual(opsBetween([a], [{ ...a, doneAt: "x" }]), [], "doneAt alone is not an edit");
 });
 
 test("merge: the sheet decides which items exist; pending ops keep local state; text matches rename ids", () => {
@@ -77,6 +84,8 @@ test("merge: a daily row's checkbox overrides the local done state (the nightly 
   assert.equal(mergeSheetRows(local, [{ ...row, done: true }], []).items[0].done, true);
   const pending = /** @type {any} */ ([{ op: "delete", id: "row-d" }]);
   assert.equal(mergeSheetRows(local, [{ ...row, done: false }], pending).items[0].done, true, "queued Done stays");
+  const ticked = mergeSheetRows([], [{ ...row, done: true }], [], "2026-10-30").items[0];
+  assert.equal(ticked.doneAt, "2026-10-30", "a row ticked in the sheet counts as done today");
 });
 
 test("the queue keeps one op per id, the latest", () => {

@@ -4,8 +4,8 @@
 //
 // Rows get a stable id in a hidden column (F) the first time they are listed, so deleting or
 // moving rows in the sheet never confuses the site. Done on the site = the row is deleted here,
-// except "daily" rows: a row whose Done cell (E) is a checkbox is ticked instead (the sheet's
-// own "Daily Checklist Reset" trigger unticks E7:E9 every night, so the site sees it undone).
+// except "daily" rows: a row whose Done cell (E) is a checkbox is ticked instead; the site
+// unticks it again the next morning (an upsert), so no nightly trigger is needed in the sheet.
 
 var SHEET_NAME = "ToDo List";
 var HEADER_ROW = 6; // Date | Task | Notes | Source | Done
@@ -65,7 +65,15 @@ function listRows_() {
   return values
     .map(function (row, i) {
       var daily = typeof doneCells[i] === "boolean";
-      return { id: ids[i], date: row[0], task: row[1], notes: row[2], source: row[3], daily: daily, done: daily && doneCells[i] };
+      return {
+        id: ids[i],
+        date: row[0],
+        task: row[1],
+        notes: row[2],
+        source: row[3],
+        daily: daily,
+        done: daily && doneCells[i],
+      };
     })
     .filter(function (row) {
       return row.task;
@@ -127,7 +135,7 @@ function isDailyRow_(sheet, row) {
   return typeof sheet.getRange(row, DONE_COLUMN).getValue() === "boolean";
 }
 
-/** Undo or Add on the site: writes Date | Task | Notes | Source; a daily row is also unticked. */
+/** Undo, Add or an edit on the site: writes Date | Task | Notes | Source and the daily checkbox. */
 function upsertRow_(op) {
   var sheet = sheet_();
   var row = rowNumberOf_(sheet, op.id);
@@ -135,11 +143,21 @@ function upsertRow_(op) {
   if (!row) {
     row = sheet.getLastRow() + 1;
     sheet.getRange(row, ID_COLUMN).setValue(op.id || newId_());
-  } else if (isDailyRow_(sheet, row)) {
-    sheet.getRange(row, DONE_COLUMN).setValue(false);
   }
   sheet.getRange(row, 1, 1, 4).setValues(values);
   sheet.getRange(row, 1).setNumberFormat("dd/mm/yyyy");
+  setDaily_(sheet, row, op.daily === true);
+}
+
+/** A daily row has a checkbox in Done (unticked after an upsert); any other row has nothing there. */
+function setDaily_(sheet, row, daily) {
+  var cell = sheet.getRange(row, DONE_COLUMN);
+  if (daily && !isDailyRow_(sheet, row)) cell.insertCheckboxes();
+  if (daily) cell.setValue(false);
+  if (!daily && isDailyRow_(sheet, row)) {
+    cell.removeCheckboxes();
+    cell.clearContent();
+  }
 }
 
 /** "yyyy-mm-dd" → a Date in the spreadsheet's time zone; anything else is written as text. */

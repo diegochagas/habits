@@ -2,8 +2,9 @@
 
 A black-and-white, ink-styled list of the things I want to read, watch, build and keep
 doing. It started as the "ToDo List" Google Sheet (Date, Task, Notes, Source, Done) and
-now lives as a static site: add an item with a name, a category and a description where
-URLs become links; mark it done; filter by category, search, export or import JSON.
+now lives on the home server: add an item with a name, a category, a description where
+URLs become links, a date and an "every day" flag; edit it in place; mark it done; filter by
+category, search, export or import JSON. Daily items come back every morning.
 
 The habits page (`index.html`) also holds the **hero**: the Today tab logs good and bad habits
 (XP in and out of three tracks, Poder / Habilidade / Resistência), the Sheet tab spends that XP on
@@ -22,22 +23,40 @@ break-time alternative: Magic Sort style tubes (one ball per pour) and coin stac
 pours), nine ink patterns instead of colours, levels generated and checked solvable by a solver.
 Sound effects are synthesised with the Web Audio API (no audio files); the 🔊 button mutes them.
 
-No build step, no runtime dependencies. Everything is saved in the browser's
-`localStorage`; **Export** downloads a JSON backup and **Import** restores one.
-**Reset to sheet** reloads the original list from `data/seed.json`.
+No build step. `server/` is a small Node server (the only dependency is `pg`) that serves the
+pages and keeps every saved document (the list, the hero, the Pomodoro, the puzzle progress,
+the sync settings) in one PostgreSQL table, so the same state is there from any device. Served
+as plain files instead (`npx serve .`), the pages fall back to the browser's `localStorage`.
+**Export** downloads a JSON backup and **Import** restores one. **Reset to sheet** reloads the
+original list from `data/seed.json`.
 
 **Sync with the Google Sheet** (optional): deploy [`sheets-sync/Code.gs`](sheets-sync/Code.gs)
 as an Apps Script web app bound to the sheet and paste its URL and secret word under **Sync**.
 The sheet then becomes the source of truth: rows deleted or added there come and go on the site,
-Done / Remove on the site delete the row (a daily row, one with a checkbox in Done, is ticked
-instead and comes back after the sheet's nightly reset), an added item is appended. Steps and the sync table
-are in [sheets-sync/README.md](sheets-sync/README.md).
+Done / Remove on the site delete the row (a daily item's row gets a checkbox in Done, ticked by
+Done and unticked again the next morning), an added or edited item is written. Steps and the
+sync table are in [sheets-sync/README.md](sheets-sync/README.md).
 
 ## Run it
 
 ```bash
-npm run serve        # http://localhost:4180 (any static server works, even `python3 -m http.server`)
+npm run serve        # no database: state in memory, http://localhost:4180
+npm run dev          # PostgreSQL from .env (copy .env.example), same port
 ```
+
+## Deploy (home server)
+
+The server runs as a docker compose stack next to the PostgreSQL app, deployed by push: a
+`git push` from the workstation also updates the clone on the server, whose post-receive hook
+runs `docker compose up -d --build`. One-time setup on the server:
+
+```bash
+sudo bash /DATA/Projects/habits/scripts/setup-zimaos-db.sh   # role + database + .env.docker
+sudo docker compose -f /DATA/Projects/habits/docker-compose.yml up -d --build
+```
+
+Backups: the PostgreSQL app's data folder is part of the nightly server backup; **Export** on the
+page is the manual copy.
 
 Or open the folder with GitHub Pages: the repo root is the site.
 

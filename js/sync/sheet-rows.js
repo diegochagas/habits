@@ -13,7 +13,7 @@ import { isCategory } from "../categories.js";
  * @property {boolean} [daily] the Done cell is a checkbox: Done ticks it, the sheet unticks it nightly
  * @property {boolean} [done] the checkbox's state (daily rows only)
  */
-/** @typedef {{ op: "delete", id: string } | { op: "upsert", id: string, date: string, name: string, description: string, category: string }} SyncOp */
+/** @typedef {{ op: "delete", id: string } | { op: "upsert", id: string, date: string, name: string, description: string, category: string, daily: boolean }} SyncOp */
 
 /**
  * "29/10/2026" → "2026-10-29"; an ISO date passes through; anything else stays as it is.
@@ -29,19 +29,22 @@ export function sheetDateToIso(text) {
 
 /**
  * A row becomes an item; rows without a valid Source are skipped (null). A daily row carries
- * `daily: true` and its checkbox as `done`.
+ * `daily: true` and its checkbox as `done` (stamped with `today`).
  * @param {SheetRow} row
+ * @param {string} [today] yyyy-mm-dd
  * @returns {import("../items-store.js").HabitItem | null}
  */
-export function rowToItem(row) {
+export function rowToItem(row, today = "") {
   if (!row.id || !row.task.trim() || !isCategory(row.source)) return null;
+  const done = row.daily === true && row.done === true;
   return {
     id: row.id,
     name: row.task.trim(),
     category: row.source,
     description: row.notes ?? "",
     date: sheetDateToIso(row.date ?? ""),
-    done: row.daily === true && row.done === true,
+    done,
+    doneAt: done ? today : "",
     createdAt: "",
     ...(row.daily === true ? { daily: true } : {}),
   };
@@ -59,12 +62,13 @@ export function upsertOp(item) {
     name: item.name,
     description: item.description,
     category: item.category,
+    daily: item.daily === true,
   };
 }
 
 /**
- * The ops that turn the sheet from `before` into `after`: Done and Remove delete the row, Undo
- * and Add write it.
+ * The ops that turn the sheet from `before` into `after`: Done and Remove delete the row, Undo,
+ * Add and an edit (name, description, category, date or daily changed) write it.
  * @param {import("../items-store.js").HabitItem[]} before
  * @param {import("../items-store.js").HabitItem[]} after
  * @returns {SyncOp[]}
@@ -76,7 +80,7 @@ export function opsBetween(before, after) {
   for (const item of after) {
     const old = previous.get(item.id);
     if (item.done && !old?.done) ops.push({ op: "delete", id: item.id });
-    else if (!item.done && (!old || old.done)) ops.push(upsertOp(item));
+    else if (!item.done && (!old || old.done || fieldsChanged(old, item))) ops.push(upsertOp(item));
     previous.delete(item.id);
   }
   for (const gone of previous.values()) if (!gone.done) ops.push({ op: "delete", id: gone.id });
@@ -91,26 +95,43 @@ export function opsBetween(before, after) {
  * @param {import("../items-store.js").HabitItem[]} local
  * @param {SheetRow[]} rows
  * @param {SyncOp[]} pending
+ * @param {string} [today] yyyy-mm-dd, stamped on daily rows ticked in the sheet
  * @returns {{ items: import("../items-store.js").HabitItem[], renamed: Record<string, string> }} renamed = old id → row id
  */
-export function mergeSheetRows(local, rows, pending) {
+export function mergeSheetRows(local, rows, pending, today = "") {
   const pendingById = new Map(pending.map((op) => [op.id, op]));
   const byId = new Map(local.map((item) => [item.id, item]));
   const byText = new Map(local.map((item) => [textKey(item), item]));
   const renamed = /** @type {Record<string, string>} */ ({});
   const items = [];
   for (const row of rows) {
-    const fromRow = rowToItem(row);
+    const fromRow = rowToItem(row, today);
     if (!fromRow) continue;
     const known = byId.get(row.id) ?? byText.get(textKey(fromRow));
     if (known && known.id !== row.id) renamed[known.id] = row.id;
     const localDone = fromRow.daily ? fromRow.done : (known?.done ?? false);
-    items.push({ ...fromRow, done: pendingById.get(row.id)?.op === "delete" || localDone });
+    const done = pendingById.get(row.id)?.op === "delete" || localDone;
+    items.push({ ...fromRow, done, doneAt: done ? known?.doneAt || today : "" });
   }
   const present = new Set(items.map((item) => item.id));
   for (const op of pending)
     if (op.op === "upsert" && !present.has(op.id) && byId.has(op.id)) items.push(byId.get(op.id));
   return { items, renamed };
+}
+
+/**
+ * @param {import("../items-store.js").HabitItem} old
+ * @param {import("../items-store.js").HabitItem} item
+ * @returns {boolean}
+ */
+function fieldsChanged(old, item) {
+  return (
+    old.name !== item.name ||
+    old.description !== item.description ||
+    old.category !== item.category ||
+    old.date !== item.date ||
+    (old.daily === true) !== (item.daily === true)
+  );
 }
 
 /**

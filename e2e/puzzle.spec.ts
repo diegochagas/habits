@@ -1,7 +1,9 @@
 // e2e/puzzle.spec.ts: the sort puzzles: locked without free time; with it, pour, undo and switch
 // to the coin stacks, with the board kept across a reload.
 import { test, expect } from "@playwright/test";
-import { collectErrors, grantFreeTime } from "./helpers";
+import { collectErrors, freshStateBeforeEach, grantFreeTime } from "./helpers";
+
+freshStateBeforeEach();
 
 test("sort puzzles pour, undo, switch skins and survive a reload", async ({ page }, testInfo) => {
   const errors = collectErrors(page);

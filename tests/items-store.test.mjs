@@ -7,7 +7,9 @@ import {
   parseItem,
   parseItemList,
   removeItem,
+  rollDailyItems,
   toggleDone,
+  updateItem,
 } from "../js/items-store.js";
 
 /** In-memory stand-in for window.localStorage. */
@@ -39,8 +41,83 @@ test("createItem trims fields and stamps date and id from the clock", () => {
     description: "ep 1",
     date: "2026-10-28",
     done: false,
+    doneAt: "",
     createdAt: "2026-10-28T12:34:56.000Z",
   });
+  const daily = createItem(
+    { name: "Duolingo", category: "Personal", description: "", daily: true, date: "2026-11-01" },
+    fixedClock,
+  );
+  assert.ok("item" in daily);
+  assert.equal(daily.item.daily, true);
+  assert.equal(daily.item.date, "2026-11-01", "a chosen date wins over today");
+  assert.deepEqual(createItem({ name: "x", category: "Read", description: "", date: "1/2/2026" }, fixedClock), {
+    error: "errorDate",
+  });
+});
+
+test("updateItem replaces the editable fields, keeps id/done, and can turn daily on and off", () => {
+  const items = [
+    {
+      id: "a",
+      name: "Old",
+      category: "Read",
+      description: "",
+      date: "2026-10-01",
+      done: true,
+      doneAt: "2026-10-02",
+      createdAt: "",
+    },
+    {
+      id: "b",
+      name: "B",
+      category: "Read",
+      description: "",
+      date: "2026-10-01",
+      done: false,
+      doneAt: "",
+      createdAt: "",
+      daily: true,
+    },
+  ];
+  const edited = updateItem(items, "a", {
+    name: " New ",
+    category: "Watch",
+    description: " d ",
+    date: "",
+    daily: true,
+  });
+  assert.ok("items" in edited);
+  assert.deepEqual(edited.items[0], {
+    id: "a",
+    name: "New",
+    category: "Watch",
+    description: "d",
+    date: "2026-10-01",
+    done: true,
+    doneAt: "2026-10-02",
+    createdAt: "",
+    daily: true,
+  });
+  const noLongerDaily = /** @type {any} */ (updateItem(items, "b", { name: "B", category: "Read", description: "" }));
+  assert.equal("daily" in noLongerDaily.items[1], false);
+  assert.deepEqual(updateItem(items, "a", { name: "", category: "Read", description: "" }), { error: "errorName" });
+});
+
+test("rollDailyItems: a daily item done yesterday is to do again, one done today stays done", () => {
+  const items = [
+    { id: "a", done: true, doneAt: "2026-10-28", daily: true },
+    { id: "b", done: true, doneAt: "2026-10-29", daily: true },
+    { id: "c", done: true, doneAt: "2026-10-01" },
+    { id: "d", done: false, doneAt: "", daily: true },
+  ];
+  const rolled = rollDailyItems(/** @type {any} */ (items), "2026-10-29");
+  assert.equal(rolled.changed, 1);
+  assert.deepEqual(
+    rolled.items.map((item) => item.done),
+    [false, true, true, false],
+  );
+  assert.equal(rolled.items[0].doneAt, "");
 });
 
 test("createItem rejects an empty name and an unknown category with i18n keys", () => {
@@ -55,7 +132,7 @@ test("toggleDone flips only the matching item and keeps order", () => {
     { id: "a", done: false },
     { id: "b", done: false },
   ];
-  const next = toggleDone(items, "b");
+  const next = toggleDone(items, "b", "2026-10-29");
   assert.deepEqual(
     next.map((item) => item.done),
     [false, true],
@@ -87,6 +164,7 @@ test("parseItem fills optional fields with safe defaults", () => {
     description: "",
     date: "",
     done: false,
+    doneAt: "",
     createdAt: "",
   });
 });
@@ -102,7 +180,16 @@ test("store round-trips a list and returns null for missing or corrupt data", ()
   const store = createItemStore(storage);
   assert.equal(store.load(), null);
   const items = [
-    { id: "a", name: "A", category: "Read", description: "", date: "2026-01-01", done: true, createdAt: "" },
+    {
+      id: "a",
+      name: "A",
+      category: "Read",
+      description: "",
+      date: "2026-01-01",
+      done: true,
+      doneAt: "",
+      createdAt: "",
+    },
   ];
   store.save(items);
   assert.deepEqual(store.load(), items);
