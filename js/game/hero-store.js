@@ -2,6 +2,7 @@
 
 import { ITEM_EFFECTS } from "./catalog.js";
 import { HERO_VERSION, createStartingHero, deriveSheet } from "./hero-sheet.js";
+import { STARTING_HEIGHT_CM } from "./weight.js";
 import { artefatoBonus, consumeItem } from "./progression.js";
 
 export const HERO_KEY = "habits:hero:v1";
@@ -63,7 +64,8 @@ export function isHero(raw) {
  */
 export function loadOrCreateHero(store, today) {
   const saved = store.load();
-  if (saved) return saved;
+  // Heroes saved before the BMI rule (2026-10-29) have no height yet.
+  if (saved) return { heightCm: STARTING_HEIGHT_CM, ...saved };
   const hero = createStartingHero(today);
   store.save(hero);
   return hero;

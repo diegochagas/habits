@@ -9,6 +9,7 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
   const errors = collectErrors(page);
   await page.goto("/");
   await expect(page.locator(".hero-rank")).toContainText("12 pts");
+  await expect(page.locator(".hero-bmi")).toHaveText("BMI 38.7");
   await expect(page.locator(".pool-poder b")).toHaveText("0");
   await expect(page.locator(".game-tabs .tab").first()).toHaveText("Today");
   await page.getByRole("button", { name: "Today", exact: true }).click();
@@ -65,6 +66,13 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
 
   await page.reload();
   await expect(page.locator(".hero-rank")).toContainText("13 pts");
+  // Height and weight together give the BMI; below 30 both desvantagens go from the Ficha.
+  await expect(page.locator(".sheet-list", { hasText: "Lento (BMI ≥ 30)" })).toContainText("Frágil (BMI ≥ 35)");
+  await page.locator(".weight-form input[name='kg']").fill("86");
+  await page.locator(".weight-form input[name='cm']").fill("170");
+  await page.getByRole("button", { name: "Log weight" }).click();
+  await expect(page.locator(".hero-bmi")).toHaveText("BMI 29.8");
+  await expect(page.locator(".sheet-list", { hasText: "Lento" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Sheet", exact: true })).toHaveClass(/tab-active/);
   expect(errors).toEqual([]);
 });

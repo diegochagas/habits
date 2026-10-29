@@ -9,7 +9,7 @@ import { restHero } from "./hero-sheet.js";
 import { loadOrCreateHero, useConsumable } from "./hero-store.js";
 import { buyEntry, creditDoneListItems, logHabit, raiseAttribute } from "./progression.js";
 import { customHabitFromForm } from "./today-view.js";
-import { parseWeight } from "./weight.js";
+import { parseHeight, parseWeight } from "./weight.js";
 
 /**
  * @typedef {object} HeroControllerDeps
@@ -112,15 +112,17 @@ export function createHeroController(deps) {
     return true;
   }
 
-  /** @param {FormData} fields */
+  /** Weight and height together: the BMI decides Lento / Frágil. @param {FormData} fields */
   function onWeight(fields) {
-    const parsed = parseWeight(fields.get("kg"));
-    if ("error" in parsed) {
-      sayKey("weightError");
+    const weight = parseWeight(fields.get("kg"));
+    const height = parseHeight(fields.get("cm"));
+    if ("error" in weight || "error" in height) {
+      sayKey("error" in weight ? "weightError" : "heightError");
       return true;
     }
     deps.sounds.play("decision");
-    commit({ ...hero, weightKg: parsed.kg, weightLog: [...hero.weightLog, { date: deps.today(), kg: parsed.kg }] });
+    const weightLog = [...hero.weightLog, { date: deps.today(), kg: weight.kg }];
+    commit({ ...hero, weightKg: weight.kg, heightCm: height.cm, weightLog });
     return true;
   }
 

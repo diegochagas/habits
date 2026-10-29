@@ -67,8 +67,9 @@ test("the hero draws in every facing and pose, with items and tier markers when 
   assert.equal(geared.glasses, "#f2c94c");
   assert.equal(geared.hat, "crown");
   assert.equal(geared.cape, true);
-  const slim = heroLook({ ...hero, weightKg: 85 }, "2026-10-28");
-  assert.equal(slim.build, 0);
+  const slim = heroLook({ ...hero, weightKg: 72 }, "2026-10-28");
+  assert.equal(slim.build, 0, "BMI 24.9 at 170 cm is athletic");
+  assert.ok(heroLook({ ...hero, weightKg: 85 }, "2026-10-28").build > 0, "BMI 29.4 still carries some mass");
 });
 
 test("the hero's own sheet: red sneaker toes, a white smile, glasses, inside the box; slimmer when light", () => {
@@ -85,7 +86,7 @@ test("the hero's own sheet: red sneaker toes, a white smile, glasses, inside the
     assert.ok(r.y >= 0 && r.y + r.h <= CHIBI_H, `y ${r.y}..${r.y + r.h}`);
   }
   const slim = new FakePainter();
-  drawChibi(slim, 0, 0, heroLook({ ...hero, weightKg: 85 }, "2026-10-28"), {
+  drawChibi(slim, 0, 0, heroLook({ ...hero, weightKg: 72 }, "2026-10-28"), {
     dir: "down",
     pose: "stand",
     step: 0,

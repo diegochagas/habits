@@ -2,6 +2,7 @@
 // weight form and the XP pools. HTML strings + one canvas draw.
 
 import { CHIBI_H, CHIBI_W, drawChibi } from "./chibi-sprite.js";
+import { bodyMassIndex } from "./weight.js";
 import { gameText } from "./game-i18n.js";
 import { deriveSheet } from "./hero-sheet.js";
 import { createPainter } from "./pixel-painter.js";
@@ -89,8 +90,11 @@ function renderResources(hero, sheet) {
  * @returns {string}
  */
 function renderWeightForm(hero, lang) {
+  const bmi = bodyMassIndex(hero.weightKg, hero.heightCm);
   return `<form class="weight-form" data-form="weight">
     <label>${gameText(lang, "weight")} <input type="number" name="kg" step="0.1" min="30" max="400" value="${hero.weightKg}" inputmode="decimal" /> kg</label>
+    <label>${gameText(lang, "height")} <input type="number" name="cm" step="1" min="100" max="250" value="${hero.heightCm}" inputmode="numeric" /> cm</label>
+    <span class="hero-bmi" title="${gameText(lang, "bmiHelp")}">${gameText(lang, "bmi")} <b>${bmi}</b></span>
     <button type="submit" class="stamp stamp-small">${gameText(lang, "weightSave")}</button>
   </form>`;
 }

@@ -13,7 +13,7 @@ daily items still to do as the good habits (Devotional, Duolingo, Finances, Gym 
 day each; a done one leaves the tab and shows "Already done today" greyed out on the list), then
 the catalog's bad habits (XP out of three tracks, Poder / Habilidade / Resistência); the Sheet tab spends that XP on
 atributos, perícias, vantagens and items, and the hero card shows the chibi whose body follows
-the logged weight. A **Pomodoro** panel sits on top: pick a list item (or press 🍅 on its card),
+the logged weight and height (the BMI). A **Pomodoro** panel sits on top: pick a list item (or press 🍅 on its card),
 work 25 minutes with an optional YouTube focus video (saved link, mute button), rest 5 (15 every
 4th). Each finished Pomodoro is a good habit (+1 XP on the item's track) and earns its break as
 **free time**, which is the only time the play
@@ -113,7 +113,7 @@ game.html ─── css/game.css (Arcas + Adventure only; needs free time)
     │
     └─ js/game/game-app.js (stage run + animation loop + sounds; hero via hero-controller)
          ├─ rules.js           3DeT core: recursos, dice, críticos, dano, XP costs, tiers
-         ├─ weight.js          kg → Lento/Frágil and the sprite's body mass
+         ├─ weight.js          kg + cm → BMI → Lento/Frágil and the sprite's body mass
          ├─ catalog.js         habits, shop (perícias/vantagens/artefatos/items) per track
          ├─ hero-sheet.js      starting Ficha, derived sheet, rest
          ├─ progression.js     habits → XP pools → purchases; list-item credit; aura
@@ -136,7 +136,8 @@ game.html ─── css/game.css (Arcas + Adventure only; needs free time)
 Rules come from the Manual 3DeT Victory (Jambô, 2024): 10 pontos, atributos 0–5, PV = R×5,
 PM = H×5, PA = P, testes de 1–3D + atributo, crítico no 6 soma o atributo de novo, ataque (P)
 contra defesa (R) com dano igual à diferença, 10 XP = 1 ponto, Iniciante → Herói (20) →
-Veterano (35). House rules: weight imposes Lento (≥ 95 kg) and Frágil (≥ 105 kg); each XP
+Veterano (35). House rules: the BMI (weight and height logged on the hero card) imposes Lento
+(≥ 30, obesity) and Frágil (≥ 35, obesity class II); each XP
 track only buys what that habit trains; Vigoroso also adds R+2 to physical defense.
 
 Flow: first visit → `fetch(data/seed.json)` → `localStorage["habits:v1"]`.

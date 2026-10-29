@@ -9,11 +9,11 @@ import {
   purchaseBlocker,
   raiseAttribute,
 } from "../js/game/progression.js";
-import { bodyMassFactor, parseWeight, weightDesvantagens } from "../js/game/weight.js";
+import { bodyMassFactor, bodyMassIndex, parseHeight, parseWeight, weightDesvantagens } from "../js/game/weight.js";
 
 const TODAY = "2026-10-28";
 
-test("starting sheet: 12 points, P2 H2 R2, 10/10/2, Lento and Frágil from 111.9 kg", () => {
+test("starting sheet: 12 points, P2 H2 R2, 10/10/2, Lento and Frágil from 111.9 kg at 170 cm (BMI 38.7)", () => {
   const hero = createStartingHero(TODAY);
   const sheet = deriveSheet(hero);
   assert.equal(sheet.points, 12);
@@ -22,14 +22,35 @@ test("starting sheet: 12 points, P2 H2 R2, 10/10/2, Lento and Frágil from 111.9
   assert.deepEqual(sheet.desvantagens, ["lento", "fragil"]);
 });
 
-test("weight thresholds drop the desvantagens as kilos go down", () => {
-  assert.deepEqual(weightDesvantagens(111.9), ["lento", "fragil"]);
-  assert.deepEqual(weightDesvantagens(104.9), ["lento"]);
-  assert.deepEqual(weightDesvantagens(94.9), []);
-  assert.equal(bodyMassFactor(111.9), 1);
-  assert.equal(bodyMassFactor(88), 0);
+test("BMI thresholds drop the desvantagens as it goes down: Frágil below 35, Lento below 30", () => {
+  assert.equal(bodyMassIndex(111.9, 170), 38.7);
+  assert.deepEqual(weightDesvantagens(111.9, 170), ["lento", "fragil"]);
+  assert.deepEqual(weightDesvantagens(101, 170), ["lento"], "BMI 34.9");
+  assert.deepEqual(weightDesvantagens(86.7, 170), ["lento"], "BMI 30.0");
+  assert.deepEqual(weightDesvantagens(86.5, 170), [], "BMI 29.9");
+  assert.deepEqual(weightDesvantagens(111.9, 195), [], "the same kilos on a taller hero: BMI 29.4");
+  assert.equal(bodyMassFactor(111.9, 170), 1);
+  assert.equal(bodyMassFactor(72, 170), 0, "BMI 24.9 is athletic");
   assert.deepEqual(parseWeight("110,5"), { kg: 110.5 });
   assert.ok("error" in parseWeight("abc"));
+  assert.deepEqual(parseHeight("170"), { cm: 170 });
+  assert.deepEqual(parseHeight("1,70"), { cm: 170 }, "metres are accepted");
+  assert.ok("error" in parseHeight("90"));
+});
+
+test("a hero saved before the BMI rule loads with the default height", async () => {
+  const { createHeroStore, loadOrCreateHero } = await import("../js/game/hero-store.js");
+  const saved = { ...createStartingHero(TODAY) };
+  delete saved.heightCm;
+  const storage = new Map();
+  const store = createHeroStore({
+    getItem: (key) => storage.get(key) ?? null,
+    setItem: (key, value) => storage.set(key, value),
+    removeItem: (key) => storage.delete(key),
+  });
+  store.save(saved);
+  assert.equal(loadOrCreateHero(store, TODAY).heightCm, 170);
+  assert.deepEqual(deriveSheet(loadOrCreateHero(store, TODAY)).desvantagens, ["lento", "fragil"]);
 });
 
 const GYM = { id: "habit-gym", name: "Gym workout", category: "Poder", daily: true, done: true, xp: 2 };

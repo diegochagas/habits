@@ -1,5 +1,5 @@
 // hero-look.js: Diego's ChibiLook from the hero sheet, drawn by diego-sprite.js (his own pixel
-// sheet): weight sets the build, the last week of habits sets skin/aura, owned items add
+// sheet): the BMI sets the build, the last week of habits sets skin/aura, owned items add
 // glasses/dumbbell/vest/headband, the tier adds cape/crown.
 
 import { deriveSheet } from "./hero-sheet.js";
@@ -12,7 +12,7 @@ const GOLD = "#f2c94c";
  * @param {import("./hero-sheet.js").Hero} hero
  * @param {string} today
  * @returns {import("./chibi-sprite.js").ChibiLook}
- * @example heroLook(hero, "2026-10-28").build // 1 at 111.9 kg
+ * @example heroLook(hero, "2026-10-28").build // 1 at 111.9 kg, 170 cm
  */
 export function heroLook(hero, today) {
   const aura = auraScore(hero, today);
@@ -21,7 +21,7 @@ export function heroLook(hero, today) {
   const skin = aura < -1 ? "#cdb39f" : "#e8a862";
   return {
     sheet: "diego",
-    build: bodyMassFactor(hero.weightKg),
+    build: bodyMassFactor(hero.weightKg, hero.heightCm),
     skin,
     hair: "#3a2416",
     beard: "#1a1a1a",

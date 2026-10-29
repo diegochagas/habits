@@ -1,14 +1,15 @@
-// hero-sheet.js: Diego's starting Ficha and the derived sheet (attributes + desvantagens from weight).
-// Starting build (12 pts = 10 + 2 from the weight desvantagens): P2 H2 R2; Luta, Máquinas, Saber;
+// hero-sheet.js: Diego's starting Ficha and the derived sheet (attributes + desvantagens from the BMI).
+// Starting build (12 pts = 10 + 2 from the BMI desvantagens): P2 H2 R2; Luta, Máquinas, Saber;
 // Devoto, Foco, Inventário (Pequeno); Lento, Frágil.
 
 import { maxResources, tierForPoints, XP_PER_POINT } from "./rules.js";
-import { STARTING_WEIGHT_KG, weightDesvantagens } from "./weight.js";
+import { STARTING_HEIGHT_CM, STARTING_WEIGHT_KG, weightDesvantagens } from "./weight.js";
 
 /**
  * @typedef {object} Hero
  * @property {number} version
  * @property {number} weightKg
+ * @property {number} heightCm with the weight, the BMI behind Lento / Frágil (heroes saved before 2026-10-29 get the default on load)
  * @property {{ date: string, kg: number }[]} weightLog
  * @property {{ P: number, H: number, R: number }} attributes
  * @property {string[]} owned shop ids and starting perícias/vantagens (stackables repeat)
@@ -42,6 +43,7 @@ export function createStartingHero(today) {
   return {
     version: HERO_VERSION,
     weightKg: STARTING_WEIGHT_KG,
+    heightCm: STARTING_HEIGHT_CM,
     weightLog: [{ date: today, kg: STARTING_WEIGHT_KG }],
     attributes,
     owned: [...STARTING_OWNED],
@@ -64,7 +66,7 @@ export function createStartingHero(today) {
  *   points: number, tier: string, owns: (id: string) => boolean, count: (id: string) => number }}
  */
 export function deriveSheet(hero) {
-  const desvantagens = weightDesvantagens(hero.weightKg);
+  const desvantagens = weightDesvantagens(hero.weightKg, hero.heightCm);
   const max = maxResources(hero.attributes);
   max.pa += 2 * countOwned(hero, "vantagem.maisAcao");
   const points = 12 + Math.floor(hero.xpSpent / XP_PER_POINT);
