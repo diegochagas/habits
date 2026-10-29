@@ -48,6 +48,8 @@ export function parseExchange(raw) {
     task: String(row?.task ?? ""),
     notes: String(row?.notes ?? ""),
     source: String(row?.source ?? ""),
+    daily: row?.daily === true,
+    done: row?.done === true,
   }));
   return { rows };
 }

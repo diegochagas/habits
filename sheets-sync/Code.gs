@@ -3,10 +3,13 @@
 // body { token, ops } and answers { rows } (the whole list after applying the ops) or { error }.
 //
 // Rows get a stable id in a hidden column (F) the first time they are listed, so deleting or
-// moving rows in the sheet never confuses the site. Done on the site = the row is deleted here.
+// moving rows in the sheet never confuses the site. Done on the site = the row is deleted here,
+// except "daily" rows: a row whose Done cell (E) is a checkbox is ticked instead (the sheet's
+// own "Daily Checklist Reset" trigger unticks E7:E9 every night, so the site sees it undone).
 
 var SHEET_NAME = "ToDo List";
 var HEADER_ROW = 6; // Date | Task | Notes | Source | Done
+var DONE_COLUMN = 5; // E, a checkbox on daily rows
 var ID_COLUMN = 6; // F, hidden, filled by this script
 var TOKEN_PROPERTY = "HABITS_TOKEN"; // Project settings → Script properties
 
@@ -48,13 +51,29 @@ function sheet_() {
   return sheet;
 }
 
-/** Every task row as { id, date (dd/mm/yyyy), task, notes, source }, assigning missing ids. */
+/** Every task row as { id, date (dd/mm/yyyy), task, notes, source, daily, done }, assigning missing ids. */
 function listRows_() {
   var sheet = sheet_();
   var last = sheet.getLastRow();
   if (last <= HEADER_ROW) return [];
   var range = sheet.getRange(HEADER_ROW + 1, 1, last - HEADER_ROW, ID_COLUMN);
   var values = range.getDisplayValues();
+  var doneCells = range.getValues().map(function (row) {
+    return row[DONE_COLUMN - 1];
+  });
+  var ids = assignIds_(sheet, values);
+  return values
+    .map(function (row, i) {
+      var daily = typeof doneCells[i] === "boolean";
+      return { id: ids[i], date: row[0], task: row[1], notes: row[2], source: row[3], daily: daily, done: daily && doneCells[i] };
+    })
+    .filter(function (row) {
+      return row.task;
+    });
+}
+
+/** The id of every row (column F), writing a fresh one on rows that have a task but no id yet. */
+function assignIds_(sheet, values) {
   var ids = values.map(function (row) {
     return [row[ID_COLUMN - 1]];
   });
@@ -69,13 +88,9 @@ function listRows_() {
     sheet.getRange(HEADER_ROW + 1, ID_COLUMN, ids.length, 1).setValues(ids);
     sheet.hideColumns(ID_COLUMN);
   }
-  return values
-    .map(function (row, i) {
-      return { id: ids[i][0], date: row[0], task: row[1], notes: row[2], source: row[3] };
-    })
-    .filter(function (row) {
-      return row.task;
-    });
+  return ids.map(function (pair) {
+    return pair[0];
+  });
 }
 
 function newId_() {
@@ -99,21 +114,31 @@ function rowNumberOf_(sheet, id) {
   return 0;
 }
 
+/** Done on the site: a daily row is ticked, any other row is deleted. */
 function deleteRow_(id) {
   var sheet = sheet_();
   var row = rowNumberOf_(sheet, id);
-  if (row) sheet.deleteRow(row);
+  if (!row) return;
+  if (isDailyRow_(sheet, row)) sheet.getRange(row, DONE_COLUMN).setValue(true);
+  else sheet.deleteRow(row);
 }
 
+function isDailyRow_(sheet, row) {
+  return typeof sheet.getRange(row, DONE_COLUMN).getValue() === "boolean";
+}
+
+/** Undo or Add on the site: writes Date | Task | Notes | Source; a daily row is also unticked. */
 function upsertRow_(op) {
   var sheet = sheet_();
   var row = rowNumberOf_(sheet, op.id);
-  var values = [[sheetDate_(op.date), op.name || "", op.description || "", op.category || "", ""]];
+  var values = [[sheetDate_(op.date), op.name || "", op.description || "", op.category || ""]];
   if (!row) {
     row = sheet.getLastRow() + 1;
     sheet.getRange(row, ID_COLUMN).setValue(op.id || newId_());
+  } else if (isDailyRow_(sheet, row)) {
+    sheet.getRange(row, DONE_COLUMN).setValue(false);
   }
-  sheet.getRange(row, 1, 1, 5).setValues(values);
+  sheet.getRange(row, 1, 1, 4).setValues(values);
   sheet.getRange(row, 1).setNumberFormat("dd/mm/yyyy");
 }
 

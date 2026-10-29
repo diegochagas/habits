@@ -13,6 +13,7 @@ import { isCategory } from "./categories.js";
  * @property {string} date  ISO yyyy-mm-dd (sheet queue date, or the day it was added)
  * @property {boolean} done
  * @property {string} createdAt ISO timestamp
+ * @property {true} [daily] a sheet row with a checkbox in Done: done resets every night, XP once a day
  */
 
 export const STORAGE_KEY = "habits:v1";
@@ -48,6 +49,7 @@ function normalizeItem(candidate) {
     date: typeof candidate.date === "string" ? candidate.date : "",
     done: candidate.done === true,
     createdAt: typeof candidate.createdAt === "string" ? candidate.createdAt : "",
+    ...(candidate.daily === true ? { daily: true } : {}),
   };
 }
 

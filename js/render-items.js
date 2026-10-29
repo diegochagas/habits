@@ -18,7 +18,7 @@ export function renderItemCard(item, lang, extras = {}) {
   return `<article class="card panel category-${categorySlug(item.category)}${doneClass}" data-id="${escapeHtml(item.id)}">
   <span class="card-stamp" aria-hidden="true">${categoryStamp(item.category)}</span>
   <span class="card-category">${translate(lang, categoryI18nKey(item.category))}</span>
-  <h3 class="card-name">${escapeHtml(item.name)}</h3>
+  <h3 class="card-name">${escapeHtml(item.name)}${item.daily ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁</span>` : ""}</h3>
   ${renderDescription(item.description)}
   <footer class="card-footer">
     <time class="card-date" datetime="${escapeHtml(item.date)}">${formatDate(item.date)}</time>${count > 0 ? `<span class="card-pomodoros" title="Pomodoros">🍅 ${count}</span>` : ""}

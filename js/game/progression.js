@@ -82,14 +82,19 @@ export function loseCurrentPv(hero, pv) {
 }
 
 /**
- * Credit list items marked done on the Habits page (+1 XP each, once per item).
+ * Credit list items marked done on the Habits page (+1 XP each, once per item; a daily item
+ * once per day, keyed "id@yyyy-mm-dd").
  * @param {Hero} hero
- * @param {{ id: string, category: string, done: boolean }[]} listItems
+ * @param {{ id: string, category: string, done: boolean, daily?: boolean }[]} listItems
+ * @param {string} [today] yyyy-mm-dd, needed for daily items
  * @returns {{ hero: Hero, credited: number }}
+ * @example creditDoneListItems(hero, items, "2026-10-29").credited // 2
  */
-export function creditDoneListItems(hero, listItems) {
-  const fresh = listItems.filter((item) => item.done && !hero.creditedListItemIds.includes(item.id));
-  let next = { ...hero, creditedListItemIds: [...hero.creditedListItemIds, ...fresh.map((item) => item.id)] };
+export function creditDoneListItems(hero, listItems, today = "") {
+  const creditKey = (/** @type {{ id: string, daily?: boolean }} */ item) =>
+    item.daily ? `${item.id}@${today}` : item.id;
+  const fresh = listItems.filter((item) => item.done && !hero.creditedListItemIds.includes(creditKey(item)));
+  let next = { ...hero, creditedListItemIds: [...hero.creditedListItemIds, ...fresh.map(creditKey)] };
   for (const item of fresh) {
     const track = /** @type {Track} */ (LIST_CATEGORY_TRACK[item.category] ?? "habilidade");
     next = awardXp(next, track, 1);

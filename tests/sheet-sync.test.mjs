@@ -28,6 +28,10 @@ test("sheet rows become items: dd/mm/yyyy → ISO, unknown Source rows are skipp
   assert.equal(rowToItem({ ...row, source: "Legend:" }), null);
   assert.equal(rowToItem({ ...row, task: "" }), null);
   assert.equal(rowToItem({ ...row, id: "" }), null);
+  const daily = rowToItem({ ...row, daily: true, done: true });
+  assert.equal(daily?.daily, true);
+  assert.equal(daily?.done, true, "a ticked daily row is done");
+  assert.equal(rowToItem({ ...row, daily: false, done: true })?.done, false, "only a checkbox counts");
 });
 
 test("ops between two lists: Done/Remove delete, Undo/Add upsert, untouched items are silent", () => {
@@ -64,6 +68,15 @@ test("merge: the sheet decides which items exist; pending ops keep local state; 
     ],
   );
   assert.deepEqual(merged.renamed, { "sheet-001": "row-a" });
+});
+
+test("merge: a daily row's checkbox overrides the local done state (the nightly reset undoes it)", () => {
+  const local = [item({ id: "row-d", name: "Devotional", category: "Personal", done: true, daily: true })];
+  const row = { id: "row-d", date: "29/10/2026", task: "Devotional", notes: "", source: "Personal", daily: true };
+  assert.equal(mergeSheetRows(local, [{ ...row, done: false }], []).items[0].done, false);
+  assert.equal(mergeSheetRows(local, [{ ...row, done: true }], []).items[0].done, true);
+  const pending = /** @type {any} */ ([{ op: "delete", id: "row-d" }]);
+  assert.equal(mergeSheetRows(local, [{ ...row, done: false }], pending).items[0].done, true, "queued Done stays");
 });
 
 test("the queue keeps one op per id, the latest", () => {
@@ -117,7 +130,9 @@ test("the client posts text/plain JSON to a script.google.com /exec URL and pars
   const client = createSheetClient(/** @type {any} */ (fetchFn));
   const settings = { url: "https://script.google.com/macros/s/abc/exec", token: "secret" };
   const result = await client.exchange(settings, [{ op: "delete", id: "row-9" }]);
-  assert.deepEqual(result, { rows: [{ id: "row-1", date: "29/10/2026", task: "T", notes: "", source: "Read" }] });
+  assert.deepEqual(result, {
+    rows: [{ id: "row-1", date: "29/10/2026", task: "T", notes: "", source: "Read", daily: false, done: false }],
+  });
   assert.equal(calls[0][1].method, "POST");
   assert.equal(calls[0][1].headers["Content-Type"], "text/plain;charset=utf-8");
   assert.deepEqual(JSON.parse(calls[0][1].body), { token: "secret", ops: [{ op: "delete", id: "row-9" }] });

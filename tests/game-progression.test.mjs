@@ -57,6 +57,17 @@ test("list items marked done are credited once, by category track", () => {
   assert.equal(creditDoneListItems(first.hero, items).credited, 0);
 });
 
+test("a daily list item pays XP once per day, keyed by the date", () => {
+  const hero = createStartingHero(TODAY);
+  const items = [{ id: "row-d", category: "Personal", done: true, daily: true }];
+  const monday = creditDoneListItems(hero, items, "2026-10-26");
+  assert.equal(monday.credited, 1);
+  assert.equal(creditDoneListItems(monday.hero, items, "2026-10-26").credited, 0);
+  const tuesday = creditDoneListItems(monday.hero, items, "2026-10-27");
+  assert.equal(tuesday.credited, 1);
+  assert.deepEqual(tuesday.hero.creditedListItemIds, ["row-d@2026-10-26", "row-d@2026-10-27"]);
+});
+
 test("raising an attribute costs 10 XP from its own track and grows the resource", () => {
   let hero = createStartingHero(TODAY);
   assert.ok("error" in raiseAttribute(hero, "resistencia"));

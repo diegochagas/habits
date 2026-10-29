@@ -9,8 +9,9 @@ word, both saved in your browser (never in this repository).
 
 ## One-time deploy (about five minutes)
 
-1. Open the sheet → **Extensions → Apps Script**. Delete the sample code and paste the contents
-   of [`Code.gs`](Code.gs). Save.
+1. Open the sheet → **Extensions → Apps Script**. Add a script file (Files **+** → Script) named
+   `HabitsSync` and paste the contents of [`Code.gs`](Code.gs) into it. Save. (Keep the project's
+   existing `Code.gs`: it holds the nightly checklist reset.)
 2. **Project Settings** (gear) → **Script properties** → **Add script property**:
    name `HABITS_TOKEN`, value: any long secret word you make up. Save.
 3. **Deploy → New deployment** → type **Web app**: description "Habits", execute as **Me**,
@@ -19,7 +20,7 @@ word, both saved in your browser (never in this repository).
 4. On the site, press **Sync** in the header, paste the URL and the secret word, **Save**, then
    **Sync now**. The first sync fills a hidden `Id` column (F) in the sheet.
 
-To update the script later: paste the new `Code.gs`, then **Deploy → Manage deployments →
+To update the script later: paste the new `Code.gs` into `HabitsSync.gs`, then **Deploy → Manage deployments →
 edit → version: New version → Deploy** (the URL stays the same).
 
 ## What syncs
@@ -31,6 +32,12 @@ edit → version: New version → Deploy** (the URL stays the same).
 | Add item              | a row is appended (Date, Task, Notes, Source) |
 | Row deleted in sheet  | the item disappears on next sync              |
 | Row added or edited   | the item appears / updates on next sync       |
+| Done on a daily row   | its Done checkbox is ticked (row kept)        |
+
+A **daily row** is one whose Done cell is a checkbox (E7:E9 today: Devotional, Duolingo,
+Finances). The sheet's own "Daily Checklist Reset" trigger unticks them every night, so the
+items come back as to-do on the site at the next sync, and each day's Done pays +1 XP again.
+The script lives in that same bound project (file `HabitsSync.gs` next to its `Code.gs`).
 
 The site syncs on load, every five minutes, and right after each change; changes made while
 offline wait in a queue. Rows whose Source is not Read, Watch, Side Hustle or Personal are

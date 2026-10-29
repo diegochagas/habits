@@ -3,7 +3,16 @@
 
 import { isCategory } from "../categories.js";
 
-/** @typedef {{ id: string, date: string, task: string, notes: string, source: string }} SheetRow */
+/**
+ * @typedef {object} SheetRow
+ * @property {string} id
+ * @property {string} date dd/mm/yyyy
+ * @property {string} task
+ * @property {string} notes
+ * @property {string} source
+ * @property {boolean} [daily] the Done cell is a checkbox: Done ticks it, the sheet unticks it nightly
+ * @property {boolean} [done] the checkbox's state (daily rows only)
+ */
 /** @typedef {{ op: "delete", id: string } | { op: "upsert", id: string, date: string, name: string, description: string, category: string }} SyncOp */
 
 /**
@@ -19,7 +28,8 @@ export function sheetDateToIso(text) {
 }
 
 /**
- * A row becomes an item; rows without a valid Source are skipped (null).
+ * A row becomes an item; rows without a valid Source are skipped (null). A daily row carries
+ * `daily: true` and its checkbox as `done`.
  * @param {SheetRow} row
  * @returns {import("../items-store.js").HabitItem | null}
  */
@@ -31,8 +41,9 @@ export function rowToItem(row) {
     category: row.source,
     description: row.notes ?? "",
     date: sheetDateToIso(row.date ?? ""),
-    done: false,
+    done: row.daily === true && row.done === true,
     createdAt: "",
+    ...(row.daily === true ? { daily: true } : {}),
   };
 }
 
@@ -74,8 +85,9 @@ export function opsBetween(before, after) {
 
 /**
  * Sheet wins: the result is the sheet's rows, except that items with a queued op keep their
- * local state (a pending delete stays done, a pending upsert stays present). Local items that
- * match a row by text (the first sync, before ids existed) are replaced by the row's id.
+ * local state (a pending delete stays done, a pending upsert stays present). A daily row's
+ * checkbox decides its done state. Local items that match a row by text (the first sync,
+ * before ids existed) are replaced by the row's id.
  * @param {import("../items-store.js").HabitItem[]} local
  * @param {SheetRow[]} rows
  * @param {SyncOp[]} pending
@@ -92,7 +104,8 @@ export function mergeSheetRows(local, rows, pending) {
     if (!fromRow) continue;
     const known = byId.get(row.id) ?? byText.get(textKey(fromRow));
     if (known && known.id !== row.id) renamed[known.id] = row.id;
-    items.push({ ...fromRow, done: pendingById.get(row.id)?.op === "delete" || (known?.done ?? false) });
+    const localDone = fromRow.daily ? fromRow.done : (known?.done ?? false);
+    items.push({ ...fromRow, done: pendingById.get(row.id)?.op === "delete" || localDone });
   }
   const present = new Set(items.map((item) => item.id));
   for (const op of pending)

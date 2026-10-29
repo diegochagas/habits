@@ -137,11 +137,11 @@ export function createHeroController(deps) {
   }
 
   /**
-   * Items marked done on the list pay XP once; says how many were new.
+   * Items marked done on the list pay XP once (daily items once a day); says how many were new.
    * @param {import("../items-store.js").HabitItem[]} items
    */
   function creditList(items) {
-    const credited = creditDoneListItems(hero, items);
+    const credited = creditDoneListItems(hero, items, deps.today());
     if (credited.credited === 0) return;
     commit(credited.hero);
     sayKey("listCredit", { count: credited.credited });

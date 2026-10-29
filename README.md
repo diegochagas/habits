@@ -29,7 +29,8 @@ No build step, no runtime dependencies. Everything is saved in the browser's
 **Sync with the Google Sheet** (optional): deploy [`sheets-sync/Code.gs`](sheets-sync/Code.gs)
 as an Apps Script web app bound to the sheet and paste its URL and secret word under **Sync**.
 The sheet then becomes the source of truth: rows deleted or added there come and go on the site,
-Done / Remove on the site delete the row, an added item is appended. Steps and the sync table
+Done / Remove on the site delete the row (a daily row, one with a checkbox in Done, is ticked
+instead and comes back after the sheet's nightly reset), an added item is appended. Steps and the sync table
 are in [sheets-sync/README.md](sheets-sync/README.md).
 
 ## Run it

@@ -118,6 +118,11 @@
   font-family: var(--font-hand);
 }
 
+.card-daily {
+  font-size: 0.7em;
+  cursor: help;
+}
+
 /* Play pages: time left in the masthead, and a lock when it runs out. */
 .free-time {
   cursor: default;
