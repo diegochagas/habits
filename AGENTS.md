@@ -20,7 +20,9 @@ ASCII in `js/game/stage-maps.js` (tests check every minion blocks the only way f
 are procedural chibis (`chibi-sprite.js`), sounds are synthesised in `sound.js` (no audio files).
 The hero's Today/Sheet tabs live on `index.html` (shared `js/game/hero-controller.js`); `game.html`
 keeps Arcas + Adventure and `puzzle.html` the sort puzzles, both locked unless the Pomodoro on
-`index.html` earned free time (`js/pomodoro/`, `?fast=1` shrinks a minute to 0.1 s for e2e).
+`index.html` earned free time (`js/pomodoro/`, `?fast=1` shrinks a minute to 0.1 s for e2e). A work
+block needs an item in "Working on" (`needsItem`); when the free time runs out the gate puts an idle
+clock back on the work mode and the overlay's link is `index.html#pomodoro` (focuses the picker).
 Optional Google Sheets sync: `sheets-sync/Code.gs` (Apps Script, deployed by Diego, token in a
 script property) + `js/sync/` (sheet wins, op queue; e2e stubs the /exec URL with page.route).
 

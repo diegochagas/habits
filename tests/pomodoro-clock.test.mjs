@@ -4,6 +4,7 @@ import {
   createPomodoro,
   formatClock,
   modeSeconds,
+  needsItem,
   pauseClock,
   remainingSeconds,
   rollDay,
@@ -16,6 +17,8 @@ import { createPomodoroStore, loadOrCreatePomodoro } from "../js/pomodoro/pomodo
 
 const TODAY = "2026-10-29";
 const T0 = Date.UTC(2026, 9, 29, 9, 0, 0);
+/** A fresh Pomodoro already working on an item (a work block cannot start without one). */
+const onItem = () => ({ ...createPomodoro(TODAY), itemId: "sheet-001" });
 
 test("a fresh pomodoro is 25:00 of work, idle, with no free time", () => {
   const state = createPomodoro(TODAY);
@@ -25,8 +28,19 @@ test("a fresh pomodoro is 25:00 of work, idle, with no free time", () => {
   assert.throws(() => modeSeconds(/** @type {any} */ ("nap"), 60), /expected work, short or long/);
 });
 
+test("a work block needs an item in Working on; breaks start without one", () => {
+  const fresh = createPomodoro(TODAY);
+  assert.equal(needsItem(fresh), true);
+  assert.equal(startClock(fresh, T0), fresh, "Start without an item leaves the clock idle");
+  assert.equal(needsItem(onItem()), false);
+  assert.equal(startClock(onItem(), T0).running, true);
+  const shortBreak = selectMode(fresh, "short", 60);
+  assert.equal(needsItem(shortBreak), false);
+  assert.equal(startClock(shortBreak, T0).running, true);
+});
+
 test("start, pause and resume keep the seconds; the clock never goes negative", () => {
-  let state = startClock(createPomodoro(TODAY), T0);
+  let state = startClock(onItem(), T0);
   assert.equal(remainingSeconds(state, T0 + 61_000), 1439);
   state = pauseClock(state, T0 + 61_000);
   assert.deepEqual([state.running, state.remaining], [false, 1439]);
@@ -48,7 +62,7 @@ test("a finished work block counts a pomodoro on its item, earns a 5 minute brea
 });
 
 test("every 4th pomodoro earns the 15 minute long break; a finished break goes back to work", () => {
-  let state = { ...createPomodoro(TODAY), completed: 3 };
+  let state = { ...onItem(), completed: 3 };
   state = tickClock(startClock(state, T0), T0 + 1500_000, 60).state;
   assert.deepEqual([state.mode, state.freeSeconds], ["long", 900]);
   const back = tickClock(startClock(state, T0), T0 + 900_000, 60);
@@ -56,7 +70,7 @@ test("every 4th pomodoro earns the 15 minute long break; a finished break goes b
 });
 
 test("free time is spent down to zero and reset on a new day; picking a mode reloads it", () => {
-  const rich = { ...createPomodoro(TODAY), freeSeconds: 10 };
+  const rich = { ...onItem(), freeSeconds: 10 };
   assert.equal(spendFreeTime(rich, 4).freeSeconds, 6);
   assert.equal(spendFreeTime(rich, 40).freeSeconds, 0);
   assert.equal(rollDay(rich, TODAY), rich);

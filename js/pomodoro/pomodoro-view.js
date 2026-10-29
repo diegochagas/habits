@@ -11,16 +11,17 @@ import { escapeHtml } from "../linkify.js";
  * @param {import("../items-store.js").HabitItem[]} items
  * @param {"en" | "pt"} lang
  * @param {number} now epoch ms
+ * @param {string} [notice] error shown under the item picker ("" = none)
  * @returns {string}
  */
-export function renderPomodoroPanel(state, items, lang, now) {
+export function renderPomodoroPanel(state, items, lang, now, notice = "") {
   return `${renderModes(state, lang)}
 <p class="pomodoro-clock" id="pomodoro-clock" aria-live="off">${formatClock(remainingSeconds(state, now))}</p>
 <div class="pomodoro-controls">
   <button type="button" class="stamp stamp-big" data-pomodoro="toggle">${pomodoroText(lang, state.running ? "pause" : "start")}</button>
   <button type="button" class="stamp" data-pomodoro="reset">${pomodoroText(lang, "reset")}</button>
 </div>
-${renderItemPicker(state, items, lang)}
+${renderItemPicker(state, items, lang, notice)}
 ${renderMusicForm(state, lang)}
 ${renderFreeTimeLine(state, lang)}`;
 }
@@ -43,16 +44,18 @@ function renderModes(state, lang) {
  * @param {import("./pomodoro-clock.js").PomodoroState} state
  * @param {import("../items-store.js").HabitItem[]} items
  * @param {"en" | "pt"} lang
+ * @param {string} notice
  * @returns {string}
  */
-function renderItemPicker(state, items, lang) {
+function renderItemPicker(state, items, lang, notice) {
   const open = items.filter((item) => !item.done || item.id === state.itemId);
   const options = open.map(
     (item) =>
       `<option value="${escapeHtml(item.id)}"${item.id === state.itemId ? " selected" : ""}>${escapeHtml(item.name)}</option>`,
   );
   return `<label class="pomodoro-item field">${pomodoroText(lang, "workingOn")}
-  <select data-pomodoro-select="item"><option value="">${pomodoroText(lang, "noItem")}</option>${options.join("")}</select></label>`;
+  <select data-pomodoro-select="item"><option value="">${pomodoroText(lang, "noItem")}</option>${options.join("")}</select></label>
+<p class="form-error pomodoro-item" data-error="pomodoro-item" role="alert"${notice ? "" : " hidden"}>${escapeHtml(notice)}</p>`;
 }
 
 /**
@@ -85,6 +88,7 @@ function renderFreeTimeLine(state, lang) {
   return `<div class="pomodoro-free">
   <span class="pomodoro-count">🍅 ${pomodoroText(lang, "completedToday", { count: state.completed })}</span>
   <span class="pomodoro-bank">⏱ ${pomodoroText(lang, "freeTime")} <b id="free-time-bank">${formatClock(state.freeSeconds)}</b></span>
+  <small class="muted">${pomodoroText(lang, "needItemHint")}</small>
   <a class="stamp stamp-small" href="game.html">${pomodoroText(lang, "playArcas")}</a>
   <a class="stamp stamp-small" href="puzzle.html">${pomodoroText(lang, "playPuzzles")}</a>
   <small class="muted">${pomodoroText(lang, "freeTimeHint")}</small>

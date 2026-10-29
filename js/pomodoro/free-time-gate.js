@@ -1,7 +1,7 @@
 // free-time-gate.js: the play pages (Arcas, puzzles) spend the free time earned by finished
 // Pomodoros, one second per second while the tab is visible, and lock the page when it runs out.
 
-import { formatClock, rollDay, spendFreeTime } from "./pomodoro-clock.js";
+import { formatClock, rollDay, selectMode, spendFreeTime } from "./pomodoro-clock.js";
 import { pomodoroText } from "./pomodoro-i18n.js";
 import { loadOrCreatePomodoro } from "./pomodoro-store.js";
 
@@ -32,16 +32,27 @@ export function startFreeTimeGate(deps) {
     deps.badge.textContent = `⏱ ${pomodoroText(lang, "freeTime")} ${formatClock(state.freeSeconds)}`;
     deps.overlay.innerHTML = `<h2 class="panel-title">${pomodoroText(lang, "freeTimeOver")}</h2>
 <p>${pomodoroText(lang, "freeTimeOverHint")}</p>
-<a class="stamp stamp-big" href="index.html">${pomodoroText(lang, "backToHabits")}</a>`;
+<a class="stamp stamp-big" href="index.html#pomodoro">${pomodoroText(lang, "backToHabits")}</a>`;
     deps.overlay.hidden = state.freeSeconds > 0;
   }
 
   function tick() {
     if (state.freeSeconds <= 0 || !visible()) return;
     state = spendFreeTime(rollDay(state, deps.today()), 1);
+    if (state.freeSeconds <= 0) state = backToWork(state);
     deps.store.save(state);
     render();
     if (state.freeSeconds <= 0) deps.onExpired();
+  }
+
+  /**
+   * The break is spent: the habits page opens on the Pomodoro mode, ready for the next block
+   * (an idle clock only; a break running there keeps counting).
+   * @param {import("./pomodoro-clock.js").PomodoroState} spent
+   * @returns {import("./pomodoro-clock.js").PomodoroState}
+   */
+  function backToWork(spent) {
+    return spent.running ? spent : selectMode(spent, "work", deps.secondsPerMinute);
   }
 
   render();

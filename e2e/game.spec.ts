@@ -1,7 +1,7 @@
 // e2e/game.spec.ts: the play page: locked without free time; with it, walk the first Arca RPG
 // Maker style, bump into the enemy, fight, continue, and leave with PV restored.
 import { test, expect } from "@playwright/test";
-import { collectErrors, freshStateBeforeEach, grantFreeTime } from "./helpers";
+import { collectErrors, freshStateBeforeEach, grantFreeTime, putState } from "./helpers";
 
 freshStateBeforeEach();
 
@@ -12,6 +12,40 @@ test("without free time the play page is locked behind the Pomodoro notice", asy
   await expect(page.locator("#free-time-over")).toContainText("Free time is over!");
   await expect(page.locator("#free-time")).toContainText("00:00");
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-locked.png` });
+  expect(errors).toEqual([]);
+});
+
+test("when the free time runs out, Back to Habits lands on the Pomodoro mode with the picker focused", async ({
+  page,
+}, testInfo) => {
+  const errors = collectErrors(page);
+  // The state a finished work block leaves: the short break selected, 2 s of play time.
+  await putState(page, "habits:pomodoro:v1", {
+    mode: "short",
+    running: false,
+    endsAt: null,
+    remaining: 300,
+    itemId: null,
+    videoUrl: "",
+    muted: false,
+    date: new Date().toISOString().slice(0, 10),
+    completed: 1,
+    freeSeconds: 2,
+    pomodoros: {},
+  });
+  await page.goto("/game.html?seed=7");
+  await expect(page.locator("#free-time-over")).toBeHidden();
+  await expect(page.locator("#free-time-over")).toBeVisible({ timeout: 10_000 });
+  await expect(page.locator("#free-time")).toContainText("00:00");
+  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-free-time-over.png` });
+
+  await page.locator("#free-time-over").getByRole("link", { name: "Back to Habits" }).click();
+  await expect(page).toHaveURL(/index\.html#pomodoro$/);
+  await expect(page.locator(".pomodoro-modes .tab-active")).toHaveText("Pomodoro");
+  await expect(page.locator("#pomodoro-clock")).toHaveText("25:00");
+  await expect(page.locator("[data-pomodoro-select='item']")).toBeFocused();
+  await expect(page.locator("#pomodoro")).toBeInViewport();
+  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home-after-free-time.png` });
   expect(errors).toEqual([]);
 });
 

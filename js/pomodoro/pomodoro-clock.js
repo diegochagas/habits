@@ -66,12 +66,23 @@ export function selectMode(state, mode, secondsPerMinute) {
 }
 
 /**
+ * A work block needs a list item to work on (the "Working on" picker); breaks run on their own.
+ * @param {PomodoroState} state
+ * @returns {boolean}
+ * @example needsItem(createPomodoro("2026-10-29")) // true
+ */
+export function needsItem(state) {
+  return state.mode === "work" && !state.itemId;
+}
+
+/**
+ * Starts the clock; a work block without an item stays idle (see `needsItem`).
  * @param {PomodoroState} state
  * @param {number} now epoch ms
  * @returns {PomodoroState}
  */
 export function startClock(state, now) {
-  if (state.running) return state;
+  if (state.running || needsItem(state)) return state;
   return { ...state, running: true, endsAt: now + state.remaining * 1000 };
 }
 

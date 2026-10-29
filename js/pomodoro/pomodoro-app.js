@@ -3,6 +3,7 @@
 
 import {
   modeSeconds,
+  needsItem,
   pauseClock,
   remainingSeconds,
   resetClock,
@@ -38,18 +39,27 @@ import { parseYouTubeId, sendYouTubeCommand, youtubeEmbedUrl } from "./youtube-e
  */
 export function startPomodoro(deps) {
   let state = rollDay(loadOrCreatePomodoro(deps.store, deps.today(), deps.secondsPerMinute), deps.today());
+  /** Shown under the item picker until the next change (Start pressed with no item). */
+  let notice = "";
 
   /** @param {import("./pomodoro-clock.js").PomodoroState} next */
   function commit(next) {
     state = next;
+    notice = "";
     deps.store.save(next);
     render();
     deps.onChange?.();
   }
 
   function render() {
-    deps.root.innerHTML = renderPomodoroPanel(state, deps.items(), deps.lang(), Date.now());
+    deps.root.innerHTML = renderPomodoroPanel(state, deps.items(), deps.lang(), Date.now(), notice);
     syncVideo();
+  }
+
+  /** Scrolls the panel into view and puts the cursor on the item picker (the play pages link here). */
+  function focusItemPicker() {
+    deps.root.scrollIntoView({ block: "start" });
+    /** @type {HTMLSelectElement | null} */ (deps.root.querySelector("[data-pomodoro-select='item']"))?.focus();
   }
 
   function tick() {
@@ -58,7 +68,7 @@ export function startPomodoro(deps) {
     if (result.state !== state) commit(result.state);
     const clock = document.getElementById("pomodoro-clock");
     if (clock) clock.textContent = formatClock(remainingSeconds(state, Date.now()));
-    if (state.running) document.title = `${formatClock(remainingSeconds(state, Date.now()))} · Habits`;
+    document.title = state.running ? `${formatClock(remainingSeconds(state, Date.now()))} · Habits` : "Habits";
   }
 
   /** @param {{ state: import("./pomodoro-clock.js").PomodoroState, finished: "work" | "short" | "long" }} result */
@@ -83,8 +93,17 @@ export function startPomodoro(deps) {
   }
 
   function onToggle() {
+    if (!state.running && needsItem(state)) return onNoItem();
     deps.sounds.play("decision");
     commit(state.running ? pauseClock(state, Date.now()) : startClock(state, Date.now()));
+  }
+
+  /** Start pressed on a work block with nothing picked: say so and hand the cursor to the picker. */
+  function onNoItem() {
+    deps.sounds.play("cancel");
+    notice = pomodoroText(deps.lang(), "needItem");
+    render();
+    focusItemPicker();
   }
 
   /** @param {HTMLFormElement} form */
@@ -172,6 +191,7 @@ export function startPomodoro(deps) {
     render,
     startOn,
     renameItems,
+    focusItemPicker,
     get state() {
       return state;
     },

@@ -387,6 +387,8 @@ async function start() {
   document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && rollDaily());
   animate();
   sync.syncNow();
+  // The play pages' "Back to Habits" lands on the Pomodoro panel so the next block starts at once.
+  if (location.hash === "#pomodoro") pomodoro.focusItemPicker();
 }
 
 start();

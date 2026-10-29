@@ -88,6 +88,15 @@ test("a Pomodoro on a list item earns free time; the focus music form validates 
   await page.goto("/?fast=1");
   await expect(page.locator("#pomodoro-clock")).toHaveText("00:03");
 
+  // A work block needs an item: Start with nothing picked says so and hands the cursor to the picker.
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(page.locator("[data-error='pomodoro-item']")).toHaveText(
+    "Pick an item in “Working on” to start a Pomodoro.",
+  );
+  await expect(page.locator("[data-pomodoro-select='item']")).toBeFocused();
+  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible();
+  await expect(page.locator("#pomodoro-clock")).toHaveText("00:03");
+
   await page.getByPlaceholder("https://www.youtube.com/watch?v=...").fill("https://example.com/not-youtube");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.locator("[data-error='focus-music']")).toHaveText("That is not a YouTube link.");
@@ -104,6 +113,7 @@ test("a Pomodoro on a list item earns free time; the focus music form validates 
   const itemName = (await card.locator(".card-name").textContent()) ?? "";
   await card.getByRole("button", { name: /Pomodoro/ }).click();
   await expect(page.locator("[data-pomodoro-select='item']")).toContainText(itemName);
+  await expect(page.locator("[data-error='pomodoro-item']")).toBeHidden();
   await expect(page.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home-pomodoro.png` });
 
