@@ -17,6 +17,11 @@
   box-sizing: border-box;
 }
 
+/* Sections are shown and hidden with the `hidden` attribute, whatever their display. */
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   margin: 0;
@@ -444,35 +449,6 @@ body::before {
   text-align: center;
   font-family: var(--font-hand);
   font-size: 1.05rem;
-}
-
-@media (min-width: 900px) {
-  .page {
-    grid-template-columns: 360px minmax(0, 1fr);
-    grid-template-areas:
-      "add filters"
-      "add items"
-      "add empty";
-    align-items: start;
-  }
-
-  .add-panel {
-    grid-area: add;
-    position: sticky;
-    top: 24px;
-  }
-
-  .filters-panel {
-    grid-area: filters;
-  }
-
-  .items-grid {
-    grid-area: items;
-  }
-
-  .empty-state {
-    grid-area: empty;
-  }
 }
 
 @media (max-width: 480px) {

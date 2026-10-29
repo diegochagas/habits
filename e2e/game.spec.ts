@@ -1,49 +1,27 @@
-// e2e/game.spec.ts: the game page on desktop and phone: log habits, see XP move, fight the first
-// Arca with a fixed seed, and keep the hero across reloads. Screenshots are the evidence.
-import { test, expect, type Page } from "@playwright/test";
+// e2e/game.spec.ts: the play page: locked without free time; with it, walk the first Arca RPG
+// Maker style, bump into the enemy, fight, continue, and leave with PV restored.
+import { test, expect } from "@playwright/test";
+import { collectErrors, grantFreeTime } from "./helpers";
 
-function collectErrors(page: Page): string[] {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
-  return errors;
-}
-
-test("habits move XP, the sheet sells with track XP, and the hero survives a reload", async ({ page }, testInfo) => {
+test("without free time the play page is locked behind the Pomodoro notice", async ({ page }, testInfo) => {
   const errors = collectErrors(page);
   await page.goto("/game.html?seed=7");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("ARCAS DO HÁBITO");
-  await expect(page.locator(".hero-rank")).toContainText("12 pts");
-  await expect(page.locator(".pool-poder b")).toHaveText("0");
-  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-today.png` });
-
-  await page.getByRole("button", { name: /Gym workout/ }).click();
-  await expect(page.locator(".pool-poder b")).toHaveText("2");
-  await page.getByRole("button", { name: /Junk food/ }).click();
-  await expect(page.locator(".pool-poder b")).toHaveText("0");
-  await expect(page.locator(".resource.pv span")).toHaveText("PV 7/10");
-  await expect(page.locator(".today-log li")).toHaveCount(2);
-
-  for (let i = 0; i < 5; i += 1) await page.getByRole("button", { name: /Gym workout/ }).click();
-  await expect(page.locator(".pool-poder b")).toHaveText("10");
-  await page.getByRole("button", { name: "Sheet", exact: true }).click();
-  await page
-    .getByRole("button", { name: /^Buy 10$/ })
-    .first()
-    .click();
-  await expect(page.locator(".sheet-list").first()).toContainText("Esporte");
-  await expect(page.locator(".pool-poder b")).toHaveText("0");
-  await expect(page.locator(".hero-rank")).toContainText("13 pts");
-  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-sheet.png`, fullPage: true });
-
-  await page.reload();
-  await expect(page.locator(".hero-rank")).toContainText("13 pts");
+  await expect(page.locator("#free-time-over")).toBeVisible();
+  await expect(page.locator("#free-time-over")).toContainText("Free time is over!");
+  await expect(page.locator("#free-time")).toContainText("00:00");
+  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-locked.png` });
   expect(errors).toEqual([]);
 });
 
-test("the first Arca is walked RPG Maker style: bump into the enemy, fight, continue", async ({ page }, testInfo) => {
+test("the first Arca is walked RPG Maker style: bump into the enemy, fight, continue, leave healed", async ({
+  page,
+}, testInfo) => {
   const errors = collectErrors(page);
+  await grantFreeTime(page, 600);
   await page.goto("/game.html?seed=7");
+  await expect(page.locator("#free-time-over")).toBeHidden();
+  await expect(page.locator("#free-time")).toContainText("Free time");
+  await expect(page.locator(".game-tabs .tab")).toHaveCount(2);
   await page.getByRole("button", { name: "Arcas", exact: true }).click();
   await expect(page.locator(".stage-card")).toHaveCount(6);
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-arcas.png` });
@@ -76,17 +54,17 @@ test("the first Arca is walked RPG Maker style: bump into the enemy, fight, cont
     await expect(page.locator(".dpad")).toBeVisible();
   }
 
-  // The on-screen d-pad moves the hero too (pointer down/up on a key).
-  const left = page.getByRole("button", { name: "Left", exact: true });
-  if ((await left.count()) > 0) await left.dispatchEvent("pointerdown");
-  await page.waitForTimeout(300);
-  await page.dispatchEvent("body", "pointerup");
+  // Leaving the Arca restores PV/PM/PA.
+  await page.getByRole("button", { name: "Back to the Arcas" }).click();
+  await expect(page.locator(".stage-card")).toHaveCount(6);
+  await expect(page.locator(".resource.pv span")).toHaveText("PV 10/10");
   expect(errors).toEqual([]);
 });
 
-test("PT toggle translates the game", async ({ page }) => {
+test("PT toggle translates the play page", async ({ page }) => {
+  await grantFreeTime(page, 600);
   await page.goto("/game.html?seed=7");
   await page.locator("#lang-toggle").click();
-  await expect(page.getByRole("button", { name: "Hoje", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Treino na academia/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Aventura", exact: true })).toBeVisible();
+  await expect(page.locator("#free-time")).toContainText("Tempo livre");
 });

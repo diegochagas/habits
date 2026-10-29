@@ -1,13 +1,7 @@
 // e2e/smoke.spec.ts: the site loads the seed, adds an item with a link, filters, toggles
 // language and keeps data across reloads, with no console errors. Screenshots are the evidence.
-import { test, expect, type Page } from "@playwright/test";
-
-function collectErrors(page: Page): string[] {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
-  return errors;
-}
+import { test, expect } from "@playwright/test";
+import { collectErrors } from "./helpers";
 
 test("loads the sheet list, adds an item with a URL, filters and survives a reload", async ({ page }, testInfo) => {
   const errors = collectErrors(page);
@@ -53,6 +47,8 @@ test("empty name shows an error and the PT toggle translates the page", async ({
   await page.locator("#lang-toggle").click();
   await expect(page.getByRole("button", { name: "ADICIONAR!" })).toBeVisible();
   await expect(page.getByRole("tab", { name: /^Assistir/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Hoje", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Iniciar", exact: true })).toBeVisible();
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-pt.png`, fullPage: false });
   expect(errors).toEqual([]);
 });

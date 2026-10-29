@@ -36,3 +36,22 @@ test("renderCategoryTabs marks the active tab and shows counts", () => {
   assert.ok(html.includes('aria-selected="true" data-category="Read">Read <b>2</b>'));
   assert.ok(html.includes('data-category="Watch">Watch <b>0</b>'));
 });
+
+test("cards get a Pomodoro button while open and show finished Pomodoros", async () => {
+  const { renderItemCard } = await import("../js/render-items.js");
+  const item = {
+    id: "a",
+    name: "Read",
+    category: "Read",
+    description: "",
+    date: "2026-10-29",
+    done: false,
+    createdAt: "",
+  };
+  const open = renderItemCard(item, "en", { pomodoros: { a: 2 }, pomodoroLabel: "Pomodoro" });
+  assert.match(open, /data-action="pomodoro"/);
+  assert.match(open, /🍅 2/);
+  const done = renderItemCard({ ...item, done: true }, "en", { pomodoroLabel: "Pomodoro" });
+  assert.doesNotMatch(done, /data-action="pomodoro"/);
+  assert.doesNotMatch(renderItemCard(item, "en"), /data-action="pomodoro"/);
+});

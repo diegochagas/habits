@@ -72,3 +72,10 @@ test("seeded random is deterministic and in [0, 1)", () => {
   assert.deepEqual(first, [b(), b(), b()]);
   assert.ok(first.every((value) => value >= 0 && value < 1));
 });
+
+test("leaving an Arca restores PV/PM/PA to the maxima", async () => {
+  const { createStartingHero, restoreResources } = await import("../js/game/hero-sheet.js");
+  const hero = createStartingHero("2026-10-29");
+  const wounded = { ...hero, current: { pv: 0, pm: 1, pa: 0 } };
+  assert.deepEqual(restoreResources(wounded).current, { pv: 10, pm: 10, pa: 2 });
+});

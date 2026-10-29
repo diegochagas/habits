@@ -6,9 +6,10 @@ the "ToDo List" Google Sheet (2026-10-28); the live list is the browser's localS
 progression are pure functions that take an injected `rollDie`, so tests use scripted dice and
 the page accepts `?seed=N`. Keep game strings in `js/game/game-i18n.js` (EN + PT). Stage maps are
 ASCII in `js/game/stage-maps.js` (tests check every minion blocks the only way forward); sprites
-are procedural chibis (`chibi-sprite.js`), sounds are synthesised in `sound.js` (no audio files). Stage maps are
-ASCII in `js/game/stage-maps.js` (tests check every minion blocks the only way forward); sprites
 are procedural chibis (`chibi-sprite.js`), sounds are synthesised in `sound.js` (no audio files).
+The hero's Today/Sheet tabs live on `index.html` (shared `js/game/hero-controller.js`); `game.html`
+keeps Arcas + Adventure and `puzzle.html` the sort puzzles, both locked unless the Pomodoro on
+`index.html` earned free time (`js/pomodoro/`, `?fast=1` shrinks a minute to 0.1 s for e2e).
 
 ## Testing and shipping (dev-playbook)
 

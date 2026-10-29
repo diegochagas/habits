@@ -106,6 +106,17 @@ export function clampResources(hero) {
 }
 
 /**
+ * Full recovery when the hero leaves an Arca: fights never carry wounds into the next one
+ * (Diego, 2026-10-29). Rest stays as the once-a-day recovery for the habits' PV hits.
+ * @param {Hero} hero
+ * @returns {Hero}
+ * @example restoreResources({ ...hero, current: { pv: 0, pm: 1, pa: 0 } }).current // the maxima
+ */
+export function restoreResources(hero) {
+  return { ...hero, current: deriveSheet(hero).max };
+}
+
+/**
  * Full recovery (8 hours of sleep), once per calendar day.
  * @param {Hero} hero
  * @param {string} today

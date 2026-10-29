@@ -1,0 +1,158 @@
+/* pomodoro.css: the Pomodoro panel on the habits page, the habits page's two-column layout
+   (hero + form beside the tabs), and the free-time badge/overlay on the play pages. */
+
+.pomodoro-wrap {
+  max-width: 1200px;
+  margin: 32px auto 0;
+  padding: 0 16px;
+}
+
+.pomodoro-panel {
+  display: grid;
+  gap: 16px;
+  text-align: center;
+}
+
+.pomodoro-modes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pomodoro-clock {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(4rem, 18vw, 8rem);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  -webkit-text-stroke: 1px var(--ink);
+  text-shadow: 6px 6px 0 #bbb;
+  font-variant-numeric: tabular-nums;
+}
+
+.pomodoro-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+
+.pomodoro-item,
+.pomodoro-music {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  text-align: left;
+}
+
+.pomodoro-item select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 3px solid var(--ink);
+  background: var(--paper);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.pomodoro-music-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.pomodoro-music-row input {
+  min-width: 0;
+}
+
+.pomodoro-video {
+  display: grid;
+  justify-items: center;
+}
+
+.pomodoro-video iframe {
+  width: min(100%, 480px);
+  aspect-ratio: 16 / 9;
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.pomodoro-free {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px 16px;
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+}
+
+.pomodoro-free small {
+  flex-basis: 100%;
+}
+
+.pomodoro-bank b {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Habits page: hero + new-item form on the side, tabs and content on the right. */
+.home-page {
+  gap: 24px;
+}
+
+.home-side {
+  display: grid;
+  gap: 28px;
+  align-content: start;
+}
+
+#list-section {
+  display: grid;
+  gap: 24px;
+}
+
+.card-pomodoros {
+  margin-left: 6px;
+  font-family: var(--font-hand);
+}
+
+/* Play pages: time left in the masthead, and a lock when it runs out. */
+.free-time {
+  cursor: default;
+  font-variant-numeric: tabular-nums;
+}
+
+.free-time-over {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-1deg);
+  width: min(92vw, 460px);
+  text-align: center;
+  z-index: 10;
+}
+
+.free-time-over p {
+  font-family: var(--font-hand);
+  font-size: 1.2rem;
+}
+
+.puzzle-locked,
+.free-time-over:not([hidden]) ~ .page {
+  pointer-events: none;
+  filter: grayscale(1) opacity(0.6);
+}
+
+@media (min-width: 900px) {
+  .home-page {
+    grid-template-columns: 400px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .pomodoro-music-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}

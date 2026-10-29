@@ -1,19 +1,18 @@
-// game-app.js: state owner and DOM wiring for the game page. Views return HTML; this file
-// re-renders on every change, runs the animation loop (map walking, battle poses) and the sounds.
+// game-app.js: the play page (Arcas + Adventure). The hero's own actions live in the shared
+// hero-controller; this file owns the stage run, the animation loop, the sounds and the
+// free-time gate (play time is earned by Pomodoros on the habits page).
 
 import { drawBattleFrame } from "./battle-scene.js";
 import { soundsForAction } from "./battle-sounds.js";
 import { renderBattleView } from "./battle-view.js";
 import { enemyLook } from "./enemy-looks.js";
 import { applyGameTranslations, gameText } from "./game-i18n.js";
+import { createHeroController } from "./hero-controller.js";
 import { heroLook } from "./hero-look.js";
-import { drawPortrait, renderHeroPanel } from "./hero-panel.js";
-import { deriveSheet, restHero } from "./hero-sheet.js";
-import { createHeroStore, loadOrCreateHero, useConsumable } from "./hero-store.js";
+import { deriveSheet, restoreResources } from "./hero-sheet.js";
+import { createHeroStore } from "./hero-store.js";
 import { drawMapFrame } from "./map-scene.js";
-import { buyEntry, creditDoneListItems, logHabit, raiseAttribute } from "./progression.js";
 import { dieFromRandom, seededRandom } from "./rules.js";
-import { renderSheetView } from "./sheet-view.js";
 import { createSoundBoard } from "./sound.js";
 import { createDirectionInput } from "./stage-input.js";
 import {
@@ -28,17 +27,15 @@ import {
 } from "./stage-run.js";
 import { stageById, stageEncounters } from "./stages.js";
 import { renderStagesView } from "./stages-view.js";
-import { customHabitFromForm, renderTodayView } from "./today-view.js";
-import { parseWeight } from "./weight.js";
-import { createItemStore } from "../items-store.js";
+import { startFreeTimeGate } from "../pomodoro/free-time-gate.js";
+import { applyPomodoroTranslations } from "../pomodoro/pomodoro-i18n.js";
+import { createPomodoroStore } from "../pomodoro/pomodoro-store.js";
 import { nextLang } from "../i18n.js";
 
 const LANG_KEY = "habits:lang";
 const TAB_KEY = "habits:game-tab";
-const seedParam = new URLSearchParams(location.search).get("seed");
-const rollDie = dieFromRandom(seedParam ? seededRandom(Number(seedParam)) : Math.random);
-const heroStore = createHeroStore(localStorage);
-const listStore = createItemStore(localStorage);
+const params = new URLSearchParams(location.search);
+const rollDie = dieFromRandom(params.get("seed") ? seededRandom(Number(params.get("seed"))) : Math.random);
 const sounds = createSoundBoard(() => new AudioContext(), localStorage);
 
 /** @returns {string} */
@@ -46,36 +43,51 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 const state = {
   lang: /** @type {"en" | "pt"} */ (localStorage.getItem(LANG_KEY) === "pt" ? "pt" : "en"),
-  tab: localStorage.getItem(TAB_KEY) ?? "today",
-  hero: loadOrCreateHero(heroStore, today()),
+  tab: localStorage.getItem(TAB_KEY) === "battle" ? "battle" : "stages",
   run: /** @type {import("./stage-run.js").StageRun | null} */ (null),
   tick: 0,
   notice: "",
 };
 
-const input = createDirectionInput(document, () => state.tab === "battle" && state.run !== null);
+const input = createDirectionInput(document, () => state.tab === "battle" && state.run !== null && gate.active());
 const main = /** @type {HTMLElement} */ (document.getElementById("game-main"));
-const heroPanel = /** @type {HTMLElement} */ (document.getElementById("hero-panel"));
 const notice = /** @type {HTMLElement} */ (document.getElementById("game-notice"));
-
-/** @param {import("./hero-sheet.js").Hero} hero */
-function commit(hero) {
-  state.hero = hero;
-  heroStore.save(hero);
-  render();
-}
+const hero = createHeroController({
+  store: createHeroStore(localStorage),
+  sounds,
+  today,
+  lang: () => state.lang,
+  say: (message) => {
+    state.notice = message;
+    render();
+  },
+  onChange: render,
+  confirmReset: (message) => confirm(message),
+});
+const gate = startFreeTimeGate({
+  store: createPomodoroStore(localStorage),
+  badge: /** @type {HTMLElement} */ (document.getElementById("free-time")),
+  overlay: /** @type {HTMLElement} */ (document.getElementById("free-time-over")),
+  lang: () => state.lang,
+  today,
+  secondsPerMinute: params.get("fast") ? 0.1 : 60,
+  onExpired: () => leaveStage(),
+});
 
 function render() {
   document.documentElement.lang = state.lang;
   applyGameTranslations(document, state.lang);
+  applyPomodoroTranslations(document, state.lang);
   /** @type {HTMLElement} */ (document.getElementById("lang-toggle")).textContent = state.lang === "en" ? "PT" : "EN";
   renderSoundToggle();
-  heroPanel.innerHTML = renderHeroPanel(state.hero, state.lang, today());
+  hero.renderPanel(/** @type {HTMLElement} */ (document.getElementById("hero-panel")));
   for (const tab of document.querySelectorAll("[data-tab]"))
     tab.classList.toggle("tab-active", tab.getAttribute("data-tab") === state.tab);
-  main.innerHTML = renderTab();
+  main.innerHTML =
+    state.tab === "battle" ? renderBattleView(state.run, state.lang) : renderStagesView(hero.hero, state.lang);
   notice.textContent = state.notice;
   notice.hidden = !state.notice;
+  gate.render();
 }
 
 function renderSoundToggle() {
@@ -84,17 +96,9 @@ function renderSoundToggle() {
   toggle.setAttribute("aria-label", gameText(state.lang, sounds.enabled() ? "soundOn" : "soundOff"));
 }
 
-/** @returns {string} */
-function renderTab() {
-  if (state.tab === "sheet") return renderSheetView(state.hero, state.lang);
-  if (state.tab === "stages") return renderStagesView(state.hero, state.lang);
-  if (state.tab === "battle") return renderBattleView(state.run, state.lang);
-  return renderTodayView(state.hero, state.lang, today());
-}
-
 /** @param {string} key */
-function say(key, values = {}) {
-  state.notice = gameText(state.lang, key, values);
+function say(key) {
+  state.notice = gameText(state.lang, key);
   render();
 }
 
@@ -109,59 +113,16 @@ function switchTab(tab) {
 
 /** @param {HTMLElement} button */
 function onAction(button) {
-  const action = button.dataset.action;
   state.notice = "";
-  if (action === "log-habit") return onLogHabit(button.dataset.habit ?? "");
-  if (action === "raise") return onPurchase(raiseAttribute(state.hero, /** @type {any} */ (button.dataset.track)));
-  if (action === "buy") return onPurchase(buyEntry(state.hero, button.dataset.entry ?? ""));
-  if (action === "use-item") return onUseItem(button.dataset.item ?? "");
-  if (action === "rest") return onRest();
-  if (action === "reset-hero") return onResetHero();
-  if (action === "enter-stage") return onEnterStage(button.dataset.stage ?? "");
-  if (action === "battle") return onBattle(button.dataset.battle ?? "");
-}
-
-/** @param {{ hero: import("./hero-sheet.js").Hero } | { error: string }} result */
-function onPurchase(result) {
-  if ("error" in result) {
-    sounds.play("cancel");
-    return say(`block${result.error.charAt(0).toUpperCase()}${result.error.slice(1)}`);
-  }
-  sounds.play("buy");
-  commit(result.hero);
-}
-
-/** @param {string} habitId */
-function onLogHabit(habitId) {
-  const result = logHabit(state.hero, habitId, today());
-  if ("error" in result) return say(result.error);
-  sounds.play(result.hero.habitLog[result.hero.habitLog.length - 1]?.good ? "habitGood" : "habitBad");
-  commit(result.hero);
-}
-
-/** @param {string} itemId */
-function onUseItem(itemId) {
-  sounds.play("heal");
-  commit(useConsumable(state.hero, itemId));
-}
-
-function onRest() {
-  const { hero, rested } = restHero(state.hero, today());
-  state.notice = gameText(state.lang, rested ? "rested" : "alreadyRested");
-  sounds.play(rested ? "heal" : "cancel");
-  commit(hero);
-}
-
-function onResetHero() {
-  if (!confirm(gameText(state.lang, "resetHeroConfirm"))) return;
-  heroStore.clear();
-  state.run = null;
-  commit(loadOrCreateHero(heroStore, today()));
+  if (hero.handleAction(button)) return;
+  if (button.dataset.action === "enter-stage") return onEnterStage(button.dataset.stage ?? "");
+  if (button.dataset.action === "battle") return onBattle(button.dataset.battle ?? "");
 }
 
 /** @param {string} stageId */
 function onEnterStage(stageId) {
-  const result = startStageRun(state.hero, stageId);
+  if (!gate.active()) return;
+  const result = startStageRun(hero.hero, stageId);
   if ("error" in result) {
     sounds.play("cancel");
     return say(result.error);
@@ -177,17 +138,20 @@ function onBattle(action) {
   if (action === "home") return leaveStage();
   if (action === "resume") return backToMap();
   const before = state.run.duel?.log.length ?? 0;
-  const { hero, run } = runAction(state.hero, state.run, action, rollDie, today());
+  const { hero: after, run } = runAction(hero.hero, state.run, action, rollDie, today());
   state.run = posesAfterAction(run, state.tick);
   for (const sound of soundsForAction(action, run.duel?.log.slice(before) ?? [], run.duel?.phase ?? ""))
     sounds.play(sound.name, sound.delay);
-  commit(hero);
+  hero.commit(after);
 }
 
+/** Leaving an Arca (by choice, after losing, or when the free time ends) restores PV/PM/PA. */
 function leaveStage() {
+  if (!state.run) return;
   state.run = null;
   input.releaseAll();
   sounds.play("cancel");
+  hero.commit(restoreResources(hero.hero));
   switchTab("stages");
 }
 
@@ -202,41 +166,9 @@ function backToMap() {
   render();
 }
 
-/** @param {SubmitEvent} event */
-function onSubmit(event) {
-  const form = /** @type {HTMLFormElement} */ (event.target);
-  event.preventDefault();
-  if (form.dataset.form === "weight") return onWeight(new FormData(form));
-  if (form.dataset.form === "custom-habit") return onCustomHabit(form);
-}
-
-/** @param {FormData} fields */
-function onWeight(fields) {
-  const parsed = parseWeight(fields.get("kg"));
-  if ("error" in parsed) return say("weightError");
-  const weightLog = [...state.hero.weightLog, { date: today(), kg: parsed.kg }];
-  sounds.play("decision");
-  commit({ ...state.hero, weightKg: parsed.kg, weightLog });
-}
-
-/** @param {HTMLFormElement} form */
-function onCustomHabit(form) {
-  const result = customHabitFromForm(new FormData(form), () => `custom-${Date.now().toString(36)}`);
-  if ("error" in result) return say(result.error);
-  sounds.play("decision");
-  commit({ ...state.hero, customHabits: [...state.hero.customHabits, result.habit] });
-}
-
 function animate() {
   state.tick += 1;
-  const portrait = /** @type {HTMLCanvasElement | null} */ (document.getElementById("portrait"));
-  if (portrait)
-    drawPortrait(
-      /** @type {CanvasRenderingContext2D} */ (portrait.getContext("2d")),
-      heroLook(state.hero, today()),
-      state.hero.current.pv > 0 ? "stand" : "hurt",
-      state.tick,
-    );
+  hero.drawPortraitFrame(state.tick);
   if (state.run && state.tab === "battle") tickStage(state.run);
   requestAnimationFrame(animate);
 }
@@ -244,7 +176,7 @@ function animate() {
 /** @param {import("./stage-run.js").StageRun} run */
 function tickStage(run) {
   if (!run.duel) {
-    const next = stepStageWalk(state.hero, run, input.current(), rollDie);
+    const next = stepStageWalk(hero.hero, run, input.current(), rollDie);
     state.run = next;
     if (next.duel) {
       sounds.play("encounter");
@@ -268,7 +200,7 @@ function mapFrame(run) {
   return {
     map: run.map,
     walk: run.walk,
-    heroLook: heroLook(state.hero, today()),
+    heroLook: heroLook(hero.hero, today()),
     foes: run.map.spawns
       .filter((spawn) => !run.walk.beaten[spawn.index])
       .map((spawn) => ({ look: enemyLook(foes[spawn.index].sprite), tx: spawn.tx, ty: spawn.ty })),
@@ -285,10 +217,10 @@ function battleFrame(run) {
   const duel = /** @type {import("./combat.js").DuelState} */ (run.duel);
   const foe = currentFoe(run);
   const poses = currentPoses(run, state.tick);
-  const max = deriveSheet(state.hero).max;
+  const max = deriveSheet(hero.hero).max;
   return {
     palette: stage.palette,
-    heroLook: heroLook(state.hero, today()),
+    heroLook: heroLook(hero.hero, today()),
     heroPose: poses.heroPose,
     foeLook: enemyLook(foe.sprite),
     foePose: poses.foePose,
@@ -305,11 +237,13 @@ function bindEvents() {
   document.addEventListener("click", (event) => {
     const target = /** @type {HTMLElement} */ (event.target);
     const tab = target.closest("[data-tab]");
-    if (tab) return switchTab(tab.getAttribute("data-tab") ?? "today");
+    if (tab) return switchTab(tab.getAttribute("data-tab") ?? "stages");
     const button = /** @type {HTMLElement | null} */ (target.closest("button[data-action]"));
     if (button) onAction(button);
   });
-  document.addEventListener("submit", onSubmit);
+  document.addEventListener("submit", (event) => {
+    if (hero.handleSubmit(/** @type {HTMLFormElement} */ (event.target))) event.preventDefault();
+  });
   document.getElementById("lang-toggle")?.addEventListener("click", () => {
     state.lang = nextLang(state.lang);
     localStorage.setItem(LANG_KEY, state.lang);
@@ -322,12 +256,6 @@ function bindEvents() {
   });
 }
 
-function start() {
-  const credited = creditDoneListItems(state.hero, listStore.load() ?? []);
-  if (credited.credited > 0) state.notice = gameText(state.lang, "listCredit", { count: credited.credited });
-  bindEvents();
-  commit(credited.hero);
-  animate();
-}
-
-start();
+bindEvents();
+render();
+animate();

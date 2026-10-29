@@ -4,21 +4,26 @@ import { CATEGORIES, categoryI18nKey, categorySlug, categoryStamp } from "./cate
 import { translate } from "./i18n.js";
 import { escapeHtml, linkifyDescription } from "./linkify.js";
 
+/** @typedef {{ pomodoros?: Record<string, number>, pomodoroLabel?: string }} CardExtras */
+
 /**
  * @param {import("./items-store.js").HabitItem} item
  * @param {import("./i18n.js").Lang} lang
+ * @param {CardExtras} [extras] finished Pomodoros per item and the label of the "start one" button
  * @returns {string}
  */
-export function renderItemCard(item, lang) {
+export function renderItemCard(item, lang, extras = {}) {
   const doneClass = item.done ? " card-done" : "";
+  const count = extras.pomodoros?.[item.id] ?? 0;
   return `<article class="card panel category-${categorySlug(item.category)}${doneClass}" data-id="${escapeHtml(item.id)}">
   <span class="card-stamp" aria-hidden="true">${categoryStamp(item.category)}</span>
   <span class="card-category">${translate(lang, categoryI18nKey(item.category))}</span>
   <h3 class="card-name">${escapeHtml(item.name)}</h3>
   ${renderDescription(item.description)}
   <footer class="card-footer">
-    <time class="card-date" datetime="${escapeHtml(item.date)}">${formatDate(item.date)}</time>
+    <time class="card-date" datetime="${escapeHtml(item.date)}">${formatDate(item.date)}</time>${count > 0 ? `<span class="card-pomodoros" title="Pomodoros">🍅 ${count}</span>` : ""}
     <span class="card-actions">
+      ${item.done || !extras.pomodoroLabel ? "" : `<button type="button" class="stamp stamp-small" data-action="pomodoro">🍅 ${escapeHtml(extras.pomodoroLabel)}</button>`}
       <button type="button" class="stamp stamp-small" data-action="toggle">${translate(lang, item.done ? "markTodo" : "markDone")}</button>
       <button type="button" class="stamp stamp-small stamp-danger" data-action="remove">${translate(lang, "remove")}</button>
     </span>
@@ -48,10 +53,11 @@ export function formatDate(isoDate) {
 /**
  * @param {import("./items-store.js").HabitItem[]} items
  * @param {import("./i18n.js").Lang} lang
+ * @param {CardExtras} [extras]
  * @returns {string}
  */
-export function renderItemGrid(items, lang) {
-  return items.map((item) => renderItemCard(item, lang)).join("\n");
+export function renderItemGrid(items, lang, extras = {}) {
+  return items.map((item) => renderItemCard(item, lang, extras)).join("\n");
 }
 
 /**

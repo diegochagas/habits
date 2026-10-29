@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/ink.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="stylesheet" href="css/pomodoro.css" />
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Crect x='3' y='3' width='26' height='26' fill='none' stroke='%23000' stroke-width='4'/%3E%3Cpath d='M9 16l5 5 9-11' fill='none' stroke='%23000' stroke-width='4'/%3E%3C/svg%3E"
@@ -25,6 +27,8 @@
       <p class="masthead-tagline" data-i18n="tagline">Chapter by chapter, one habit at a time.</p>
       <div class="masthead-tools">
         <a class="stamp" href="game.html" data-i18n="play">Play</a>
+        <a class="stamp" href="puzzle.html" data-i18n="puzzles">Puzzles</a>
+        <button type="button" class="stamp" id="sound-toggle" aria-label="Sound">🔊</button>
         <button type="button" class="stamp" id="lang-toggle" aria-label="Toggle language">PT</button>
         <button type="button" class="stamp" id="export-button" data-i18n="export">Export</button>
         <label class="stamp" for="import-input" data-i18n="import">Import</label>
@@ -33,48 +37,70 @@
       </div>
     </header>
 
-    <main class="page">
-      <section class="panel panel-tilt-left add-panel" aria-labelledby="add-title">
-        <h2 id="add-title" class="panel-title" data-i18n="addTitle">New item!</h2>
-        <form id="add-form" class="bubble" novalidate>
-          <label class="field">
-            <span data-i18n="fieldName">Name</span>
-            <input type="text" name="name" required maxlength="200" autocomplete="off" />
-          </label>
-          <label class="field">
-            <span data-i18n="fieldCategory">Category</span>
-            <select name="category" id="category-select"></select>
-          </label>
-          <label class="field">
-            <span data-i18n="fieldDescription">Description (URLs become links)</span>
-            <textarea name="description" rows="3" maxlength="2000"></textarea>
-          </label>
-          <p class="form-error" id="form-error" role="alert" hidden></p>
-          <button type="submit" class="stamp stamp-big" data-i18n="addButton">ADD!</button>
-        </form>
-      </section>
+    <section class="pomodoro-wrap">
+      <div class="panel pomodoro-panel" aria-labelledby="pomodoro-title">
+        <h2 id="pomodoro-title" class="panel-title" data-pomodoro-i18n="pomodoroTitle">Pomodoro</h2>
+        <div id="pomodoro-body"></div>
+        <div class="pomodoro-video" id="pomodoro-video"></div>
+      </div>
+    </section>
 
-      <section class="panel panel-tilt-right filters-panel" aria-label="Filters">
-        <div class="category-tabs" id="category-tabs" role="tablist"></div>
-        <div class="filters-row">
-          <input
-            type="search"
-            id="search-input"
-            class="search-input"
-            data-i18n-placeholder="searchPlaceholder"
-            placeholder="Search..."
-          />
-          <select id="status-select" class="status-select">
-            <option value="all" data-i18n="statusAll">All</option>
-            <option value="todo" data-i18n="statusTodo">To do</option>
-            <option value="done" data-i18n="statusDone">Done</option>
-          </select>
+    <main class="page home-page">
+      <aside class="home-side">
+        <section class="panel hero-panel" id="hero-panel" aria-label="Hero"></section>
+        <section class="panel panel-tilt-left add-panel" id="add-panel" aria-labelledby="add-title">
+          <h2 id="add-title" class="panel-title" data-i18n="addTitle">New item!</h2>
+          <form id="add-form" class="bubble" novalidate>
+            <label class="field">
+              <span data-i18n="fieldName">Name</span>
+              <input type="text" name="name" required maxlength="200" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span data-i18n="fieldCategory">Category</span>
+              <select name="category" id="category-select"></select>
+            </label>
+            <label class="field">
+              <span data-i18n="fieldDescription">Description (URLs become links)</span>
+              <textarea name="description" rows="3" maxlength="2000"></textarea>
+            </label>
+            <p class="form-error" id="form-error" role="alert" hidden></p>
+            <button type="submit" class="stamp stamp-big" data-i18n="addButton">ADD!</button>
+          </form>
+        </section>
+      </aside>
+
+      <section class="home-content">
+        <nav class="game-tabs" aria-label="Sections">
+          <button type="button" class="tab" data-tab="list" data-i18n="tabList">List</button>
+          <button type="button" class="tab" data-tab="today" data-game-i18n="tabToday">Today</button>
+          <button type="button" class="tab" data-tab="sheet" data-game-i18n="tabSheet">Sheet</button>
+        </nav>
+        <p class="game-notice form-error" id="game-notice" role="status" hidden></p>
+
+        <div id="list-section">
+          <section class="panel panel-tilt-right filters-panel" aria-label="Filters">
+            <div class="category-tabs" id="category-tabs" role="tablist"></div>
+            <div class="filters-row">
+              <input
+                type="search"
+                id="search-input"
+                class="search-input"
+                data-i18n-placeholder="searchPlaceholder"
+                placeholder="Search..."
+              />
+              <select id="status-select" class="status-select">
+                <option value="all" data-i18n="statusAll">All</option>
+                <option value="todo" data-i18n="statusTodo">To do</option>
+                <option value="done" data-i18n="statusDone">Done</option>
+              </select>
+            </div>
+            <p class="counter" id="counter"></p>
+          </section>
+          <section class="items-grid" id="items-grid" aria-live="polite"></section>
+          <p class="empty-state panel" id="empty-state" hidden data-i18n="empty">Nothing here... yet.</p>
         </div>
-        <p class="counter" id="counter"></p>
+        <div id="hero-main" hidden></div>
       </section>
-
-      <section class="items-grid" id="items-grid" aria-live="polite"></section>
-      <p class="empty-state panel" id="empty-state" hidden data-i18n="empty">Nothing here... yet.</p>
     </main>
 
     <footer class="colophon">

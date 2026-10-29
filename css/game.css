@@ -507,7 +507,7 @@
     grid-template-areas: "hero content";
   }
 
-  .hero-panel {
+  .game-page .hero-panel {
     grid-area: hero;
     position: sticky;
     top: 24px;

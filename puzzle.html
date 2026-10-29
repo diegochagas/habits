@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sort Puzzles</title>
+    <meta name="description" content="Ink-style sort puzzles for the Pomodoro break: magic tubes and coin stacks." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/ink.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="stylesheet" href="css/pomodoro.css" />
+    <link rel="stylesheet" href="css/puzzle.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Crect x='3' y='3' width='26' height='26' fill='none' stroke='%23000' stroke-width='4'/%3E%3Cpath d='M9 16l5 5 9-11' fill='none' stroke='%23000' stroke-width='4'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div class="speed-lines" aria-hidden="true"></div>
+
+    <header class="masthead panel game-masthead">
+      <h1 class="masthead-title" data-puzzle-i18n="puzzleTitle">SORT PUZZLES</h1>
+      <p class="masthead-tagline" data-puzzle-i18n="puzzleTagline">
+        Break-time brain teasers: sort the tubes, stack the coins.
+      </p>
+      <div class="masthead-tools">
+        <a class="stamp" href="index.html" data-pomodoro-i18n="backToHabits">Back to Habits</a>
+        <a class="stamp" href="game.html" data-puzzle-i18n="backToArcas">Arcas</a>
+        <span class="stamp free-time" id="free-time" role="timer">⏱</span>
+        <button type="button" class="stamp" id="sound-toggle" aria-label="Sound">🔊</button>
+        <button type="button" class="stamp" id="lang-toggle" aria-label="Toggle language">PT</button>
+      </div>
+    </header>
+
+    <main class="page puzzle-page">
+      <section class="panel puzzle-panel" id="puzzle-main" aria-label="Puzzle"></section>
+    </main>
+
+    <div class="free-time-over panel" id="free-time-over" role="alert" hidden></div>
+
+    <footer class="colophon">Saved in this browser only.</footer>
+
+    <script type="module" src="js/puzzle/puzzle-app.js"></script>
+  </body>
+</html>

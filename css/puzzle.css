@@ -1,0 +1,157 @@
+/* puzzle.css: the sort-puzzle board in ink. Nine ink patterns stand in for colours. */
+
+.puzzle-page {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.puzzle-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.puzzle-status {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+}
+
+.sort-board {
+  --slot: 44px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 18px 12px;
+  padding: 16px 4px 4px;
+}
+
+.tube {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 2px;
+  width: calc(var(--slot) + 10px);
+  height: calc(var(--capacity) * (var(--slot) + 2px) + 10px);
+  padding: 4px;
+  border: 3px solid var(--ink);
+  border-top: 0;
+  border-radius: 0 0 22px 22px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 var(--ink);
+  cursor: pointer;
+  overflow: visible;
+  transition: transform 80ms ease;
+}
+
+.tube:hover,
+.tube:focus-visible {
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.tube-selected {
+  box-shadow:
+    4px 4px 0 var(--ink),
+    0 0 0 3px var(--paper),
+    0 0 0 6px var(--ink);
+}
+
+.sort-item {
+  display: block;
+  width: var(--slot);
+  height: var(--slot);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  transition: transform 100ms ease;
+}
+
+.sort-item.lifted {
+  transform: translateY(-14px);
+}
+
+/* Coin stacks: flat coins, no glass. */
+.skin-coins .tube {
+  border: 0;
+  border-bottom: 4px solid var(--ink);
+  border-radius: 0;
+  box-shadow: none;
+  gap: 0;
+  height: calc(var(--capacity) * 22px + 36px);
+  justify-content: flex-start;
+}
+
+.skin-coins .sort-item {
+  width: calc(var(--slot) + 14px);
+  height: 26px;
+  margin-top: -5px;
+  border-radius: 50% / 45%;
+  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.25);
+}
+
+.skin-coins .sort-item.lifted {
+  transform: translateY(-10px);
+}
+
+.skin-coins .tube-selected {
+  box-shadow: 0 6px 0 -3px var(--ink);
+}
+
+/* The nine "colours". */
+.ink-0 {
+  background: var(--ink);
+}
+.ink-1 {
+  background: var(--paper);
+}
+.ink-2 {
+  background: repeating-linear-gradient(0deg, var(--ink) 0 3px, var(--paper) 3px 7px);
+}
+.ink-3 {
+  background: repeating-linear-gradient(90deg, var(--ink) 0 3px, var(--paper) 3px 7px);
+}
+.ink-4 {
+  background: radial-gradient(circle, var(--ink) 2px, transparent 2.5px) 0 0 / 8px 8px var(--paper);
+}
+.ink-5 {
+  background: repeating-linear-gradient(45deg, var(--ink) 0 3px, var(--paper) 3px 8px);
+}
+.ink-6 {
+  background:
+    repeating-linear-gradient(45deg, var(--ink) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(-45deg, var(--ink) 0 2px, var(--paper) 2px 7px);
+}
+.ink-7 {
+  background: linear-gradient(var(--ink) 50%, var(--paper) 50%);
+}
+.ink-8 {
+  background: radial-gradient(circle, var(--paper) 35%, var(--ink) 40%, var(--ink) 55%, var(--paper) 60%);
+}
+
+.puzzle-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.puzzle-win {
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+}
+
+.puzzle-win p {
+  margin: 0 0 12px;
+}
+
+.puzzle-how {
+  text-align: center;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .sort-board {
+    --slot: 32px;
+    gap: 14px 8px;
+  }
+}
