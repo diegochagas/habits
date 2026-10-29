@@ -13,6 +13,9 @@
  * @property {number} [pvHit] PV lost today when a bad habit is logged
  */
 
+// The former "language", "devotional" and "budget" habits are now the list's Today habits
+// (Duolingo, Devotional, Finances rows flagged `daily`; Diego, 2026-10-29). Their i18n keys
+// stay so older log entries still read well.
 /** @type {HabitDefinition[]} */
 export const DEFAULT_HABITS = [
   { id: "gym", track: "poder", xp: 2, good: true },
@@ -20,11 +23,8 @@ export const DEFAULT_HABITS = [
   { id: "read", track: "habilidade", xp: 1, good: true },
   { id: "study", track: "habilidade", xp: 1, good: true },
   { id: "code", track: "habilidade", xp: 1, good: true },
-  { id: "language", track: "habilidade", xp: 1, good: true },
-  { id: "devotional", track: "resistencia", xp: 1, good: true },
   { id: "healthyMeal", track: "resistencia", xp: 1, good: true },
   { id: "sleep", track: "resistencia", xp: 1, good: true },
-  { id: "budget", track: "resistencia", xp: 1, good: true },
   { id: "junkFood", track: "resistencia", xp: -2, good: false, pvHit: 3 },
   { id: "spending", track: "resistencia", xp: -2, good: false },
   { id: "skipGym", track: "poder", xp: -1, good: false },

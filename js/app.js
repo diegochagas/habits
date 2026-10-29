@@ -154,8 +154,19 @@ function renderHeroArea() {
   /** @type {HTMLElement} */ (document.getElementById("list-section")).hidden = !onList;
   /** @type {HTMLElement} */ (document.getElementById("add-panel")).hidden = !onList;
   heroMain.hidden = onList;
-  if (state.tab === "today") heroMain.innerHTML = renderTodayView(hero.hero, state.lang, today());
+  if (state.tab === "today")
+    heroMain.innerHTML = renderTodayView(hero.hero, state.lang, today(), todayHabits(state.items));
   if (state.tab === "sheet") heroMain.innerHTML = renderSheetView(hero.hero, state.lang);
+}
+
+/**
+ * The Today tab's habits: items flagged daily, to do first.
+ * @param {import("./items-store.js").HabitItem[]} items
+ * @returns {import("./items-store.js").HabitItem[]}
+ */
+function todayHabits(items) {
+  const daily = items.filter((item) => item.daily);
+  return [...daily.filter((item) => !item.done), ...daily.filter((item) => item.done)];
 }
 
 /** @param {import("./items-store.js").HabitItem[]} items */
@@ -273,7 +284,16 @@ function onHeroClick(event) {
   );
   if (!button) return;
   say("");
+  if (button.dataset.action === "done-item") return onTodayHabitDone(button.dataset.id ?? "");
   hero.handleAction(button);
+}
+
+/** A Today habit pressed on the Today tab: done for today (the list card greys out). */
+function onTodayHabitDone(id) {
+  const item = state.items.find((entry) => entry.id === id);
+  if (!item || item.done) return;
+  sounds.play("habitGood");
+  commit(toggleDone(state.items, id, today()));
 }
 
 /** @param {File} file */

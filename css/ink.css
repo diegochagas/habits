@@ -464,6 +464,22 @@ body::before {
   opacity: 0.85;
 }
 
+/* A Today habit done today: greyed out with a note instead of the DONE stamp. */
+.card-done-today {
+  opacity: 0.55;
+}
+
+.card-done-today::after {
+  content: none;
+}
+
+.card-done-today-note {
+  margin: 0 0 6px;
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+}
+
 .empty-state {
   margin: 0;
   font-family: var(--font-title);

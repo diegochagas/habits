@@ -6,6 +6,7 @@
     "description": "Fazer uma oração concentrado ao acordar",
     "date": "2026-10-28",
     "done": false,
+    "daily": true,
     "createdAt": "2026-10-28T00:00:00.000Z"
   },
   {
@@ -15,6 +16,7 @@
     "description": "Fazer 1 lição no Duolingo",
     "date": "2026-10-28",
     "done": false,
+    "daily": true,
     "createdAt": "2026-10-28T00:00:00.000Z"
   },
   {
@@ -24,6 +26,7 @@
     "description": "Assistir 1 aula da AUVP",
     "date": "2026-10-28",
     "done": false,
+    "daily": true,
     "createdAt": "2026-10-28T00:00:00.000Z"
   },
   {

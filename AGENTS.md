@@ -4,9 +4,10 @@ Vanilla ES-module pages, no build, plus `server/` (node:http + `pg`, the one run
 dependency, behind `server/state-postgres.js`): it serves the pages and keeps every saved
 document in one PostgreSQL table (`/api/state/<key>`, see `js/state-storage.js`; the pages fall
 back to localStorage when served as plain files). The seed in `data/seed.json` is a snapshot of
-the "ToDo List" Google Sheet (2026-10-28). Items have `doneAt` and an optional `daily` flag:
-`rollDailyItems` brings daily items back every morning; cards edit in place
-(`js/render-item-editor.js`). Deployed on the home server by push (docker compose, see README).
+the "ToDo List" Google Sheet (2026-10-28). Items have `doneAt` and an optional `daily` flag
+("Today habit" in the UI): `rollDailyItems` brings them back every morning, the Today tab lists
+them first (`today-view.js`, action `done-item`) and a done one is greyed on the list; cards
+edit in place (`js/render-item-editor.js`). Deployed on the home server by push (docker compose, see README).
 `game.html` + `js/game/` is the 3DeT Victory game (see README "Architecture"); combat and
 progression are pure functions that take an injected `rollDie`, so tests use scripted dice and
 the page accepts `?seed=N`. Keep game strings in `js/game/game-i18n.js` (EN + PT). Stage maps are

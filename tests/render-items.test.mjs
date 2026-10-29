@@ -27,6 +27,14 @@ test("a done card gets the done class and the undo label in PT", () => {
   assert.ok(html.includes(">Desfazer<"));
 });
 
+test("a Today habit done today is greyed out with an 'already done' note", () => {
+  const html = renderItemCard({ ...item, daily: true, done: true, doneAt: "2026-10-29" }, "en");
+  assert.ok(html.includes("card-done card-done-today"));
+  assert.ok(html.includes("✓ Already done today"));
+  const plain = renderItemCard({ ...item, done: true }, "en");
+  assert.ok(!plain.includes("card-done-today"), "a plain done item keeps the DONE stamp");
+});
+
 test("formatDate leaves non-ISO input untouched but escaped", () => {
   assert.equal(formatDate("soon <b>"), "soon &lt;b&gt;");
 });

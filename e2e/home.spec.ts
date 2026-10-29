@@ -10,9 +10,9 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
   await page.goto("/");
   await expect(page.locator(".hero-rank")).toContainText("12 pts");
   await expect(page.locator(".pool-poder b")).toHaveText("0");
+  await expect(page.locator(".game-tabs .tab").first()).toHaveText("Today");
   await page.getByRole("button", { name: "Today", exact: true }).click();
   await expect(page.locator("#list-section")).toBeHidden();
-  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home-today.png` });
 
   await page.getByRole("button", { name: /Gym workout/ }).click();
   await expect(page.locator(".pool-poder b")).toHaveText("2");
@@ -20,6 +20,24 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
   await expect(page.locator(".pool-poder b")).toHaveText("0");
   await expect(page.locator(".resource.pv span")).toHaveText("PV 7/10");
   await expect(page.locator(".today-log li")).toHaveCount(2);
+
+  // The seed's Devotional row is a Today habit: once a day, greyed on the list afterwards.
+  const devotional = page.locator(".today-habits button", { hasText: "Devotional" });
+  await expect(devotional).toContainText("+1 R");
+  await devotional.click();
+  await expect(devotional).toBeDisabled();
+  await expect(devotional).toContainText("Already done today");
+  await expect(page.locator(".pool-resistencia b")).toHaveText("1");
+  await expect(page.locator(".today-log li")).toHaveCount(3);
+  await expect(page.locator(".today-log li").first()).toContainText("Devotional");
+  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home-today.png` });
+  await page.getByRole("button", { name: "List", exact: true }).click();
+  await page.getByPlaceholder("Search...").fill("Devotional");
+  const card = page.locator("article.card", { hasText: "Devotional" });
+  await expect(card).toHaveClass(/card-done-today/);
+  await expect(card.locator(".card-done-today-note")).toHaveText("✓ Already done today");
+  await page.getByPlaceholder("Search...").fill("");
+  await page.getByRole("button", { name: "Today", exact: true }).click();
 
   for (let i = 0; i < 5; i += 1) await page.getByRole("button", { name: /Gym workout/ }).click();
   await expect(page.locator(".pool-poder b")).toHaveText("10");

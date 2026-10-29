@@ -3,11 +3,13 @@
 A black-and-white, ink-styled list of the things I want to read, watch, build and keep
 doing. It started as the "ToDo List" Google Sheet (Date, Task, Notes, Source, Done) and
 now lives on the home server: add an item with a name, a category, a description where
-URLs become links, a date and an "every day" flag; edit it in place; mark it done; filter by
-category, search, export or import JSON. Daily items come back every morning.
+URLs become links, a date and a "Today habit" flag; edit it in place; mark it done; filter by
+category, search, export or import JSON. Today habits come back every morning.
 
-The habits page (`index.html`) also holds the **hero**: the Today tab logs good and bad habits
-(XP in and out of three tracks, Poder / Habilidade / Resistência), the Sheet tab spends that XP on
+The habits page (`index.html`) also holds the **hero**: the Today tab (the first one) lists the
+Today habits of the list (Devotional, Duolingo, Finances… once a day each; a done one shows
+"Already done today" greyed out on the list), then the catalog's good and bad habits (XP in and
+out of three tracks, Poder / Habilidade / Resistência); the Sheet tab spends that XP on
 atributos, perícias, vantagens and items, and the hero card shows the chibi whose body follows
 the logged weight. A **Pomodoro** panel sits on top: pick a list item (or press 🍅 on its card),
 work 25 minutes with an optional YouTube focus video (saved link, mute button), rest 5 (15 every

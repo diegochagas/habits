@@ -68,6 +68,24 @@ test("a daily list item pays XP once per day, keyed by the date", () => {
   assert.deepEqual(tuesday.hero.creditedListItemIds, ["row-d@2026-10-26", "row-d@2026-10-27"]);
 });
 
+test("a daily list item (a Today habit) is also logged for today; a plain item is not", () => {
+  const hero = createStartingHero(TODAY);
+  const items = [
+    { id: "row-d", name: "Devotional", category: "Personal", done: true, daily: true },
+    { id: "b", name: "Bleach", category: "Watch", done: true },
+  ];
+  const credited = creditDoneListItems(hero, items, "2026-10-26").hero;
+  assert.equal(credited.habitLog.length, 1);
+  assert.deepEqual(credited.habitLog[0], {
+    date: "2026-10-26",
+    habitId: "list:row-d",
+    xp: 1,
+    track: "resistencia",
+    good: true,
+    label: "Devotional",
+  });
+});
+
 test("raising an attribute costs 10 XP from its own track and grows the resource", () => {
   let hero = createStartingHero(TODAY);
   assert.ok("error" in raiseAttribute(hero, "resistencia"));

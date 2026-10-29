@@ -1,6 +1,8 @@
-// today-view.js: the daily habit log. Good habits add XP to a track, bad habits remove it.
+// today-view.js: the daily habit log. The list's Today habits (items flagged `daily`) come
+// first, once a day each; then the catalog's good habits add XP to a track and bad habits
+// remove it.
 
-import { DEFAULT_HABITS } from "./catalog.js";
+import { DEFAULT_HABITS, LIST_CATEGORY_TRACK } from "./catalog.js";
 import { gameText } from "./game-i18n.js";
 import { capitalize } from "./hero-panel.js";
 import { escapeHtml } from "../linkify.js";
@@ -9,9 +11,11 @@ import { escapeHtml } from "../linkify.js";
  * @param {import("./hero-sheet.js").Hero} hero
  * @param {"en" | "pt"} lang
  * @param {string} today
+ * @param {import("../items-store.js").HabitItem[]} [todayItems] the list items flagged `daily`
  * @returns {string}
+ * @example renderTodayView(hero, "en", "2026-10-29", items.filter((item) => item.daily))
  */
-export function renderTodayView(hero, lang, today) {
+export function renderTodayView(hero, lang, today, todayItems = []) {
   const all = [
     ...DEFAULT_HABITS.map((habit) => ({ ...habit, label: gameText(lang, `habit.${habit.id}`) })),
     ...hero.customHabits,
@@ -19,11 +23,30 @@ export function renderTodayView(hero, lang, today) {
   const good = all.filter((habit) => habit.good);
   const bad = all.filter((habit) => !habit.good);
   return `<div class="today-grid">
-  <section class="panel panel-tilt-left"><h3 class="panel-title">${gameText(lang, "goodHabits")}</h3>${renderHabitButtons(good, "good")}</section>
-  <section class="panel panel-tilt-right"><h3 class="panel-title">${gameText(lang, "badHabits")}</h3>${renderHabitButtons(bad, "bad")}</section>
+  <section class="panel panel-tilt-left today-habits"><h3 class="panel-title">${gameText(lang, "todayHabits")}</h3>
+    <p class="muted">${gameText(lang, "todayHabitsHelp")}</p>${renderTodayItems(todayItems, lang)}</section>
+  <section class="panel panel-tilt-right"><h3 class="panel-title">${gameText(lang, "goodHabits")}</h3>${renderHabitButtons(good, "good")}</section>
+  <section class="panel"><h3 class="panel-title">${gameText(lang, "badHabits")}</h3>${renderHabitButtons(bad, "bad")}</section>
   <section class="panel">${renderCustomForm(lang)}</section>
   <section class="panel"><h3 class="panel-title">${gameText(lang, "todayLog")}</h3>${renderTodayLog(hero, lang, today)}</section>
 </div>`;
+}
+
+/**
+ * One button per Today habit; a done one is greyed and disabled until tomorrow.
+ * @param {import("../items-store.js").HabitItem[]} items
+ * @param {"en" | "pt"} lang
+ * @returns {string}
+ */
+function renderTodayItems(items, lang) {
+  if (items.length === 0) return `<p class="muted">${gameText(lang, "noTodayHabits")}</p>`;
+  const buttons = items.map((item) => {
+    const track = LIST_CATEGORY_TRACK[item.category] ?? "habilidade";
+    const state = item.done ? `<b>✓ ${gameText(lang, "doneToday")}</b>` : `<b>+1 ${trackTag(track)}</b>`;
+    return `<button type="button" class="habit-button habit-good track-${track}${item.done ? " habit-done" : ""}" data-action="done-item" data-id="${escapeHtml(item.id)}"${item.done ? " disabled" : ""}>
+        <span>${escapeHtml(item.name)}</span>${state}</button>`;
+  });
+  return `<div class="habit-buttons">${buttons.join("")}</div>`;
 }
 
 /**

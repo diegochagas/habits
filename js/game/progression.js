@@ -83,9 +83,10 @@ export function loseCurrentPv(hero, pv) {
 
 /**
  * Credit list items marked done on the Habits page (+1 XP each, once per item; a daily item
- * once per day, keyed "id@yyyy-mm-dd").
+ * once per day, keyed "id@yyyy-mm-dd"). Daily items are the Today habits, so each credit is
+ * also logged for today (the Today tab's log shows them next to the catalog habits).
  * @param {Hero} hero
- * @param {{ id: string, category: string, done: boolean, daily?: boolean }[]} listItems
+ * @param {{ id: string, name?: string, category: string, done: boolean, daily?: boolean }[]} listItems
  * @param {string} [today] yyyy-mm-dd, needed for daily items
  * @returns {{ hero: Hero, credited: number }}
  * @example creditDoneListItems(hero, items, "2026-10-29").credited // 2
@@ -98,8 +99,21 @@ export function creditDoneListItems(hero, listItems, today = "") {
   for (const item of fresh) {
     const track = /** @type {Track} */ (LIST_CATEGORY_TRACK[item.category] ?? "habilidade");
     next = awardXp(next, track, 1);
+    if (item.daily) next = logListItem(next, item, track, today);
   }
   return { hero: next, credited: fresh.length };
+}
+
+/**
+ * @param {Hero} hero
+ * @param {{ id: string, name?: string }} item
+ * @param {Track} track
+ * @param {string} today
+ * @returns {Hero}
+ */
+function logListItem(hero, item, track, today) {
+  const entry = { date: today, habitId: `list:${item.id}`, xp: 1, track, good: true, label: item.name ?? item.id };
+  return { ...hero, habitLog: [...hero.habitLog, entry] };
 }
 
 /**

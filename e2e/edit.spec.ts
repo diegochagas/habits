@@ -17,7 +17,7 @@ test("edit a card: name, category and daily; the change survives a reload", asyn
   await expect(editor.getByLabel("Name")).toHaveValue("Duolingo");
   await editor.getByLabel("Name").fill("Duolingo: 2 lessons");
   await editor.getByLabel("Category").selectOption("Side Hustle");
-  await editor.getByLabel("Every day").check();
+  await editor.getByLabel("Today habit").check();
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-edit.png`, fullPage: false });
   await editor.getByRole("button", { name: "Save" }).click();
 
@@ -56,6 +56,8 @@ test("a daily item done yesterday is to do again today; one done today stays don
   await page.goto("/");
   await expect(page.locator("#counter")).toContainText("2 of 2");
   await expect(page.locator("article.card", { hasText: "Yesterday's habit" })).not.toHaveClass(/card-done/);
-  await expect(page.locator("article.card", { hasText: "Today's habit" })).toHaveClass(/card-done/);
+  const doneToday = page.locator("article.card", { hasText: "Today's habit" });
+  await expect(doneToday).toHaveClass(/card-done-today/);
+  await expect(doneToday.locator(".card-done-today-note")).toHaveText("✓ Already done today");
   expect(errors).toEqual([]);
 });

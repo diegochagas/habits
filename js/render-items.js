@@ -14,7 +14,7 @@ import { escapeHtml, linkifyDescription } from "./linkify.js";
  * @returns {string}
  */
 export function renderItemCard(item, lang, extras = {}) {
-  const doneClass = item.done ? " card-done" : "";
+  const doneClass = item.done ? (item.daily ? " card-done card-done-today" : " card-done") : "";
   const editing = extras.editingId === item.id && extras.editor;
   return `<article class="card panel category-${categorySlug(item.category)}${doneClass}" data-id="${escapeHtml(item.id)}">
   <span class="card-stamp" aria-hidden="true">${categoryStamp(item.category)}</span>
@@ -32,6 +32,7 @@ export function renderItemCard(item, lang, extras = {}) {
 function renderCardBody(item, lang, extras) {
   const count = extras.pomodoros?.[item.id] ?? 0;
   return `<h3 class="card-name">${escapeHtml(item.name)}${item.daily ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁</span>` : ""}</h3>
+  ${item.daily && item.done ? `<p class="card-done-today-note">✓ ${translate(lang, "doneToday")}</p>` : ""}
   ${renderDescription(item.description)}
   <footer class="card-footer">
     <time class="card-date" datetime="${escapeHtml(item.date)}">${formatDate(item.date)}</time>${count > 0 ? `<span class="card-pomodoros" title="Pomodoros">🍅 ${count}</span>` : ""}
