@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createStartingHero } from "../js/game/hero-sheet.js";
 import { createHeroStore, loadOrCreateHero, useConsumable } from "../js/game/hero-store.js";
-import { nextEncounter, runAction, startStageRun } from "../js/game/stage-run.js";
+import { isStageCleared, resumeWalk, runAction, startStageRun, stepStageWalk } from "../js/game/stage-run.js";
 import { STAGES, encounterXp, enemyPoints, stageEncounters } from "../js/game/stages.js";
 import { DEFAULT_HABITS, SHOP } from "../js/game/catalog.js";
 import { gameText } from "../js/game/game-i18n.js";
@@ -56,28 +56,52 @@ test("XP: minions pay 1 once per day, bosses pay 5 the first time and 1 on repla
   assert.equal(encounterXp(boss, { ...fresh, bossBeaten: true }, TODAY), 1);
 });
 
-test("a run: winning awards Poder XP and records progress; a 0 PV hero cannot start", () => {
+test("a run: bumping into the first enemy starts its duel, winning awards Poder XP and clears it from the map", () => {
   const hero = createStartingHero(TODAY);
-  assert.ok("error" in startStageRun({ ...hero, current: { ...hero.current, pv: 0 } }, "academia", scriptedDie([])));
-  assert.ok("error" in startStageRun(hero, "nope", scriptedDie([])));
-  const started = /** @type {any} */ (startStageRun(hero, "academia", scriptedDie([4, 1]))).run;
-  const { hero: after, run } = runAction(hero, started, "attack", scriptedDie([3, 3, 2]), TODAY);
-  assert.equal(run.duel.phase, "won");
-  assert.equal(run.lastXp, 1);
+  assert.ok("error" in startStageRun({ ...hero, current: { ...hero.current, pv: 0 } }, "academia"));
+  assert.ok("error" in startStageRun(hero, "nope"));
+  let run = /** @type {any} */ (startStageRun(hero, "academia")).run;
+  assert.equal(run.duel, null);
+  assert.deepEqual([run.walk.tx, run.walk.ty], [2, 7]);
+  // walk right 7 tiles (8 ticks each), the 8th press bumps into minion 1 at (10, 7)
+  for (let tick = 0; tick < 7 * 8; tick += 1) run = stepStageWalk(hero, run, "right", scriptedDie([]));
+  assert.deepEqual([run.walk.tx, run.walk.ty, run.duel], [9, 7, null]);
+  run = stepStageWalk(hero, run, "right", scriptedDie([4, 1]));
+  assert.equal(run.index, 0);
+  assert.equal(run.duel?.phase, "player");
+  const { hero: after, run: won } = runAction(hero, run, "attack", scriptedDie([3, 3, 2]), TODAY);
+  assert.equal(won.duel?.phase, "won");
+  assert.equal(won.lastXp, 1);
   assert.equal(after.pools.poder, 1);
   assert.equal(after.stages.academia.minions, 1);
-  const next = nextEncounter(after, run, scriptedDie([4, 1]));
-  assert.equal(next?.index, 1);
+  const back = resumeWalk(won);
+  assert.equal(back.duel, null);
+  assert.deepEqual(back.walk.beaten, [true, false, false, false]);
+  assert.equal(isStageCleared(back), false);
   assert.equal(stageEncounters(STAGES[0]).length, 4);
 });
 
-test("a lost fight writes 0 PV back into the hero", () => {
+test("fleeing keeps the enemy on the map; walking into it again restarts the fight", () => {
+  const hero = createStartingHero(TODAY);
+  let run = /** @type {any} */ (startStageRun(hero, "academia")).run;
+  run = { ...run, walk: { ...run.walk, tx: 9 } };
+  run = stepStageWalk(hero, run, "right", scriptedDie([4, 1]));
+  const fled = runAction(hero, run, "flee", scriptedDie([]), TODAY).run;
+  assert.equal(fled.duel?.phase, "fled");
+  const back = resumeWalk(fled);
+  assert.deepEqual(back.walk.beaten, [false, false, false, false]);
+  assert.equal(stepStageWalk(hero, back, "right", scriptedDie([4, 1])).duel?.phase, "player");
+});
+
+test("a lost fight writes 0 PV back into the hero and cannot be resumed", () => {
   const hero = { ...createStartingHero(TODAY), current: { pv: 1, pm: 10, pa: 2 } };
-  const started = /** @type {any} */ (startStageRun(hero, "academia", scriptedDie([4, 1]))).run;
+  let run = /** @type {any} */ (startStageRun(hero, "academia")).run;
+  run = stepStageWalk(hero, { ...run, walk: { ...run.walk, tx: 9 } }, "right", scriptedDie([4, 1]));
   // attack misses: [1,1]+2 = 4 vs [2]+1 = 3 → 1 damage; foe answers [6]+1+1 = 8 vs [1]+2 = 3 → 5 damage → lost
-  const { hero: after, run } = runAction(hero, started, "attack", scriptedDie([1, 1, 2, 6, 1]), TODAY);
-  assert.equal(run.duel.phase, "lost");
+  const { hero: after, run: lost } = runAction(hero, run, "attack", scriptedDie([1, 1, 2, 6, 1]), TODAY);
+  assert.equal(lost.duel?.phase, "lost");
   assert.equal(after.current.pv, 0);
+  assert.equal(resumeWalk(lost), lost);
 });
 
 test("hero store round-trips and consumables restore resources", () => {

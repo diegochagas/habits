@@ -41,7 +41,7 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
   expect(errors).toEqual([]);
 });
 
-test("the first Arca can be fought with the starting sheet", async ({ page }, testInfo) => {
+test("the first Arca is walked RPG Maker style: bump into the enemy, fight, continue", async ({ page }, testInfo) => {
   const errors = collectErrors(page);
   await page.goto("/game.html?seed=7");
   await page.getByRole("button", { name: "Arcas", exact: true }).click();
@@ -50,7 +50,17 @@ test("the first Arca can be fought with the starting sheet", async ({ page }, te
 
   await page.getByRole("button", { name: "Enter" }).first().click();
   await expect(page.locator(".battle-head")).toContainText("Haunted Gym");
+  await expect(page.locator(".battle-head")).toContainText("0 of 4");
   await expect(page.locator("#battle-canvas")).toBeVisible();
+  await expect(page.locator(".dpad")).toBeVisible();
+  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-map.png` });
+
+  // Hold → until the hero bumps into Dumbbell Bro (7 tiles away) and the command window appears.
+  await page.locator("#battle-canvas").click({ position: { x: 10, y: 10 } });
+  await page.keyboard.down("ArrowRight");
+  await expect(page.getByRole("button", { name: "Attack" })).toBeVisible({ timeout: 10_000 });
+  await page.keyboard.up("ArrowRight");
+  await expect(page.locator(".battle-head")).toContainText("Dumbbell Bro");
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-battle.png` });
 
   for (let turn = 0; turn < 12; turn += 1) {
@@ -58,8 +68,19 @@ test("the first Arca can be fought with the starting sheet", async ({ page }, te
     if ((await attack.count()) === 0) break;
     await attack.click();
   }
-  await expect(page.locator(".battle-actions .stamp").first()).toHaveText(/Next enemy|Back to the Arcas/);
+  await expect(page.locator(".rm-commands .rm-command").first()).toHaveText(/Continue|Back to the Arcas/);
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-game-battle-end.png` });
+  if ((await page.getByRole("button", { name: "Continue" }).count()) > 0) {
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.locator(".battle-head")).toContainText("1 of 4");
+    await expect(page.locator(".dpad")).toBeVisible();
+  }
+
+  // The on-screen d-pad moves the hero too (pointer down/up on a key).
+  const left = page.getByRole("button", { name: "Left", exact: true });
+  if ((await left.count()) > 0) await left.dispatchEvent("pointerdown");
+  await page.waitForTimeout(300);
+  await page.dispatchEvent("body", "pointerup");
   expect(errors).toEqual([]);
 });
 

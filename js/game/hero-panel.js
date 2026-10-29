@@ -1,43 +1,25 @@
-// hero-panel.js: the always-visible hero card: animated sprite, points/tier, P/H/R, PV/PM/PA,
+// hero-panel.js: the always-visible hero card: animated chibi, points/tier, P/H/R, PV/PM/PA,
 // weight form and the XP pools. HTML strings + one canvas draw.
 
-import { drawCharacter } from "./character-sprite.js";
+import { CHIBI_H, CHIBI_W, drawChibi } from "./chibi-sprite.js";
 import { gameText } from "./game-i18n.js";
 import { deriveSheet } from "./hero-sheet.js";
 import { createPainter } from "./pixel-painter.js";
-import { auraScore } from "./progression.js";
-import { bodyMassFactor } from "./weight.js";
 import { escapeHtml } from "../linkify.js";
 
-export const PORTRAIT_W = 40;
-export const PORTRAIT_H = 56;
-
 /**
- * @param {import("./hero-sheet.js").Hero} hero
- * @param {string} today
- * @returns {import("./character-sprite.js").CharacterLook}
- */
-export function heroLook(hero, today) {
-  return {
-    mass: bodyMassFactor(hero.weightKg),
-    aura: auraScore(hero, today),
-    owned: hero.owned,
-    tier: deriveSheet(hero).tier,
-  };
-}
-
-/**
+ * The portrait: the chibi walking in place, facing the player.
  * @param {CanvasRenderingContext2D} ctx
- * @param {import("./character-sprite.js").CharacterLook} look
- * @param {import("./character-sprite.js").Pose} pose
+ * @param {import("./chibi-sprite.js").ChibiLook} look
+ * @param {import("./chibi-sprite.js").ChibiPose} pose
  * @param {number} tick
  */
 export function drawPortrait(ctx, look, pose, tick) {
-  const scale = ctx.canvas.width / PORTRAIT_W;
+  const scale = ctx.canvas.width / CHIBI_W;
   const p = createPainter(ctx, scale);
-  p.rect(0, 0, PORTRAIT_W, PORTRAIT_H, "#fff");
-  p.halftone(0, 0, PORTRAIT_W, PORTRAIT_H, "#d8d8d8", 4);
-  drawCharacter(p, 0, 0, look, pose, tick);
+  p.rect(0, 0, CHIBI_W, CHIBI_H, "#fff");
+  p.halftone(0, 0, CHIBI_W, CHIBI_H, "#d8d8d8", 4);
+  drawChibi(p, 0, 0, look, { dir: "down", pose, step: Math.floor(tick / 8) % 4, tick });
 }
 
 /**
@@ -50,7 +32,7 @@ export function renderHeroPanel(hero, lang, today) {
   const sheet = deriveSheet(hero);
   const tier = gameText(lang, `tier${sheet.tier.charAt(0).toUpperCase()}${sheet.tier.slice(1)}`);
   return `<div class="hero-card">
-  <canvas id="portrait" class="portrait" width="160" height="224" aria-label="Diego"></canvas>
+  <canvas id="portrait" class="portrait" width="120" height="160" aria-label="Diego"></canvas>
   <div class="hero-stats">
     <p class="hero-rank"><b>${sheet.points}</b> ${gameText(lang, "points")} · ${tier}</p>
     ${renderAttributes(sheet)}

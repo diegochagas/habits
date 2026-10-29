@@ -4,7 +4,11 @@ Static site, vanilla ES modules, no build. The seed in `data/seed.json` is a sna
 the "ToDo List" Google Sheet (2026-10-28); the live list is the browser's localStorage.
 `game.html` + `js/game/` is the 3DeT Victory game (see README "Architecture"); combat and
 progression are pure functions that take an injected `rollDie`, so tests use scripted dice and
-the page accepts `?seed=N`. Keep game strings in `js/game/game-i18n.js` (EN + PT).
+the page accepts `?seed=N`. Keep game strings in `js/game/game-i18n.js` (EN + PT). Stage maps are
+ASCII in `js/game/stage-maps.js` (tests check every minion blocks the only way forward); sprites
+are procedural chibis (`chibi-sprite.js`), sounds are synthesised in `sound.js` (no audio files). Stage maps are
+ASCII in `js/game/stage-maps.js` (tests check every minion blocks the only way forward); sprites
+are procedural chibis (`chibi-sprite.js`), sounds are synthesised in `sound.js` (no audio files).
 
 ## Testing and shipping (dev-playbook)
 

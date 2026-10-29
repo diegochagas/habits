@@ -1,154 +1,196 @@
-// battle-scene.js: draws one frame of a fight (backdrop, hero, foe, HP bars) on a 160x90 logical
-// canvas. Pure drawing; the state comes from the caller each frame.
+// battle-scene.js: RPG Maker 2003 style side-view battle on the 320x240 screen: backdrop, the foe
+// on the left, the hero on the right (both chibis at 2x), and two status windows at the bottom.
 
-import { drawCharacter } from "./character-sprite.js";
-import { ENEMY_MAPS, ENEMY_PALETTE } from "./enemy-pixels.js";
+import { drawChibi } from "./chibi-sprite.js";
 import { createPainter } from "./pixel-painter.js";
+import { SCREEN_H, SCREEN_W } from "./stage-maps.js";
 
-export const SCENE_W = 160;
-export const SCENE_H = 90;
+const INK = "#111";
+const RED = "#c0392b";
+const FLOOR_Y = 120;
+const WINDOW_Y = 174;
 
+/** @type {Record<string, { sky: string, floor: string, props: number[][] }>} */
 const BACKDROPS = {
   gym: {
     sky: "#fff",
     floor: "#e6e6e6",
     props: [
-      [10, 36, 6, 24],
-      [120, 42, 14, 18],
-      [140, 30, 4, 30],
+      [20, 72, 12, 48],
+      [240, 84, 28, 36],
+      [280, 60, 8, 60],
     ],
   },
   library: {
     sky: "#fafafa",
     floor: "#dcdcdc",
     props: [
-      [0, 20, 24, 40],
-      [40, 24, 20, 36],
-      [110, 18, 50, 42],
+      [0, 40, 48, 80],
+      [80, 48, 40, 72],
+      [220, 36, 100, 84],
     ],
   },
   foodcourt: {
     sky: "#fff",
     floor: "#eaeaea",
     props: [
-      [8, 40, 30, 20],
-      [60, 30, 12, 30],
-      [120, 40, 30, 20],
+      [16, 80, 60, 40],
+      [120, 60, 24, 60],
+      [240, 80, 60, 40],
     ],
   },
   mall: {
     sky: "#f4f4f4",
     floor: "#d9d9d9",
     props: [
-      [0, 10, 10, 50],
-      [30, 16, 24, 44],
-      [120, 12, 40, 48],
+      [0, 20, 20, 100],
+      [60, 32, 48, 88],
+      [240, 24, 80, 96],
     ],
   },
   tower: {
     sky: "#ededed",
     floor: "#cfcfcf",
     props: [
-      [70, 0, 20, 60],
-      [20, 20, 8, 40],
-      [130, 10, 8, 50],
+      [140, 0, 40, 120],
+      [40, 40, 16, 80],
+      [260, 20, 16, 100],
     ],
   },
-  mirror: { sky: "#f7f7f7", floor: "#bdbdbd", props: [[0, 0, 160, 60]] },
+  mirror: { sky: "#f7f7f7", floor: "#bdbdbd", props: [[0, 0, 320, 120]] },
 };
 
 /**
- * @typedef {object} SceneFrame
+ * @typedef {object} BattleFrame
  * @property {string} palette
- * @property {import("./character-sprite.js").CharacterLook} look
- * @property {import("./character-sprite.js").Pose} heroPose
- * @property {string} foeSprite
- * @property {"idle" | "hurt" | "down"} foePose
+ * @property {import("./chibi-sprite.js").ChibiLook} heroLook
+ * @property {import("./chibi-sprite.js").ChibiPose} heroPose
+ * @property {import("./chibi-sprite.js").ChibiLook} foeLook
+ * @property {import("./chibi-sprite.js").ChibiPose} foePose
+ * @property {boolean} foeVisible false once a beaten foe has faded
  * @property {{ pv: number, max: number }} heroBar
+ * @property {{ pm: number, max: number }} heroPm
+ * @property {{ pa: number, max: number }} heroPa
  * @property {{ pv: number, max: number }} foeBar
  * @property {number} tick
  */
 
 /**
  * @param {CanvasRenderingContext2D} ctx
- * @param {SceneFrame} frame
+ * @param {BattleFrame} frame
  */
 export function drawBattleFrame(ctx, frame) {
-  const scale = ctx.canvas.width / SCENE_W;
+  const scale = ctx.canvas.width / SCREEN_W;
   const p = createPainter(ctx, scale);
-  drawBackdrop(p, frame.palette, frame.tick);
-  drawCharacter(p, 20, 30, frame.look, frame.heroPose, frame.tick);
-  drawFoe(p, frame);
-  drawBar(p, 4, 4, frame.heroBar, "#111");
-  drawBar(p, SCENE_W - 52, 4, frame.foeBar, "#c0392b");
+  const big = createPainter(ctx, scale * 2);
+  drawBackdrop(p, frame.palette);
+  const breath = Math.floor(frame.tick / 24) % 2;
+  if (frame.foeVisible)
+    drawChibi(big, 30, 44 + idleBob(frame.foePose, breath), frame.foeLook, battlePose(frame, "foe"));
+  drawChibi(big, 110, 44 + idleBob(frame.heroPose, breath), frame.heroLook, battlePose(frame, "hero"));
+  drawStatusWindows(p, frame);
+}
+
+/**
+ * @param {import("./chibi-sprite.js").ChibiPose} pose
+ * @param {number} breath
+ * @returns {number}
+ */
+const idleBob = (pose, breath) => (pose === "stand" ? breath : 0);
+
+/**
+ * @param {BattleFrame} frame
+ * @param {"hero" | "foe"} who
+ * @returns {import("./chibi-sprite.js").ChibiFrame}
+ */
+function battlePose(frame, who) {
+  const pose = who === "hero" ? frame.heroPose : frame.foePose;
+  return { dir: who === "hero" ? "left" : "right", pose, step: 0, tick: frame.tick };
 }
 
 /**
  * @param {import("./pixel-painter.js").Painter} p
  * @param {string} palette
- * @param {number} tick
  */
-function drawBackdrop(p, palette, tick) {
+function drawBackdrop(p, palette) {
   const style = BACKDROPS[palette] ?? BACKDROPS.gym;
-  p.rect(0, 0, SCENE_W, SCENE_H, style.sky);
-  p.halftone(0, 0, SCENE_W, 60, "#cfcfcf", 4);
+  p.rect(0, 0, SCREEN_W, SCREEN_H, style.sky);
+  p.halftone(0, 0, SCREEN_W, FLOOR_Y, "#d4d4d4", 4);
   for (const [x, y, w, h] of style.props) {
-    p.rect(x, y, w, h, "#111");
-    p.rect(x + 1, y + 1, Math.max(0, w - 2), Math.max(0, h - 2), "#f1f1f1");
-    p.halftone(x + 1, y + 1, Math.max(0, w - 2), Math.max(0, h - 2), "#9a9a9a", 3);
+    p.rect(x, y, w, h, INK);
+    p.rect(x + 2, y + 2, Math.max(0, w - 4), Math.max(0, h - 4), "#f1f1f1");
+    p.halftone(x + 2, y + 2, Math.max(0, w - 4), Math.max(0, h - 4), "#9a9a9a", 3);
   }
-  p.rect(0, 60, SCENE_W, 30, style.floor);
-  p.rect(0, 60, SCENE_W, 1, "#111");
-  const slide = tick % 12;
-  for (let x = -12 + slide; x < SCENE_W; x += 12) p.rect(x, 74, 6, 1, "#9a9a9a");
+  p.rect(0, FLOOR_Y, SCREEN_W, WINDOW_Y - FLOOR_Y, style.floor);
+  p.rect(0, FLOOR_Y, SCREEN_W, 1, INK);
+  for (let x = 0; x < SCREEN_W; x += 24) p.rect(x, FLOOR_Y + 30, 12, 1, "#9a9a9a");
 }
 
 /**
+ * Two RPG Maker style windows: the foe's PV on the left, the hero's PV/PM/PA on the right.
  * @param {import("./pixel-painter.js").Painter} p
- * @param {SceneFrame} frame
+ * @param {BattleFrame} frame
  */
-function drawFoe(p, frame) {
-  const rows = ENEMY_MAPS[frame.foeSprite] ?? ENEMY_MAPS.halter;
-  const bob = frame.foePose === "idle" ? Math.floor(frame.tick / 10) % 2 : 0;
-  const shake = frame.foePose === "hurt" ? (Math.floor(frame.tick / 3) % 2 ? 2 : -2) : 0;
-  const scaleUp = frame.foeSprite.length > 0 && rows.length > 13 ? 3 : 3;
-  const x = 108 + shake;
-  const y = frame.foePose === "down" ? 62 - rows.length * scaleUp + 10 : 60 - rows.length * scaleUp + bob;
-  if (frame.foePose === "down") p.rect(x - 4, y + rows.length * scaleUp - 6, rows[0].length * scaleUp + 8, 2, "#999");
-  const palette = frame.foePose === "hurt" ? { ...ENEMY_PALETTE, "#": "#c0392b" } : ENEMY_PALETTE;
-  const big = createPainterScaled(p, scaleUp);
-  big.map(x, y, rows, palette);
-}
-
-/**
- * A painter that draws each map pixel as a `factor` square, for the 3x enemies.
- * @param {import("./pixel-painter.js").Painter} p
- * @param {number} factor
- * @returns {{ map: import("./pixel-painter.js").Painter["map"] }}
- */
-function createPainterScaled(p, factor) {
-  return {
-    map: (x, y, rows, palette) =>
-      rows.forEach((row, rowIndex) => {
-        for (let column = 0; column < row.length; column += 1) {
-          const color = palette[row[column]];
-          if (color) p.rect(x + column * factor, y + rowIndex * factor, factor, factor, color);
-        }
-      }),
-  };
+function drawStatusWindows(p, frame) {
+  p.rect(0, WINDOW_Y - 2, SCREEN_W, SCREEN_H - WINDOW_Y + 2, "#fff");
+  drawWindow(p, 4, WINDOW_Y, 150, 62);
+  drawWindow(p, 166, WINDOW_Y, 150, 62);
+  drawBar(p, 14, WINDOW_Y + 12, 130, "PV", frame.foeBar.pv, frame.foeBar.max, RED);
+  drawBar(p, 176, WINDOW_Y + 8, 130, "PV", frame.heroBar.pv, frame.heroBar.max, INK);
+  drawBar(p, 176, WINDOW_Y + 26, 130, "PM", frame.heroPm.pm, frame.heroPm.max, "#777");
+  drawGlyphs(p, 176, WINDOW_Y + 44, "PA");
+  for (let i = 0; i < frame.heroPa.max; i += 1)
+    p.rect(196 + i * 8, WINDOW_Y + 44, 5, 5, i < frame.heroPa.pa ? INK : "#ccc");
 }
 
 /**
  * @param {import("./pixel-painter.js").Painter} p
  * @param {number} x
  * @param {number} y
- * @param {{ pv: number, max: number }} bar
- * @param {string} color
+ * @param {number} w
+ * @param {number} h
  */
-function drawBar(p, x, y, bar, color) {
-  const width = 48;
-  const filled = bar.max > 0 ? Math.round((width - 2) * Math.max(0, Math.min(1, bar.pv / bar.max))) : 0;
-  p.rect(x, y, width, 6, "#111");
-  p.rect(x + 1, y + 1, width - 2, 4, "#fff");
-  p.rect(x + 1, y + 1, filled, 4, color);
+function drawWindow(p, x, y, w, h) {
+  p.rect(x, y, w, h, INK);
+  p.rect(x + 2, y + 2, w - 4, h - 4, "#fff");
+  p.rect(x + 3, y + 3, w - 6, h - 6, INK);
+  p.rect(x + 4, y + 4, w - 8, h - 8, "#fff");
+}
+
+/**
+ * @param {import("./pixel-painter.js").Painter} p
+ * @param {number} x
+ * @param {number} y
+ * @param {number} w
+ * @param {string} label
+ * @param {number} value
+ * @param {number} max
+ * @param {string} colour
+ */
+function drawBar(p, x, y, w, label, value, max, colour) {
+  drawGlyphs(p, x, y, label);
+  const barX = x + 20;
+  const barW = w - 20;
+  const filled = max > 0 ? Math.round((barW - 2) * Math.max(0, Math.min(1, value / max))) : 0;
+  p.rect(barX, y - 1, barW, 7, INK);
+  p.rect(barX + 1, y, barW - 2, 5, "#fff");
+  p.rect(barX + 1, y, filled, 5, colour);
+}
+
+/** 3x5 pixel glyphs for the status labels. */
+const GLYPHS = {
+  P: ["###", "#.#", "###", "#..", "#.."],
+  V: ["#.#", "#.#", "#.#", "#.#", ".#."],
+  M: ["#.#", "###", "###", "#.#", "#.#"],
+  A: [".#.", "#.#", "###", "#.#", "#.#"],
+};
+
+/**
+ * @param {import("./pixel-painter.js").Painter} p
+ * @param {number} x
+ * @param {number} y
+ * @param {string} text letters from GLYPHS
+ */
+function drawGlyphs(p, x, y, text) {
+  [...text].forEach((letter, i) => p.map(x + i * 4, y, GLYPHS[letter] ?? [], { "#": INK }));
 }

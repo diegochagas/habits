@@ -21,7 +21,7 @@
 
 .portrait {
   width: 120px;
-  height: 168px;
+  height: 160px;
   border: 3px solid var(--ink);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
@@ -323,7 +323,7 @@
 .battle-canvas {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
   height: auto;
   border: 3px solid var(--ink);
   image-rendering: pixelated;
@@ -331,27 +331,149 @@
   background: var(--paper);
 }
 
-.battle-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0;
-}
-
-.battle-actions .stamp {
-  flex: 1 1 120px;
-  min-height: 44px;
-}
-
-.battle-log {
-  margin: 0;
-  padding-left: 20px;
+/* RPG Maker style windows: double ink border on paper, a pointer cursor on the hovered command. */
+.rm-window {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border: 3px solid var(--ink);
+  outline: 2px solid var(--ink);
+  outline-offset: -7px;
+  background: var(--paper);
   font-family: var(--font-hand);
   font-size: 1.05rem;
 }
 
+.rm-commands {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 12px;
+  padding: 12px 16px;
+}
+
+.rm-command {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 8px 6px 26px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-hand);
+  font-size: 1.2rem;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+}
+
+.rm-command::before {
+  content: "▶";
+  position: absolute;
+  left: 6px;
+  opacity: 0;
+}
+
+.rm-command:hover,
+.rm-command:focus-visible {
+  outline: none;
+  background: repeating-linear-gradient(45deg, var(--paper) 0 4px, #e8e8e8 4px 6px);
+}
+
+.rm-command:hover::before,
+.rm-command:focus-visible::before {
+  opacity: 1;
+}
+
+.rm-command-danger {
+  color: #8e1b1b;
+}
+
+.battle-log {
+  list-style: none;
+  padding-left: 12px;
+}
+
+.battle-log li {
+  margin-bottom: 2px;
+}
+
 .battle-log li:first-child {
   font-weight: 700;
+}
+
+.battle-log li:first-child::before {
+  content: "▶ ";
+}
+
+.walk-hint {
+  margin-top: 12px;
+}
+
+.map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 0;
+}
+
+.map-controls .rm-command {
+  width: auto;
+  flex: 0 0 auto;
+  border: 3px solid var(--ink);
+  padding-left: 12px;
+}
+
+.map-controls .rm-command::before {
+  content: none;
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 52px);
+  grid-template-areas:
+    ". up ."
+    "left . right"
+    ". down .";
+  gap: 4px;
+  touch-action: none;
+  user-select: none;
+}
+
+.dpad-key {
+  min-width: 52px;
+  min-height: 52px;
+  border: 3px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--ink);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dpad-key:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.dpad-up {
+  grid-area: up;
+}
+
+.dpad-left {
+  grid-area: left;
+}
+
+.dpad-right {
+  grid-area: right;
+}
+
+.dpad-down {
+  grid-area: down;
 }
 
 @media (min-width: 700px) {
@@ -367,6 +489,10 @@
   }
 
   .shop-columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rm-commands {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -399,6 +525,6 @@
 
   .portrait {
     width: 90px;
-    height: 126px;
+    height: 120px;
   }
 }

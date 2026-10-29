@@ -5,11 +5,14 @@ doing. It started as the "ToDo List" Google Sheet (Date, Task, Notes, Source, Do
 now lives as a static site: add an item with a name, a category and a description where
 URLs become links; mark it done; filter by category, search, export or import JSON.
 
-**Arcas do Hábito** (`game.html`) turns the list into a 3DeT Victory campaign: the hero is
-Diego, drawn as a pixel character whose body follows the logged weight and whose look follows
-the week's habits. Good habits add XP to a track (Poder, Habilidade, Resistência), bad habits
-remove it; each track buys only its own atributos, perícias, vantagens and items. Six Arcas with
-three minions and a boss each, all open, each beatable from a given number of points.
+**Arcas do Hábito** (`game.html`) turns the list into a 3DeT Victory campaign in RPG Maker
+2000 style: the hero is Diego, drawn as a chibi charset whose body follows the logged weight and
+whose look follows the week's habits. Good habits add XP to a track (Poder, Habilidade,
+Resistência), bad habits remove it; each track buys only its own atributos, perícias, vantagens
+and items. Six Arcas, each a 40×15 tile map you walk through (arrow keys, WASD or the on-screen
+d-pad) with three humanoid minions guarding the way to the boss; bumping into one starts a
+side-view battle with a command window. Sound effects are synthesised with the Web Audio API
+(no audio files); the 🔊 button mutes them.
 
 No build step, no runtime dependencies. Everything is saved in the browser's
 `localStorage`; **Export** downloads a JSON backup and **Import** restores one.
@@ -57,8 +60,14 @@ game.html ─── css/game.css
          ├─ hero-store.js      localStorage ("habits:hero:v1"), Hero → Combatant
          ├─ stages.js          the six Arcas and their enemies
          ├─ combat.js          one duel as a pure state machine
-         ├─ stage-run.js       minions → boss, rewards, poses
-         ├─ character-sprite.js / enemy-pixels.js / battle-scene.js / pixel-painter.js  drawing
+         ├─ stage-maps.js      ASCII tile map per Arca (legend in the file), start + spawns
+         ├─ stage-walk.js      tile movement, bumping into enemies, camera
+         ├─ stage-run.js       map walk → duel → back to the map, rewards, pose beats
+         ├─ stage-input.js     arrow/WASD keys + d-pad pointer events → held direction
+         ├─ chibi-sprite.js / chibi-gear.js   one charset drawer for hero and enemies (hats, items)
+         ├─ hero-look.js / enemy-looks.js     ChibiLook from the hero sheet / per enemy key
+         ├─ tile-art.js / map-scene.js / battle-scene.js / pixel-painter.js  drawing
+         ├─ sound.js / battle-sounds.js       Web Audio RPG Maker style effects, duel → sounds
          ├─ hero-panel.js / today-view.js / sheet-view.js / stages-view.js / battle-view.js  HTML
          └─ game-i18n.js       EN / PT game strings
 ```
