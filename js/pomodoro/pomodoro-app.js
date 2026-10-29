@@ -29,6 +29,7 @@ import { parseYouTubeId, sendYouTubeCommand, youtubeEmbedUrl } from "./youtube-e
  * @property {number} secondsPerMinute
  * @property {(message: string) => void} say
  * @property {() => void} [onChange] the page re-renders what shows Pomodoro counts
+ * @property {(itemId: string | null) => void} [onWorkDone] a work block finished on that item
  */
 
 /**
@@ -65,6 +66,7 @@ export function startPomodoro(deps) {
     deps.sounds.play(result.finished === "work" ? "fanfare" : "decision");
     document.title = "Habits";
     commit(result.state);
+    if (result.finished === "work") deps.onWorkDone?.(state.itemId);
     const minutes = Math.round(modeSeconds(result.state.mode, deps.secondsPerMinute) / 60);
     deps.say(pomodoroText(deps.lang(), result.finished === "work" ? "workDone" : "breakDone", { minutes }));
   }

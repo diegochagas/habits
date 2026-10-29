@@ -93,3 +93,29 @@ test("rest recovers everything once per day; aura counts the last 7 days", () =>
   assert.equal(auraScore(hero, TODAY), 2);
   assert.equal(auraScore(hero, "2026-11-10"), 0);
 });
+
+test("a finished Pomodoro credits 1 XP to the item's track and logs it for today", async () => {
+  const { creditPomodoro } = await import("../js/game/progression.js");
+  const { createStartingHero } = await import("../js/game/hero-sheet.js");
+  const hero = createStartingHero("2026-10-29");
+  const personal = {
+    id: "a",
+    name: "Devotional",
+    category: "Personal",
+    description: "",
+    date: "",
+    done: false,
+    createdAt: "",
+  };
+  const credited = creditPomodoro(hero, personal, "2026-10-29");
+  assert.equal(credited.pools.resistencia, 1);
+  assert.deepEqual(credited.habitLog.at(-1), {
+    date: "2026-10-29",
+    habitId: "pomodoro",
+    xp: 1,
+    track: "resistencia",
+    good: true,
+    label: "🍅 Devotional",
+  });
+  assert.equal(creditPomodoro(hero, null, "2026-10-29").pools.habilidade, 1);
+});

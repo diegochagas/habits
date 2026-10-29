@@ -98,6 +98,22 @@ export function creditDoneListItems(hero, listItems) {
 }
 
 /**
+ * A finished Pomodoro is a good habit: +1 XP to the track of the item's category (Habilidade
+ * without an item), logged for today so the Today tab shows it (Diego, 2026-10-29).
+ * @param {Hero} hero
+ * @param {import("../items-store.js").HabitItem | null} item
+ * @param {string} today
+ * @returns {Hero}
+ * @example creditPomodoro(hero, { category: "Personal", name: "Devotional" }, "2026-10-29").pools.resistencia // +1
+ */
+export function creditPomodoro(hero, item, today) {
+  const track = /** @type {Track} */ ((item && LIST_CATEGORY_TRACK[item.category]) ?? "habilidade");
+  const label = item ? `🍅 ${item.name}` : "🍅 Pomodoro";
+  const entry = { date: today, habitId: "pomodoro", xp: 1, track, good: true, label };
+  return awardXp({ ...hero, habitLog: [...hero.habitLog, entry] }, track, 1);
+}
+
+/**
  * Why an attribute can't be raised right now, or null when it can.
  * @param {Hero} hero
  * @param {Track} track

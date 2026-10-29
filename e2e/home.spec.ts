@@ -72,5 +72,9 @@ test("a Pomodoro on a list item earns free time; the focus music form validates 
   await expect(page.locator("#free-time-bank")).toHaveText("00:01");
   await expect(page.locator(".pomodoro-modes .tab-active")).toHaveText("Short break");
   await expect(card.locator(".card-pomodoros")).toHaveText("🍅 1");
+  // The finished Pomodoro is a good habit: +1 XP on the item's track (Side Hustle → Habilidade).
+  await expect(page.locator(".pool-habilidade b")).toHaveText("1");
+  await page.getByRole("button", { name: "Today", exact: true }).click();
+  await expect(page.locator(".today-log li").first()).toContainText("🍅");
   expect(errors).toEqual([]);
 });

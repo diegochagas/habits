@@ -11,6 +11,7 @@ import { applyGameTranslations, gameText } from "./game/game-i18n.js";
 import { createHeroController } from "./game/hero-controller.js";
 import { createHeroStore } from "./game/hero-store.js";
 import { renderSheetView } from "./game/sheet-view.js";
+import { creditPomodoro } from "./game/progression.js";
 import { createSoundBoard } from "./game/sound.js";
 import { renderTodayView } from "./game/today-view.js";
 import { startPomodoro } from "./pomodoro/pomodoro-app.js";
@@ -59,6 +60,8 @@ const pomodoro = startPomodoro({
   secondsPerMinute: params.get("fast") ? 0.1 : 60,
   say,
   onChange: () => render(),
+  onWorkDone: (itemId) =>
+    hero.commit(creditPomodoro(hero.hero, state.items.find((item) => item.id === itemId) ?? null, today())),
 });
 
 /** @returns {import("./i18n.js").Lang} */

@@ -10,7 +10,8 @@ The habits page (`index.html`) also holds the **hero**: the Today tab logs good 
 atributos, perícias, vantagens and items, and the hero card shows the chibi whose body follows
 the logged weight. A **Pomodoro** panel sits on top: pick a list item (or press 🍅 on its card),
 work 25 minutes with an optional YouTube focus video (saved link, mute button), rest 5 (15 every
-4th). Each finished Pomodoro earns its break as **free time**, which is the only time the play
+4th). Each finished Pomodoro is a good habit (+1 XP on the item's track) and earns its break as
+**free time**, which is the only time the play
 pages are open; they count it down while you play and lock when it runs out.
 
 **Arcas do Hábito** (`game.html`) is the 3DeT Victory campaign in RPG Maker 2000 style: six
