@@ -14,32 +14,33 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
   await page.getByRole("button", { name: "Today", exact: true }).click();
   await expect(page.locator("#list-section")).toBeHidden();
 
-  await page.getByRole("button", { name: /Gym workout/ }).click();
+  // Good habits are the list's Today items: once a day each, then greyed on the list.
+  const gym = page.locator(".today-habits button", { hasText: "Gym workout" });
+  await expect(gym).toContainText("+2 P");
+  await gym.click();
+  await expect(gym).toBeDisabled();
+  await expect(gym).toContainText("Already done today");
   await expect(page.locator(".pool-poder b")).toHaveText("2");
   await page.getByRole("button", { name: /Junk food/ }).click();
-  await expect(page.locator(".pool-poder b")).toHaveText("0");
+  await expect(page.locator(".pool-poder b")).toHaveText("0", "falls back to the fullest pool");
   await expect(page.locator(".resource.pv span")).toHaveText("PV 7/10");
   await expect(page.locator(".today-log li")).toHaveCount(2);
-
-  // The seed's Devotional row is a Today habit: once a day, greyed on the list afterwards.
-  const devotional = page.locator(".today-habits button", { hasText: "Devotional" });
-  await expect(devotional).toContainText("+1 R");
-  await devotional.click();
-  await expect(devotional).toBeDisabled();
-  await expect(devotional).toContainText("Already done today");
+  await page.locator(".today-habits button", { hasText: "Devotional" }).click();
   await expect(page.locator(".pool-resistencia b")).toHaveText("1");
-  await expect(page.locator(".today-log li")).toHaveCount(3);
   await expect(page.locator(".today-log li").first()).toContainText("Devotional");
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home-today.png` });
   await page.getByRole("button", { name: "List", exact: true }).click();
-  await page.getByPlaceholder("Search...").fill("Devotional");
-  const card = page.locator("article.card", { hasText: "Devotional" });
+  await page.getByRole("tab", { name: /^Today/ }).click();
+  await expect(page.locator("#counter")).toContainText("10 of 315");
+  const card = page.locator("article.card", { hasText: "Gym workout" });
   await expect(card).toHaveClass(/card-done-today/);
   await expect(card.locator(".card-done-today-note")).toHaveText("✓ Already done today");
-  await page.getByPlaceholder("Search...").fill("");
-  await page.getByRole("button", { name: "Today", exact: true }).click();
 
-  for (let i = 0; i < 5; i += 1) await page.getByRole("button", { name: /Gym workout/ }).click();
+  // Ten XP on Poder (as if gym had been logged all week) buys a perícia on the Sheet tab.
+  const saved = await (await page.request.get("/api/state")).json();
+  const hero = saved.state["habits:hero:v1"];
+  await page.request.put("/api/state/habits%3Ahero%3Av1", { data: { ...hero, pools: { ...hero.pools, poder: 10 } } });
+  await page.reload();
   await expect(page.locator(".pool-poder b")).toHaveText("10");
   await page.getByRole("button", { name: "Sheet", exact: true }).click();
   await page

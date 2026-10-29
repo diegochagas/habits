@@ -44,19 +44,24 @@ test("createItem trims fields and stamps date and id from the clock", () => {
     doneAt: "",
     createdAt: "2026-10-28T12:34:56.000Z",
   });
-  const daily = createItem(
-    { name: "Duolingo", category: "Personal", description: "", daily: true, date: "2026-11-01" },
+  const habit = createItem(
+    { name: "Gym", category: "Today", description: "", track: "poder", xp: "2", date: "2026-11-01" },
     fixedClock,
   );
-  assert.ok("item" in daily);
-  assert.equal(daily.item.daily, true);
-  assert.equal(daily.item.date, "2026-11-01", "a chosen date wins over today");
+  assert.ok("item" in habit);
+  assert.equal(habit.item.track, "poder");
+  assert.equal(habit.item.xp, 2);
+  assert.equal(habit.item.date, "2026-11-01", "a chosen date wins over today");
+  const defaults = /** @type {any} */ (createItem({ name: "Pray", category: "Today", description: "" }, fixedClock));
+  assert.deepEqual([defaults.item.track, defaults.item.xp], ["resistencia", 1], "Today items get the default track");
+  const plain = /** @type {any} */ (createItem({ name: "x", category: "Read", description: "", track: "poder" }, fixedClock));
+  assert.equal("track" in plain.item, false, "only Today items carry a track");
   assert.deepEqual(createItem({ name: "x", category: "Read", description: "", date: "1/2/2026" }, fixedClock), {
     error: "errorDate",
   });
 });
 
-test("updateItem replaces the editable fields, keeps id/done, and can turn daily on and off", () => {
+test("updateItem replaces the editable fields, keeps id/done, and can turn Today on and off", () => {
   const items = [
     {
       id: "a",
@@ -77,39 +82,35 @@ test("updateItem replaces the editable fields, keeps id/done, and can turn daily
       done: false,
       doneAt: "",
       createdAt: "",
-      daily: true,
+      track: "poder",
+      xp: 2,
     },
   ];
-  const edited = updateItem(items, "a", {
-    name: " New ",
-    category: "Watch",
-    description: " d ",
-    date: "",
-    daily: true,
-  });
+  const edited = updateItem(items, "a", { name: " New ", category: "Today", description: " d ", date: "", xp: 3 });
   assert.ok("items" in edited);
   assert.deepEqual(edited.items[0], {
     id: "a",
     name: "New",
-    category: "Watch",
+    category: "Today",
     description: "d",
     date: "2026-10-01",
     done: true,
     doneAt: "2026-10-02",
     createdAt: "",
-    daily: true,
+    track: "resistencia",
+    xp: 3,
   });
-  const noLongerDaily = /** @type {any} */ (updateItem(items, "b", { name: "B", category: "Read", description: "" }));
-  assert.equal("daily" in noLongerDaily.items[1], false);
+  const noLongerHabit = /** @type {any} */ (updateItem(items, "b", { name: "B", category: "Read", description: "" }));
+  assert.equal("track" in noLongerHabit.items[1], false);
   assert.deepEqual(updateItem(items, "a", { name: "", category: "Read", description: "" }), { error: "errorName" });
 });
 
-test("rollDailyItems: a daily item done yesterday is to do again, one done today stays done", () => {
+test("rollDailyItems: a Today item done yesterday is to do again, one done today stays done", () => {
   const items = [
-    { id: "a", done: true, doneAt: "2026-10-28", daily: true },
-    { id: "b", done: true, doneAt: "2026-10-29", daily: true },
-    { id: "c", done: true, doneAt: "2026-10-01" },
-    { id: "d", done: false, doneAt: "", daily: true },
+    { id: "a", done: true, doneAt: "2026-10-28", category: "Today" },
+    { id: "b", done: true, doneAt: "2026-10-29", category: "Today" },
+    { id: "c", done: true, doneAt: "2026-10-01", category: "Read" },
+    { id: "d", done: false, doneAt: "", category: "Today" },
   ];
   const rolled = rollDailyItems(/** @type {any} */ (items), "2026-10-29");
   assert.equal(rolled.changed, 1);
@@ -150,7 +151,7 @@ test("parseItem explains what is wrong, with the offending value", () => {
     error: 'name "": expected a non-empty string',
   });
   assert.deepEqual(parseItem({ id: "x", name: "y", category: "Game" }), {
-    error: 'category "Game": expected Read, Watch, Side Hustle or Personal',
+    error: 'category "Game": expected Read, Watch, Side Hustle or Today',
   });
 });
 

@@ -2,32 +2,112 @@
   {
     "id": "sheet-001",
     "name": "Devotional",
-    "category": "Personal",
+    "category": "Today",
     "description": "Fazer uma oração concentrado ao acordar",
     "date": "2026-10-28",
     "done": false,
-    "daily": true,
-    "createdAt": "2026-10-28T00:00:00.000Z"
+    "createdAt": "2026-10-28T00:00:00.000Z",
+    "track": "resistencia",
+    "xp": 1
   },
   {
     "id": "sheet-002",
     "name": "Duolingo",
-    "category": "Personal",
+    "category": "Today",
     "description": "Fazer 1 lição no Duolingo",
     "date": "2026-10-28",
     "done": false,
-    "daily": true,
-    "createdAt": "2026-10-28T00:00:00.000Z"
+    "createdAt": "2026-10-28T00:00:00.000Z",
+    "track": "habilidade",
+    "xp": 1
   },
   {
     "id": "sheet-003",
     "name": "Finances",
-    "category": "Personal",
+    "category": "Today",
     "description": "Assistir 1 aula da AUVP",
     "date": "2026-10-28",
     "done": false,
-    "daily": true,
-    "createdAt": "2026-10-28T00:00:00.000Z"
+    "createdAt": "2026-10-28T00:00:00.000Z",
+    "track": "resistencia",
+    "xp": 1
+  },
+  {
+    "id": "habit-gym",
+    "name": "Gym workout",
+    "category": "Today",
+    "description": "",
+    "date": "2026-10-29",
+    "done": false,
+    "createdAt": "2026-10-29T00:00:00.000Z",
+    "track": "poder",
+    "xp": 2
+  },
+  {
+    "id": "habit-walk",
+    "name": "Walk / sport",
+    "category": "Today",
+    "description": "",
+    "date": "2026-10-29",
+    "done": false,
+    "createdAt": "2026-10-29T00:00:00.000Z",
+    "track": "poder",
+    "xp": 1
+  },
+  {
+    "id": "habit-read",
+    "name": "Read a chapter",
+    "category": "Today",
+    "description": "",
+    "date": "2026-10-29",
+    "done": false,
+    "createdAt": "2026-10-29T00:00:00.000Z",
+    "track": "habilidade",
+    "xp": 1
+  },
+  {
+    "id": "habit-study",
+    "name": "Study / class",
+    "category": "Today",
+    "description": "",
+    "date": "2026-10-29",
+    "done": false,
+    "createdAt": "2026-10-29T00:00:00.000Z",
+    "track": "habilidade",
+    "xp": 1
+  },
+  {
+    "id": "habit-code",
+    "name": "Code a project",
+    "category": "Today",
+    "description": "",
+    "date": "2026-10-29",
+    "done": false,
+    "createdAt": "2026-10-29T00:00:00.000Z",
+    "track": "habilidade",
+    "xp": 1
+  },
+  {
+    "id": "habit-meal",
+    "name": "Healthy meal",
+    "category": "Today",
+    "description": "",
+    "date": "2026-10-29",
+    "done": false,
+    "createdAt": "2026-10-29T00:00:00.000Z",
+    "track": "resistencia",
+    "xp": 1
+  },
+  {
+    "id": "habit-sleep",
+    "name": "Slept 7h+",
+    "category": "Today",
+    "description": "",
+    "date": "2026-10-29",
+    "done": false,
+    "createdAt": "2026-10-29T00:00:00.000Z",
+    "track": "resistencia",
+    "xp": 1
   },
   {
     "id": "sheet-004",
@@ -278,24 +358,6 @@
     "category": "Side Hustle",
     "description": "",
     "date": "2027-09-01",
-    "done": false,
-    "createdAt": "2026-10-28T00:00:00.000Z"
-  },
-  {
-    "id": "sheet-032",
-    "name": "Finish generated comics",
-    "category": "Personal",
-    "description": "Digimon Adventure MIllenium Bug 2, Megaman, Cavaleiros do Zodíaco",
-    "date": "2027-09-15",
-    "done": false,
-    "createdAt": "2026-10-28T00:00:00.000Z"
-  },
-  {
-    "id": "sheet-033",
-    "name": "Como meditar na palavra de Deus",
-    "category": "Personal",
-    "description": "- Orar diariamente a todo momento\n - Fazer devocional às 22h (10pm) e Deixar despertador para as 6:30am\n. Usar Anki para decorar e meditar em pelo menos dois versículos lidos no dia",
-    "date": "2027-09-29",
     "done": false,
     "createdAt": "2026-10-28T00:00:00.000Z"
   },

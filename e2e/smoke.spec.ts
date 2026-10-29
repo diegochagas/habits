@@ -10,7 +10,7 @@ test("loads the sheet list, adds an item with a URL, filters and survives a relo
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("HABITS");
   await expect(page.locator("article.card").first()).toBeVisible();
-  await expect(page.locator("#counter")).toContainText("310 of 310");
+  await expect(page.locator("#counter")).toContainText("315 of 315");
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home.png`, fullPage: false });
 
   await page.getByLabel("Name").fill("Read Vagabond");
@@ -21,11 +21,11 @@ test("loads the sheet list, adds an item with a URL, filters and survives a relo
   const card = page.locator("article.card", { hasText: "Read Vagabond" });
   await expect(card).toBeVisible();
   await expect(card.getByRole("link", { name: "https://example.com/vagabond" })).toHaveAttribute("target", "_blank");
-  await expect(page.locator("#counter")).toContainText("311 of 311");
+  await expect(page.locator("#counter")).toContainText("316 of 316");
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-added.png`, fullPage: false });
 
   await page.getByRole("tab", { name: /^Watch/ }).click();
-  await expect(page.locator("#counter")).toContainText("of 311");
+  await expect(page.locator("#counter")).toContainText("of 316");
   await expect(page.locator("article.card.category-read")).toHaveCount(0);
 
   await page.getByRole("tab", { name: /^All/ }).click();

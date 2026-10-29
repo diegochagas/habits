@@ -363,7 +363,7 @@ body::before {
     -1px 1px 0 var(--ink);
 }
 
-.category-personal .card-category {
+.category-today .card-category {
   background: var(--paper);
   color: var(--ink);
   border-style: dashed;

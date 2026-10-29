@@ -71,6 +71,28 @@ test("the hero draws in every facing and pose, with items and tier markers when 
   assert.equal(slim.build, 0);
 });
 
+test("the hero's own sheet: red sneaker toes, a white smile, glasses, inside the box; slimmer when light", () => {
+  const hero = createStartingHero("2026-10-28");
+  const look = heroLook(hero, "2026-10-28");
+  assert.equal(look.sheet, "diego");
+  const heavy = new FakePainter();
+  drawChibi(heavy, 0, 0, look, { dir: "down", pose: "stand", step: 0, tick: 0 });
+  const colours = new Set(heavy.rects.map((r) => r.color));
+  for (const colour of [look.shoeTrim, "#fff", look.glasses, look.beard, look.hair]) assert.ok(colours.has(colour), colour);
+  for (const r of heavy.rects) {
+    assert.ok(r.x >= 0 && r.x + r.w <= CHIBI_W, `x ${r.x}..${r.x + r.w}`);
+    assert.ok(r.y >= 0 && r.y + r.h <= CHIBI_H, `y ${r.y}..${r.y + r.h}`);
+  }
+  const slim = new FakePainter();
+  drawChibi(slim, 0, 0, heroLook({ ...hero, weightKg: 85 }, "2026-10-28"), { dir: "down", pose: "stand", step: 0, tick: 0 });
+  assert.ok(slim.rects.length < heavy.rects.length, "a lighter hero loses the belly columns");
+  const stand = new FakePainter();
+  const walk = new FakePainter();
+  drawChibi(stand, 0, 0, look, { dir: "right", pose: "walk", step: 0, tick: 0 });
+  drawChibi(walk, 0, 0, look, { dir: "right", pose: "walk", step: 1, tick: 0 });
+  assert.notDeepEqual(stand.rects, walk.rects, "the side walk alternates the legs");
+});
+
 test("map tiles draw for every legend char and enemies turn towards an adjacent hero", () => {
   for (const char of [".", ",", "~", "T", "t", "#", "R", "D", "H", "o", "M", "S", "1", "B"]) {
     const p = new FakePainter();

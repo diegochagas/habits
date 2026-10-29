@@ -32,9 +32,11 @@ test("weight thresholds drop the desvantagens as kilos go down", () => {
   assert.ok("error" in parseWeight("abc"));
 });
 
-test("good habit adds XP to its track; bad habit removes XP and PV", () => {
+const GYM = { id: "habit-gym", name: "Gym workout", category: "Today", done: true, track: "poder", xp: 2 };
+
+test("a Today item adds its XP to its track; a bad habit removes XP and PV", () => {
   let hero = createStartingHero(TODAY);
-  hero = /** @type {any} */ (logHabit(hero, "gym", TODAY)).hero;
+  hero = creditDoneListItems(hero, [GYM], TODAY).hero;
   assert.equal(hero.pools.poder, 2);
   hero = /** @type {any} */ (logHabit(hero, "junkFood", TODAY)).hero;
   assert.equal(hero.pools.poder, 0, "falls back to the fullest pool when the track is empty");
@@ -47,19 +49,19 @@ test("list items marked done are credited once, by category track", () => {
   const hero = createStartingHero(TODAY);
   const items = [
     { id: "a", category: "Read", done: true },
-    { id: "b", category: "Personal", done: true },
+    { id: "b", category: "Side Hustle", done: true },
     { id: "c", category: "Watch", done: false },
   ];
   const first = creditDoneListItems(hero, items);
   assert.equal(first.credited, 2);
-  assert.equal(first.hero.pools.habilidade, 1);
-  assert.equal(first.hero.pools.resistencia, 1);
+  assert.equal(first.hero.pools.habilidade, 2);
+  assert.equal(first.hero.habitLog.length, 0, "plain items are not logged as habits");
   assert.equal(creditDoneListItems(first.hero, items).credited, 0);
 });
 
-test("a daily list item pays XP once per day, keyed by the date", () => {
+test("a Today item pays XP once per day, keyed by the date", () => {
   const hero = createStartingHero(TODAY);
-  const items = [{ id: "row-d", category: "Personal", done: true, daily: true }];
+  const items = [{ id: "row-d", category: "Today", done: true }];
   const monday = creditDoneListItems(hero, items, "2026-10-26");
   assert.equal(monday.credited, 1);
   assert.equal(creditDoneListItems(monday.hero, items, "2026-10-26").credited, 0);
@@ -68,14 +70,15 @@ test("a daily list item pays XP once per day, keyed by the date", () => {
   assert.deepEqual(tuesday.hero.creditedListItemIds, ["row-d@2026-10-26", "row-d@2026-10-27"]);
 });
 
-test("a daily list item (a Today habit) is also logged for today; a plain item is not", () => {
+test("a Today item is logged for today on its own track and XP; a plain item is not", () => {
   const hero = createStartingHero(TODAY);
   const items = [
-    { id: "row-d", name: "Devotional", category: "Personal", done: true, daily: true },
+    { id: "row-d", name: "Devotional", category: "Today", done: true },
     { id: "b", name: "Bleach", category: "Watch", done: true },
+    GYM,
   ];
   const credited = creditDoneListItems(hero, items, "2026-10-26").hero;
-  assert.equal(credited.habitLog.length, 1);
+  assert.equal(credited.habitLog.length, 2);
   assert.deepEqual(credited.habitLog[0], {
     date: "2026-10-26",
     habitId: "list:row-d",
@@ -84,6 +87,8 @@ test("a daily list item (a Today habit) is also logged for today; a plain item i
     good: true,
     label: "Devotional",
   });
+  assert.equal(credited.habitLog[1].xp, 2);
+  assert.equal(credited.pools.poder, 2);
 });
 
 test("raising an attribute costs 10 XP from its own track and grows the resource", () => {
@@ -118,7 +123,8 @@ test("rest recovers everything once per day; aura counts the last 7 days", () =>
   assert.equal(rested.rested, true);
   assert.deepEqual(rested.hero.current, { pv: 10, pm: 10, pa: 2 });
   assert.equal(restHero(rested.hero, TODAY).rested, false);
-  hero = /** @type {any} */ (logHabit(logHabit(hero, "gym", TODAY).hero, "read", "2026-10-27")).hero;
+  hero = creditDoneListItems(hero, [GYM], TODAY).hero;
+  hero = creditDoneListItems(hero, [{ ...GYM, id: "habit-read", track: "habilidade", xp: 1 }], "2026-10-27").hero;
   assert.equal(auraScore(hero, TODAY), 2);
   assert.equal(auraScore(hero, "2026-11-10"), 0);
 });
@@ -127,16 +133,18 @@ test("a finished Pomodoro credits 1 XP to the item's track and logs it for today
   const { creditPomodoro } = await import("../js/game/progression.js");
   const { createStartingHero } = await import("../js/game/hero-sheet.js");
   const hero = createStartingHero("2026-10-29");
-  const personal = {
+  const habit = {
     id: "a",
     name: "Devotional",
-    category: "Personal",
+    category: "Today",
     description: "",
     date: "",
     done: false,
     createdAt: "",
+    track: "resistencia",
+    xp: 1,
   };
-  const credited = creditPomodoro(hero, personal, "2026-10-29");
+  const credited = creditPomodoro(hero, habit, "2026-10-29");
   assert.equal(credited.pools.resistencia, 1);
   assert.deepEqual(credited.habitLog.at(-1), {
     date: "2026-10-29",

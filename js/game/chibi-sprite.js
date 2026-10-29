@@ -3,15 +3,12 @@
 // and held things change the sprite without sprite sheets.
 
 import { HATS, HELD } from "./chibi-gear.js";
+import { INK, RED, drawAura, ghostPainter } from "./chibi-common.js";
+import { drawDiego } from "./diego-sprite.js";
 
 export const CHIBI_W = 24;
 export const CHIBI_H = 32;
-const INK = "#111";
-const GOLD = "#f2c94c";
-const RED = "#c0392b";
-const GHOST = "#cfcfcf";
 const VEST = "#5b5b5b";
-const SWEAT = "#7aa7d6";
 const EYE = { ink: INK, red: RED, white: "#fff" };
 
 /**
@@ -34,6 +31,7 @@ const EYE = { ink: INK, red: RED, white: "#fff" };
  * @property {boolean} headband
  * @property {boolean} tall boss size (+2 px torso)
  * @property {number} aura -5..5: sparkles from 3, sweat from -3, tired eyes from -2
+ * @property {"diego"} [sheet] a hand-drawn pixel sheet instead of the generic chibi (the hero)
  */
 
 /** @typedef {"down" | "up" | "left" | "right"} Facing */
@@ -50,9 +48,10 @@ const EYE = { ink: INK, red: RED, white: "#fff" };
  * @example drawChibi(painter, 0, 0, look, { dir: "down", pose: "walk", step: 1, tick: 0 })
  */
 export function drawChibi(p, ox, oy, look, frame) {
+  if (look.sheet === "diego") return drawDiego(p, ox, oy, look, frame);
   const paint = frame.pose === "down" ? ghostPainter(p) : p;
   const g = geometry(ox, oy, look, frame);
-  drawAura(paint, g, look, frame.tick);
+  drawAura(paint, g.cx, g.top, look.aura, frame.tick);
   if (look.cape) paint.rect(g.cx - half(g.torsoW) - 2, g.top + 14, g.torsoW + 4, 9 + g.tall, "#8e1b1b");
   drawLegs(paint, g, look);
   drawBody(paint, g, look);
@@ -63,14 +62,6 @@ export function drawChibi(p, ox, oy, look, frame) {
 
 /** @param {number} w @returns {number} */
 const half = (w) => Math.floor(w / 2);
-
-/**
- * @param {import("./pixel-painter.js").Painter} p
- * @returns {import("./pixel-painter.js").Painter}
- */
-function ghostPainter(p) {
-  return { ...p, rect: (x, y, w, h) => p.rect(x, y, w, h, GHOST) };
-}
 
 /**
  * @param {number} ox
@@ -99,29 +90,6 @@ function geometry(ox, oy, look, frame) {
 }
 
 /** @typedef {ReturnType<typeof geometry>} Geometry */
-
-/**
- * @param {import("./pixel-painter.js").Painter} p
- * @param {Geometry} g
- * @param {ChibiLook} look
- * @param {number} tick
- */
-function drawAura(p, g, look, tick) {
-  if (look.aura >= 3) {
-    const t = Math.floor(tick / 6) % 3;
-    for (const [dx, dy] of [
-      [-11, 6],
-      [10, 2],
-      [-9, 20],
-      [11, 16],
-    ])
-      p.rect(g.cx + dx, g.top + dy + t, 1, 1, GOLD);
-  }
-  if (look.aura > -3) return;
-  const t = Math.floor(tick / 10) % 2;
-  p.rect(g.cx - 9, g.top + 4 + t, 1, 3, SWEAT);
-  p.rect(g.cx + 8, g.top + 14 - t, 1, 3, SWEAT);
-}
 
 /**
  * @param {import("./pixel-painter.js").Painter} p

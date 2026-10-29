@@ -1,6 +1,6 @@
 // progression.js: how habits turn into XP, and XP into the Ficha. Pure functions over Hero.
 
-import { ARTEFATO_BONUS, LIST_CATEGORY_TRACK, SHOP, TRACK_ATTRIBUTE, habitDefinition, shopEntry } from "./catalog.js";
+import { ARTEFATO_BONUS, SHOP, TRACK_ATTRIBUTE, habitDefinition, shopEntry, trackForItem } from "./catalog.js";
 import { clampResources, countOwned, deriveSheet } from "./hero-sheet.js";
 import { xpToRaiseAttribute } from "./rules.js";
 
@@ -81,38 +81,48 @@ export function loseCurrentPv(hero, pv) {
   return { ...hero, current: { ...hero.current, pv: Math.max(0, hero.current.pv - pv) } };
 }
 
+/** @typedef {{ id: string, name?: string, category: string, done: boolean, track?: string, xp?: number }} CreditableItem */
+
 /**
- * Credit list items marked done on the Habits page (+1 XP each, once per item; a daily item
- * once per day, keyed "id@yyyy-mm-dd"). Daily items are the Today habits, so each credit is
- * also logged for today (the Today tab's log shows them next to the catalog habits).
+ * Credit list items marked done on the Habits page: +1 XP once per item on its category's track;
+ * a Today item (a habit) pays its own XP on its own track once per day (keyed "id@yyyy-mm-dd")
+ * and is logged for today, so the Today tab's log shows it next to the bad habits.
  * @param {Hero} hero
- * @param {{ id: string, name?: string, category: string, done: boolean, daily?: boolean }[]} listItems
- * @param {string} [today] yyyy-mm-dd, needed for daily items
+ * @param {CreditableItem[]} listItems
+ * @param {string} [today] yyyy-mm-dd, needed for Today items
  * @returns {{ hero: Hero, credited: number }}
  * @example creditDoneListItems(hero, items, "2026-10-29").credited // 2
  */
 export function creditDoneListItems(hero, listItems, today = "") {
-  const creditKey = (/** @type {{ id: string, daily?: boolean }} */ item) =>
-    item.daily ? `${item.id}@${today}` : item.id;
+  const creditKey = (/** @type {CreditableItem} */ item) => (isHabitItem(item) ? `${item.id}@${today}` : item.id);
   const fresh = listItems.filter((item) => item.done && !hero.creditedListItemIds.includes(creditKey(item)));
   let next = { ...hero, creditedListItemIds: [...hero.creditedListItemIds, ...fresh.map(creditKey)] };
   for (const item of fresh) {
-    const track = /** @type {Track} */ (LIST_CATEGORY_TRACK[item.category] ?? "habilidade");
-    next = awardXp(next, track, 1);
-    if (item.daily) next = logListItem(next, item, track, today);
+    const xp = isHabitItem(item) ? (item.xp ?? 1) : 1;
+    next = awardXp(next, trackForItem(item), xp);
+    if (isHabitItem(item)) next = logListItem(next, item, xp, today);
   }
   return { hero: next, credited: fresh.length };
 }
 
 /**
+ * @param {{ category: string }} item
+ * @returns {boolean}
+ */
+function isHabitItem(item) {
+  return item.category === "Today";
+}
+
+/**
  * @param {Hero} hero
- * @param {{ id: string, name?: string }} item
- * @param {Track} track
+ * @param {CreditableItem} item
+ * @param {number} xp
  * @param {string} today
  * @returns {Hero}
  */
-function logListItem(hero, item, track, today) {
-  const entry = { date: today, habitId: `list:${item.id}`, xp: 1, track, good: true, label: item.name ?? item.id };
+function logListItem(hero, item, xp, today) {
+  const track = trackForItem(item);
+  const entry = { date: today, habitId: `list:${item.id}`, xp, track, good: true, label: item.name ?? item.id };
   return { ...hero, habitLog: [...hero.habitLog, entry] };
 }
 
@@ -126,7 +136,7 @@ function logListItem(hero, item, track, today) {
  * @example creditPomodoro(hero, { category: "Personal", name: "Devotional" }, "2026-10-29").pools.resistencia // +1
  */
 export function creditPomodoro(hero, item, today) {
-  const track = /** @type {Track} */ ((item && LIST_CATEGORY_TRACK[item.category]) ?? "habilidade");
+  const track = item ? trackForItem(item) : "habilidade";
   const label = item ? `🍅 ${item.name}` : "🍅 Pomodoro";
   const entry = { date: today, habitId: "pomodoro", xp: 1, track, good: true, label };
   return awardXp({ ...hero, habitLog: [...hero.habitLog, entry] }, track, 1);

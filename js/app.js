@@ -10,13 +10,14 @@ import { bindHomeToolbar, toggleSyncPanel } from "./home-toolbar.js";
 import {
   createItem,
   createItemStore,
+  isHabit,
   parseItemList,
   removeItem,
   rollDailyItems,
   toggleDone,
   updateItem,
 } from "./items-store.js";
-import { itemFieldsFromForm, renderItemEditor } from "./render-item-editor.js";
+import { itemFieldsFromForm, renderHabitFields, renderItemEditor, toggleHabitFields } from "./render-item-editor.js";
 import { renderCategoryOptions, renderCategoryTabs, renderItemGrid } from "./render-items.js";
 import { connectStateStorage } from "./state-storage.js";
 import { applyGameTranslations, gameText } from "./game/game-i18n.js";
@@ -160,13 +161,13 @@ function renderHeroArea() {
 }
 
 /**
- * The Today tab's habits: items flagged daily, to do first.
+ * The Today tab's habits: the Today items, to do first.
  * @param {import("./items-store.js").HabitItem[]} items
  * @returns {import("./items-store.js").HabitItem[]}
  */
 function todayHabits(items) {
-  const daily = items.filter((item) => item.daily);
-  return [...daily.filter((item) => !item.done), ...daily.filter((item) => item.done)];
+  const habits = items.filter(isHabit);
+  return [...habits.filter((item) => !item.done), ...habits.filter((item) => item.done)];
 }
 
 /** @param {import("./items-store.js").HabitItem[]} items */
@@ -189,6 +190,8 @@ function renderLanguage() {
   const chosen = categorySelect.value;
   categorySelect.innerHTML = renderCategoryOptions(state.lang);
   if (chosen) categorySelect.value = chosen;
+  /** @type {HTMLElement} */ (document.getElementById("add-habit-fields")).innerHTML = renderHabitFields(state.lang);
+  toggleHabitFields(form);
   render();
 }
 
@@ -208,8 +211,17 @@ function onAddSubmit(event) {
   if ("error" in result) return showFormError(translate(state.lang, result.error));
   showFormError("");
   form.reset();
+  toggleHabitFields(form);
   sounds.play("decision");
   commit([result.item, ...state.items]);
+}
+
+/** The category of the add form or an editor changed: track + XP show for Today only. @param {Event} event */
+function onCategoryChange(event) {
+  const select = /** @type {HTMLElement} */ (event.target);
+  if (select.matches("select[name='category']") && select.closest("form")) {
+    toggleHabitFields(/** @type {HTMLFormElement} */ (select.closest("form")));
+  }
 }
 
 /** The inline editor of a card was submitted. @param {SubmitEvent} event */
@@ -311,6 +323,7 @@ async function onReset() {
 
 function bindEvents() {
   form.addEventListener("submit", onAddSubmit);
+  document.addEventListener("change", onCategoryChange);
   grid.addEventListener("click", onGridClick);
   grid.addEventListener("submit", onEditSubmit);
   tabs.addEventListener("click", onTabClick);

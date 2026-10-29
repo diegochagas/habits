@@ -3,12 +3,13 @@
 A black-and-white, ink-styled list of the things I want to read, watch, build and keep
 doing. It started as the "ToDo List" Google Sheet (Date, Task, Notes, Source, Done) and
 now lives on the home server: add an item with a name, a category, a description where
-URLs become links, a date and a "Today habit" flag; edit it in place; mark it done; filter by
-category, search, export or import JSON. Today habits come back every morning.
+URLs become links and a date; edit it in place; mark it done; filter by category (Read, Watch,
+Side Hustle, Today), search, export or import JSON. A **Today** item is a habit: it carries an
+XP track and amount, is done once a day and comes back every morning.
 
 The habits page (`index.html`) also holds the **hero**: the Today tab (the first one) lists the
-Today habits of the list (Devotional, Duolingo, Finances… once a day each; a done one shows
-"Already done today" greyed out on the list), then the catalog's good and bad habits (XP in and
+Today items as the good habits (Devotional, Duolingo, Finances, Gym workout… once a day each; a
+done one shows "Already done today" greyed out on the list), then the catalog's bad habits (XP
 out of three tracks, Poder / Habilidade / Resistência); the Sheet tab spends that XP on
 atributos, perícias, vantagens and items, and the hero card shows the chibi whose body follows
 the logged weight. A **Pomodoro** panel sits on top: pick a list item (or press 🍅 on its card),
@@ -82,7 +83,7 @@ index.html ─── css/ink.css (ink, halftone, speed lines, bubble, stamps) + 
          ├─ linkify.js       escape text, http(s) URLs → <a>, newlines → <br>
          ├─ export-import.js JSON download / upload
          ├─ i18n.js          EN / PT strings
-         ├─ categories.js    Read · Watch · Side Hustle · Personal
+         ├─ categories.js    Read · Watch · Side Hustle · Today (habits: track + XP, once a day)
          ├─ game/hero-controller.js   the hero's actions (habits, shop, rest, weight), shared with game.html
          ├─ sync/
          │    ├─ sheet-rows.js     sheet row ↔ item, ops between two lists, merge (sheet wins, queue kept)
@@ -122,7 +123,8 @@ game.html ─── css/game.css (Arcas + Adventure only; needs free time)
          ├─ stage-walk.js      tile movement, bumping into enemies, camera
          ├─ stage-run.js       map walk → duel → back to the map, rewards, pose beats
          ├─ stage-input.js     arrow/WASD keys + d-pad pointer events → held direction
-         ├─ chibi-sprite.js / chibi-gear.js   one charset drawer for hero and enemies (hats, items)
+         ├─ chibi-sprite.js / chibi-gear.js   one charset drawer for the enemies (hats, items)
+         ├─ diego-sprite.js / chibi-common.js the hero's own pixel sheet (traced from Diego's reference figure)
          ├─ hero-look.js / enemy-looks.js     ChibiLook from the hero sheet / per enemy key
          ├─ tile-art.js / map-scene.js / battle-scene.js / pixel-painter.js  drawing
          ├─ sound.js / battle-sounds.js       Web Audio RPG Maker style effects, duel → sounds
@@ -144,5 +146,8 @@ Pomodoro "minute" 0.1 s so e2e can finish one. Unspent free time resets at midni
 
 ## Categories
 
-`Read`, `Watch`, `Side Hustle`, `Personal`, the four values of the sheet's Source column.
-Add one in `js/categories.js` (list, i18n key, kanji stamp) and `js/i18n.js`.
+`Read`, `Watch`, `Side Hustle`, `Today`, the four values of the sheet's Source column (`Today`
+replaced `Personal` on 2026-10-29; old Personal rows and items still load as Today). A Today
+item is a habit: it carries a track and an XP amount, is listed on the Today tab, done once a
+day and back every morning. Add a category in `js/categories.js` (list, i18n key, kanji
+stamp) and `js/i18n.js`.

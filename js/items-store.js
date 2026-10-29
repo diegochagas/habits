@@ -3,22 +3,23 @@
 // (data/seed.json) is copied into storage on first visit so sheet items and user items are
 // edited the same way.
 
-import { isCategory } from "./categories.js";
+import { DEFAULT_HABIT_TRACK, TODAY_CATEGORY, isCategory, isHabitTrack, migrateCategory } from "./categories.js";
 
 /**
  * @typedef {object} HabitItem
  * @property {string} id
  * @property {string} name
- * @property {import("./categories.js").Category} category
+ * @property {import("./categories.js").Category} category "Today" = a habit: once a day, back every morning
  * @property {string} description
  * @property {string} date  ISO yyyy-mm-dd (sheet queue date, or the day it was added)
  * @property {boolean} done
- * @property {string} doneAt yyyy-mm-dd of the last Done ("" while to do); daily items reset the next day
+ * @property {string} doneAt yyyy-mm-dd of the last Done ("" while to do); Today items reset the next day
  * @property {string} createdAt ISO timestamp
- * @property {true} [daily] comes back every morning (rollDailyItems); XP once a day
+ * @property {import("./categories.js").HabitTrack} [track] Today items: the XP track the habit trains
+ * @property {number} [xp] Today items: XP per day (1–3)
  */
 
-/** @typedef {{ name: string, category: string, description: string, date?: string, daily?: boolean }} ItemFields */
+/** @typedef {{ name: string, category: string, description: string, date?: string, track?: string, xp?: number | string }} ItemFields */
 
 export const STORAGE_KEY = "habits:v1";
 
@@ -34,28 +35,56 @@ export function parseItem(raw) {
     return { error: `id ${JSON.stringify(candidate.id)}: expected a non-empty string` };
   if (typeof candidate.name !== "string" || !candidate.name.trim())
     return { error: `name ${JSON.stringify(candidate.name)}: expected a non-empty string` };
-  if (typeof candidate.category !== "string" || !isCategory(candidate.category)) {
-    return { error: `category ${JSON.stringify(candidate.category)}: expected Read, Watch, Side Hustle or Personal` };
+  const category = migrateCategory(candidate.category, candidate.daily === true);
+  if (!category) {
+    return { error: `category ${JSON.stringify(candidate.category)}: expected Read, Watch, Side Hustle or Today` };
   }
-  return { item: normalizeItem(candidate) };
+  return { item: normalizeItem(candidate, category) };
 }
 
 /**
- * @param {Record<string, unknown>} candidate already checked for id/name/category
+ * @param {Record<string, unknown>} candidate already checked for id/name
+ * @param {import("./categories.js").Category} category
  * @returns {HabitItem}
  */
-function normalizeItem(candidate) {
-  return {
+function normalizeItem(candidate, category) {
+  const base = {
     id: String(candidate.id),
     name: String(candidate.name).trim(),
-    category: /** @type {import("./categories.js").Category} */ (candidate.category),
+    category,
     description: typeof candidate.description === "string" ? candidate.description : "",
     date: typeof candidate.date === "string" ? candidate.date : "",
     done: candidate.done === true,
     doneAt: typeof candidate.doneAt === "string" ? candidate.doneAt : "",
     createdAt: typeof candidate.createdAt === "string" ? candidate.createdAt : "",
-    ...(candidate.daily === true ? { daily: true } : {}),
   };
+  return withHabitFields(base, candidate.track, candidate.xp);
+}
+
+/**
+ * Today items carry a track and an XP amount (defaults Resistência, 1); other items carry none.
+ * @template {{ category: string }} T
+ * @param {T} item
+ * @param {unknown} track
+ * @param {unknown} xp
+ * @returns {T & { track?: import("./categories.js").HabitTrack, xp?: number }}
+ */
+function withHabitFields(item, track, xp) {
+  if (item.category !== TODAY_CATEGORY) return item;
+  const amount = Math.round(Number(xp));
+  return {
+    ...item,
+    track: typeof track === "string" && isHabitTrack(track) ? track : DEFAULT_HABIT_TRACK,
+    xp: amount >= 1 && amount <= 3 ? amount : 1,
+  };
+}
+
+/**
+ * @param {HabitItem} item
+ * @returns {boolean} true for a Today item (a habit)
+ */
+export function isHabit(item) {
+  return item.category === TODAY_CATEGORY;
 }
 
 /**
@@ -86,7 +115,7 @@ export function checkItemFields(fields) {
   const date = (fields.date ?? "").trim();
   if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "errorDate" };
   const checked = { name, category: fields.category, description: fields.description.trim(), date };
-  return { fields: fields.daily ? { ...checked, daily: true } : checked };
+  return { fields: withHabitFields(checked, fields.track, fields.xp) };
 }
 
 /**
@@ -100,26 +129,25 @@ export function createItem(fields, clock) {
   const checked = checkItemFields(fields);
   if ("error" in checked) return checked;
   const now = clock.now();
-  const base = {
+  const item = {
     id: clock.id(),
-    name: checked.fields.name,
+    ...checked.fields,
     category: /** @type {import("./categories.js").Category} */ (checked.fields.category),
-    description: checked.fields.description,
     date: checked.fields.date || now.toISOString().slice(0, 10),
     done: false,
     doneAt: "",
     createdAt: now.toISOString(),
   };
-  return { item: checked.fields.daily ? { ...base, daily: true } : base };
+  return { item };
 }
 
 /**
- * Replace an item's editable fields (name, category, description, date, daily).
+ * Replace an item's editable fields (name, category, description, date; track and XP on Today items).
  * @param {HabitItem[]} items
  * @param {string} id
  * @param {ItemFields} fields
  * @returns {{ items: HabitItem[] } | { error: "errorName" | "errorCategory" | "errorDate" }}
- * @example updateItem(items, "a", { name: "Bleach", category: "Watch", description: "", daily: true })
+ * @example updateItem(items, "a", { name: "Gym", category: "Today", description: "", track: "poder", xp: 2 })
  */
 export function updateItem(items, id, fields) {
   const checked = checkItemFields(fields);
@@ -127,15 +155,14 @@ export function updateItem(items, id, fields) {
   return {
     items: items.map((item) => {
       if (item.id !== id) return item;
-      const { daily: _wasDaily, ...rest } = item;
-      const next = { ...rest, ...checked.fields, date: checked.fields.date || item.date };
-      return /** @type {HabitItem} */ (checked.fields.daily ? { ...next, daily: true } : next);
+      const { track: _track, xp: _xp, ...rest } = item;
+      return /** @type {HabitItem} */ ({ ...rest, ...checked.fields, date: checked.fields.date || item.date });
     }),
   };
 }
 
 /**
- * Daily items marked done on an earlier day come back as to do.
+ * Today items marked done on an earlier day come back as to do.
  * @param {HabitItem[]} items
  * @param {string} today yyyy-mm-dd
  * @returns {{ items: HabitItem[], changed: number }}
@@ -144,7 +171,7 @@ export function updateItem(items, id, fields) {
 export function rollDailyItems(items, today) {
   let changed = 0;
   const rolled = items.map((item) => {
-    if (!item.daily || !item.done || item.doneAt === today) return item;
+    if (!isHabit(item) || !item.done || item.doneAt === today) return item;
     changed += 1;
     return { ...item, done: false, doneAt: "" };
   });

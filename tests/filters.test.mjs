@@ -4,7 +4,7 @@ import { DEFAULT_FILTER, countByCategory, matchesFilter, visibleItems } from "..
 
 const sample = [
   { id: "1", name: "One Piece", category: "Read", description: "Chapter 1197", date: "2026-11-01", done: false },
-  { id: "2", name: "Duolingo", category: "Personal", description: "1 lesson", date: "2026-10-28", done: true },
+  { id: "2", name: "Duolingo", category: "Today", description: "1 lesson", date: "2026-10-28", done: true },
   { id: "3", name: "Bleach", category: "Watch", description: "", date: "2026-10-28", done: false },
   {
     id: "4",
@@ -43,5 +43,5 @@ test("search is case-insensitive and looks at name and description", () => {
 });
 
 test("countByCategory includes the total under All", () => {
-  assert.deepEqual(countByCategory(sample), { All: 4, Read: 1, Personal: 1, Watch: 1, "Side Hustle": 1 });
+  assert.deepEqual(countByCategory(sample), { All: 4, Read: 1, Today: 1, Watch: 1, "Side Hustle": 1 });
 });

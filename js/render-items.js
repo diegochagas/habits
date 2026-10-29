@@ -2,6 +2,7 @@
 
 import { CATEGORIES, categoryI18nKey, categorySlug, categoryStamp } from "./categories.js";
 import { translate } from "./i18n.js";
+import { isHabit } from "./items-store.js";
 import { escapeHtml, linkifyDescription } from "./linkify.js";
 
 /** @typedef {{ pomodoros?: Record<string, number>, pomodoroLabel?: string, editingId?: string | null, editor?: string }} CardExtras */
@@ -14,7 +15,7 @@ import { escapeHtml, linkifyDescription } from "./linkify.js";
  * @returns {string}
  */
 export function renderItemCard(item, lang, extras = {}) {
-  const doneClass = item.done ? (item.daily ? " card-done card-done-today" : " card-done") : "";
+  const doneClass = item.done ? (isHabit(item) ? " card-done card-done-today" : " card-done") : "";
   const editing = extras.editingId === item.id && extras.editor;
   return `<article class="card panel category-${categorySlug(item.category)}${doneClass}" data-id="${escapeHtml(item.id)}">
   <span class="card-stamp" aria-hidden="true">${categoryStamp(item.category)}</span>
@@ -31,8 +32,8 @@ export function renderItemCard(item, lang, extras = {}) {
  */
 function renderCardBody(item, lang, extras) {
   const count = extras.pomodoros?.[item.id] ?? 0;
-  return `<h3 class="card-name">${escapeHtml(item.name)}${item.daily ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁</span>` : ""}</h3>
-  ${item.daily && item.done ? `<p class="card-done-today-note">✓ ${translate(lang, "doneToday")}</p>` : ""}
+  return `<h3 class="card-name">${escapeHtml(item.name)}${isHabit(item) ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁 +${item.xp ?? 1} ${trackTag(item.track)}</span>` : ""}</h3>
+  ${isHabit(item) && item.done ? `<p class="card-done-today-note">✓ ${translate(lang, "doneToday")}</p>` : ""}
   ${renderDescription(item.description)}
   <footer class="card-footer">
     <time class="card-date" datetime="${escapeHtml(item.date)}">${formatDate(item.date)}</time>${count > 0 ? `<span class="card-pomodoros" title="Pomodoros">🍅 ${count}</span>` : ""}
@@ -43,6 +44,15 @@ function renderCardBody(item, lang, extras) {
       <button type="button" class="stamp stamp-small stamp-danger" data-action="remove">${translate(lang, "remove")}</button>
     </span>
   </footer>`;
+}
+
+/**
+ * "poder" → "P": the track letter shown next to a habit's XP.
+ * @param {string} [track]
+ * @returns {string}
+ */
+export function trackTag(track = "resistencia") {
+  return track.charAt(0).toUpperCase();
 }
 
 /**

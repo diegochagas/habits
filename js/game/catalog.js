@@ -13,18 +13,11 @@
  * @property {number} [pvHit] PV lost today when a bad habit is logged
  */
 
-// The former "language", "devotional" and "budget" habits are now the list's Today habits
-// (Duolingo, Devotional, Finances rows flagged `daily`; Diego, 2026-10-29). Their i18n keys
-// stay so older log entries still read well.
+// Good habits are list items of category "Today" since 2026-10-29 (Diego: edit/remove them
+// like any item); the catalog keeps only the bad ones. The good habits' i18n keys stay so
+// older log entries still read well.
 /** @type {HabitDefinition[]} */
 export const DEFAULT_HABITS = [
-  { id: "gym", track: "poder", xp: 2, good: true },
-  { id: "walk", track: "poder", xp: 1, good: true },
-  { id: "read", track: "habilidade", xp: 1, good: true },
-  { id: "study", track: "habilidade", xp: 1, good: true },
-  { id: "code", track: "habilidade", xp: 1, good: true },
-  { id: "healthyMeal", track: "resistencia", xp: 1, good: true },
-  { id: "sleep", track: "resistencia", xp: 1, good: true },
   { id: "junkFood", track: "resistencia", xp: -2, good: false, pvHit: 3 },
   { id: "spending", track: "resistencia", xp: -2, good: false },
   { id: "skipGym", track: "poder", xp: -1, good: false },
@@ -38,8 +31,18 @@ export const LIST_CATEGORY_TRACK = {
   Read: "habilidade",
   Watch: "habilidade",
   "Side Hustle": "habilidade",
-  Personal: "resistencia",
 };
+
+/**
+ * The track an item trains: a Today item says so itself, the others follow their category.
+ * @param {{ category: string, track?: string }} item
+ * @returns {Track}
+ * @example trackForItem({ category: "Today", track: "poder" }) // "poder"
+ */
+export function trackForItem(item) {
+  if (item.category === "Today") return /** @type {Track} */ (item.track ?? "resistencia");
+  return /** @type {Track} */ (LIST_CATEGORY_TRACK[item.category] ?? "habilidade");
+}
 
 /**
  * @typedef {object} ShopEntry

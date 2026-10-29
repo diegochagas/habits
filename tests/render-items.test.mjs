@@ -5,7 +5,7 @@ import { formatDate, renderCategoryTabs, renderItemCard } from "../js/render-ite
 const item = {
   id: "sheet-001",
   name: "<script>alert(1)</script> Devotional",
-  category: "Personal",
+  category: "Read",
   description: "Pray. https://bible.com/x",
   date: "2026-10-28",
   done: false,
@@ -18,7 +18,7 @@ test("renderItemCard escapes the name, links the description and shows the sheet
   assert.ok(!html.includes("<script>"));
   assert.ok(html.includes('<a href="https://bible.com/x"'));
   assert.ok(html.includes("28/10/2026"));
-  assert.ok(html.includes('class="card panel category-personal"'));
+  assert.ok(html.includes('class="card panel category-read"'));
 });
 
 test("a done card gets the done class and the undo label in PT", () => {
@@ -28,9 +28,11 @@ test("a done card gets the done class and the undo label in PT", () => {
 });
 
 test("a Today habit done today is greyed out with an 'already done' note", () => {
-  const html = renderItemCard({ ...item, daily: true, done: true, doneAt: "2026-10-29" }, "en");
+  const habit = { ...item, category: "Today", track: "poder", xp: 2, done: true, doneAt: "2026-10-29" };
+  const html = renderItemCard(habit, "en");
   assert.ok(html.includes("card-done card-done-today"));
   assert.ok(html.includes("✓ Already done today"));
+  assert.ok(html.includes("🔁 +2 P"), "a Today card shows its XP and track");
   const plain = renderItemCard({ ...item, done: true }, "en");
   assert.ok(!plain.includes("card-done-today"), "a plain done item keeps the DONE stamp");
 });

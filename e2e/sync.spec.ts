@@ -32,7 +32,7 @@ test("the list follows the sheet and pushes Done / Add as ops", async ({ page },
   });
 
   await page.goto("/");
-  await expect(page.locator("#counter")).toContainText("310 of 310");
+  await expect(page.locator("#counter")).toContainText("315 of 315");
   await page.getByRole("button", { name: "Sync", exact: true }).click();
   await expect(page.locator("#sync-panel")).toBeVisible();
   await page.getByLabel("Web app URL").fill(SCRIPT_URL);
