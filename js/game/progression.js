@@ -81,36 +81,28 @@ export function loseCurrentPv(hero, pv) {
   return { ...hero, current: { ...hero.current, pv: Math.max(0, hero.current.pv - pv) } };
 }
 
-/** @typedef {{ id: string, name?: string, category: string, done: boolean, track?: string, xp?: number }} CreditableItem */
+/** @typedef {{ id: string, name?: string, category: string, done: boolean, daily?: boolean, xp?: number }} CreditableItem */
 
 /**
- * Credit list items marked done on the Habits page: +1 XP once per item on its category's track;
- * a Today item (a habit) pays its own XP on its own track once per day (keyed "id@yyyy-mm-dd")
- * and is logged for today, so the Today tab's log shows it next to the bad habits.
+ * Credit list items marked done on the Habits page on the track of their category
+ * (característica): +1 XP once per item, and a daily item (a Today habit) its own XP once per day
+ * (keyed "id@yyyy-mm-dd"). Each credit is logged for today, so the Today tab's log shows it next
+ * to the bad habits.
  * @param {Hero} hero
  * @param {CreditableItem[]} listItems
- * @param {string} [today] yyyy-mm-dd, needed for Today items
+ * @param {string} [today] yyyy-mm-dd
  * @returns {{ hero: Hero, credited: number }}
  * @example creditDoneListItems(hero, items, "2026-10-29").credited // 2
  */
 export function creditDoneListItems(hero, listItems, today = "") {
-  const creditKey = (/** @type {CreditableItem} */ item) => (isHabitItem(item) ? `${item.id}@${today}` : item.id);
+  const creditKey = (/** @type {CreditableItem} */ item) => (item.daily ? `${item.id}@${today}` : item.id);
   const fresh = listItems.filter((item) => item.done && !hero.creditedListItemIds.includes(creditKey(item)));
   let next = { ...hero, creditedListItemIds: [...hero.creditedListItemIds, ...fresh.map(creditKey)] };
   for (const item of fresh) {
-    const xp = isHabitItem(item) ? (item.xp ?? 1) : 1;
-    next = awardXp(next, trackForItem(item), xp);
-    if (isHabitItem(item)) next = logListItem(next, item, xp, today);
+    const xp = item.daily ? (item.xp ?? 1) : 1;
+    next = logListItem(awardXp(next, trackForItem(item), xp), item, xp, today);
   }
   return { hero: next, credited: fresh.length };
-}
-
-/**
- * @param {{ category: string }} item
- * @returns {boolean}
- */
-function isHabitItem(item) {
-  return item.category === "Today";
 }
 
 /**
@@ -133,7 +125,7 @@ function logListItem(hero, item, xp, today) {
  * @param {import("../items-store.js").HabitItem | null} item
  * @param {string} today
  * @returns {Hero}
- * @example creditPomodoro(hero, { category: "Personal", name: "Devotional" }, "2026-10-29").pools.resistencia // +1
+ * @example creditPomodoro(hero, { category: "Resistência", name: "Devotional" }, "2026-10-29").pools.resistencia // +1
  */
 export function creditPomodoro(hero, item, today) {
   const track = item ? trackForItem(item) : "habilidade";

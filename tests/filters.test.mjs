@@ -3,13 +3,30 @@ import assert from "node:assert/strict";
 import { DEFAULT_FILTER, countByCategory, matchesFilter, visibleItems } from "../js/filters.js";
 
 const sample = [
-  { id: "1", name: "One Piece", category: "Read", description: "Chapter 1197", date: "2026-11-01", done: false },
-  { id: "2", name: "Duolingo", category: "Today", description: "1 lesson", date: "2026-10-28", done: true },
-  { id: "3", name: "Bleach", category: "Watch", description: "", date: "2026-10-28", done: false },
+  {
+    id: "1",
+    name: "One Piece",
+    category: "Habilidade",
+    daily: false,
+    description: "Chapter 1197",
+    date: "2026-11-01",
+    done: false,
+  },
+  {
+    id: "2",
+    name: "Duolingo",
+    category: "Habilidade",
+    daily: true,
+    description: "1 lesson",
+    date: "2026-10-28",
+    done: true,
+  },
+  { id: "3", name: "Bleach", category: "Resistência", daily: false, description: "", date: "2026-10-28", done: false },
   {
     id: "4",
     name: "Anki",
-    category: "Side Hustle",
+    category: "Poder",
+    daily: false,
     description: "https://apps.ankiweb.net",
     date: "2026-10-28",
     done: false,
@@ -24,8 +41,13 @@ test("default filter shows everything, to-do first, then by date and name", () =
 });
 
 test("category filter keeps only that category", () => {
-  const ids = visibleItems(sample, { ...DEFAULT_FILTER, category: "Watch" }).map((item) => item.id);
+  const ids = visibleItems(sample, { ...DEFAULT_FILTER, category: "Resistência" }).map((item) => item.id);
   assert.deepEqual(ids, ["3"]);
+});
+
+test("the Today tab shows the daily items of every category", () => {
+  const ids = visibleItems(sample, { ...DEFAULT_FILTER, category: "Today" }).map((item) => item.id);
+  assert.deepEqual(ids, ["2"]);
 });
 
 test("status filter separates to-do from done", () => {
@@ -43,5 +65,5 @@ test("search is case-insensitive and looks at name and description", () => {
 });
 
 test("countByCategory includes the total under All", () => {
-  assert.deepEqual(countByCategory(sample), { All: 4, Read: 1, Today: 1, Watch: 1, "Side Hustle": 1 });
+  assert.deepEqual(countByCategory(sample), { All: 4, Today: 1, Habilidade: 2, Resistência: 1, Poder: 1 });
 });

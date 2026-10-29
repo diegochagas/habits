@@ -3,14 +3,15 @@
 A black-and-white, ink-styled list of the things I want to read, watch, build and keep
 doing. It started as the "ToDo List" Google Sheet (Date, Task, Notes, Source, Done) and
 now lives on the home server: add an item with a name, a category, a description where
-URLs become links and a date; edit it in place; mark it done; filter by category (Read, Watch,
-Side Hustle, Today), search, export or import JSON. A **Today** item is a habit: it carries an
-XP track and amount, is done once a day and comes back every morning.
+URLs become links and a date; edit it in place; mark it done; filter by category, search, export
+or import JSON. The categories are the three 3DeT **características** (Poder, Habilidade,
+Resistência): an item done pays 1 XP on that track, and a **Today habit** (any item with the
+flag ticked) pays its own XP per day, is done once a day and comes back every morning.
 
 The habits page (`index.html`) also holds the **hero**: the Today tab (the first one) lists the
-Today items as the good habits (Devotional, Duolingo, Finances, Gym workout… once a day each; a
-done one shows "Already done today" greyed out on the list), then the catalog's bad habits (XP
-out of three tracks, Poder / Habilidade / Resistência); the Sheet tab spends that XP on
+daily items still to do as the good habits (Devotional, Duolingo, Finances, Gym workout… once a
+day each; a done one leaves the tab and shows "Already done today" greyed out on the list), then
+the catalog's bad habits (XP out of three tracks, Poder / Habilidade / Resistência); the Sheet tab spends that XP on
 atributos, perícias, vantagens and items, and the hero card shows the chibi whose body follows
 the logged weight. A **Pomodoro** panel sits on top: pick a list item (or press 🍅 on its card),
 work 25 minutes with an optional YouTube focus video (saved link, mute button), rest 5 (15 every
@@ -83,7 +84,7 @@ index.html ─── css/ink.css (ink, halftone, speed lines, bubble, stamps) + 
          ├─ linkify.js       escape text, http(s) URLs → <a>, newlines → <br>
          ├─ export-import.js JSON download / upload
          ├─ i18n.js          EN / PT strings
-         ├─ categories.js    Read · Watch · Side Hustle · Today (habits: track + XP, once a day)
+         ├─ categories.js    Poder · Habilidade · Resistência (= XP track), old Source values migrated
          ├─ game/hero-controller.js   the hero's actions (habits, shop, rest, weight), shared with game.html
          ├─ sync/
          │    ├─ sheet-rows.js     sheet row ↔ item, ops between two lists, merge (sheet wins, queue kept)
@@ -146,8 +147,10 @@ Pomodoro "minute" 0.1 s so e2e can finish one. Unspent free time resets at midni
 
 ## Categories
 
-`Read`, `Watch`, `Side Hustle`, `Today`, the four values of the sheet's Source column (`Today`
-replaced `Personal` on 2026-10-29; old Personal rows and items still load as Today). A Today
-item is a habit: it carries a track and an XP amount, is listed on the Today tab, done once a
-day and back every morning. Add a category in `js/categories.js` (list, i18n key, kanji
-stamp) and `js/i18n.js`.
+`Poder`, `Habilidade`, `Resistência`: the sheet's Source column holds the característica an item
+trains since 2026-10-29 (Poder for doing and shipping, Habilidade for reading, courses and code,
+Resistência for devotional, finances, health and rest). Its old values still load: Read →
+Habilidade, Watch → Resistência, Side Hustle → Poder, and a Today / Personal row is a daily item
+of the track it had. Any item can be a **Today habit** (`daily`): listed on the Today tab, done
+once a day, back every morning, worth 1–3 XP per day. Add a category in `js/categories.js`
+(list, track, i18n key, kanji stamp) and `js/i18n.js`.

@@ -3,23 +3,23 @@
 // (data/seed.json) is copied into storage on first visit so sheet items and user items are
 // edited the same way.
 
-import { DEFAULT_HABIT_TRACK, TODAY_CATEGORY, isCategory, isHabitTrack, migrateCategory } from "./categories.js";
+import { isCategory, isLegacyDailyCategory, migrateCategory } from "./categories.js";
 
 /**
  * @typedef {object} HabitItem
  * @property {string} id
  * @property {string} name
- * @property {import("./categories.js").Category} category "Today" = a habit: once a day, back every morning
+ * @property {import("./categories.js").Category} category the característica it trains (its XP track)
+ * @property {boolean} daily a Today habit: on the Today tab, once a day, back every morning
  * @property {string} description
  * @property {string} date  ISO yyyy-mm-dd (sheet queue date, or the day it was added)
  * @property {boolean} done
- * @property {string} doneAt yyyy-mm-dd of the last Done ("" while to do); Today items reset the next day
+ * @property {string} doneAt yyyy-mm-dd of the last Done ("" while to do); daily items reset the next day
  * @property {string} createdAt ISO timestamp
- * @property {import("./categories.js").HabitTrack} [track] Today items: the XP track the habit trains
- * @property {number} [xp] Today items: XP per day (1–3)
+ * @property {number} [xp] daily items: XP per day (1–3); any other item pays 1 once
  */
 
-/** @typedef {{ name: string, category: string, description: string, date?: string, track?: string, xp?: number | string }} ItemFields */
+/** @typedef {{ name: string, category: string, description: string, date?: string, daily?: boolean, xp?: number | string }} ItemFields */
 
 export const STORAGE_KEY = "habits:v1";
 
@@ -35,9 +35,9 @@ export function parseItem(raw) {
     return { error: `id ${JSON.stringify(candidate.id)}: expected a non-empty string` };
   if (typeof candidate.name !== "string" || !candidate.name.trim())
     return { error: `name ${JSON.stringify(candidate.name)}: expected a non-empty string` };
-  const category = migrateCategory(candidate.category, candidate.daily === true);
+  const category = migrateCategory(candidate.category, candidate.track);
   if (!category) {
-    return { error: `category ${JSON.stringify(candidate.category)}: expected Read, Watch, Side Hustle or Today` };
+    return { error: `category ${JSON.stringify(candidate.category)}: expected Poder, Habilidade or Resistência` };
   }
   return { item: normalizeItem(candidate, category) };
 }
@@ -58,33 +58,31 @@ function normalizeItem(candidate, category) {
     doneAt: typeof candidate.doneAt === "string" ? candidate.doneAt : "",
     createdAt: typeof candidate.createdAt === "string" ? candidate.createdAt : "",
   };
-  return withHabitFields(base, candidate.track, candidate.xp);
+  // Items saved before 2026-10-29 said "Today" (or "Personal") as their category instead.
+  const daily = candidate.daily === true || isLegacyDailyCategory(candidate.category);
+  return withHabitFields(base, daily, candidate.xp);
 }
 
 /**
- * Today items carry a track and an XP amount (defaults Resistência, 1); other items carry none.
- * @template {{ category: string }} T
+ * A daily item (a Today habit) carries its XP per day (1–3, default 1); other items carry none.
+ * @template {object} T
  * @param {T} item
- * @param {unknown} track
+ * @param {boolean} daily
  * @param {unknown} xp
- * @returns {T & { track?: import("./categories.js").HabitTrack, xp?: number }}
+ * @returns {T & { daily: boolean, xp?: number }}
  */
-function withHabitFields(item, track, xp) {
-  if (item.category !== TODAY_CATEGORY) return item;
+function withHabitFields(item, daily, xp) {
+  if (!daily) return { ...item, daily: false };
   const amount = Math.round(Number(xp));
-  return {
-    ...item,
-    track: typeof track === "string" && isHabitTrack(track) ? track : DEFAULT_HABIT_TRACK,
-    xp: amount >= 1 && amount <= 3 ? amount : 1,
-  };
+  return { ...item, daily: true, xp: amount >= 1 && amount <= 3 ? amount : 1 };
 }
 
 /**
  * @param {HabitItem} item
- * @returns {boolean} true for a Today item (a habit)
+ * @returns {boolean} true for a daily item (a Today habit)
  */
 export function isHabit(item) {
-  return item.category === TODAY_CATEGORY;
+  return item.daily === true;
 }
 
 /**
@@ -115,7 +113,7 @@ export function checkItemFields(fields) {
   const date = (fields.date ?? "").trim();
   if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "errorDate" };
   const checked = { name, category: fields.category, description: fields.description.trim(), date };
-  return { fields: withHabitFields(checked, fields.track, fields.xp) };
+  return { fields: withHabitFields(checked, fields.daily === true, fields.xp) };
 }
 
 /**
@@ -123,7 +121,7 @@ export function checkItemFields(fields) {
  * @param {ItemFields} fields
  * @param {{ id: () => string, now: () => Date }} clock injected so tests are deterministic
  * @returns {{ item: HabitItem } | { error: "errorName" | "errorCategory" | "errorDate" }}
- * @example createItem({ name: "Bleach", category: "Watch", description: "" }, { id: () => "x", now: () => new Date() })
+ * @example createItem({ name: "Bleach", category: "Resistência", description: "" }, { id: () => "x", now: () => new Date() })
  */
 export function createItem(fields, clock) {
   const checked = checkItemFields(fields);
@@ -138,16 +136,16 @@ export function createItem(fields, clock) {
     doneAt: "",
     createdAt: now.toISOString(),
   };
-  return { item };
+  return { item: /** @type {HabitItem} */ (item) };
 }
 
 /**
- * Replace an item's editable fields (name, category, description, date; track and XP on Today items).
+ * Replace an item's editable fields (name, category, description, date, daily and its XP).
  * @param {HabitItem[]} items
  * @param {string} id
  * @param {ItemFields} fields
  * @returns {{ items: HabitItem[] } | { error: "errorName" | "errorCategory" | "errorDate" }}
- * @example updateItem(items, "a", { name: "Gym", category: "Today", description: "", track: "poder", xp: 2 })
+ * @example updateItem(items, "a", { name: "Gym", category: "Poder", description: "", daily: true, xp: 2 })
  */
 export function updateItem(items, id, fields) {
   const checked = checkItemFields(fields);
@@ -155,14 +153,14 @@ export function updateItem(items, id, fields) {
   return {
     items: items.map((item) => {
       if (item.id !== id) return item;
-      const { track: _track, xp: _xp, ...rest } = item;
+      const { xp: _xp, ...rest } = item;
       return /** @type {HabitItem} */ ({ ...rest, ...checked.fields, date: checked.fields.date || item.date });
     }),
   };
 }
 
 /**
- * Today items marked done on an earlier day come back as to do.
+ * Daily items marked done on an earlier day come back as to do.
  * @param {HabitItem[]} items
  * @param {string} today yyyy-mm-dd
  * @returns {{ items: HabitItem[], changed: number }}

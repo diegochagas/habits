@@ -7,7 +7,7 @@ function fakeFetch(statusByMethod = {}) {
   const calls = [];
   const fetchFn = async (url, init = {}) => {
     const method = init.method ?? "GET";
-    calls.push({ url, method, body: init.body });
+    calls.push({ url, method, body: init.body, keepalive: init.keepalive });
     const status = statusByMethod[method] ?? 200;
     return { ok: status < 400, status, json: async () => ({ state: { "habits:v1": [{ id: "a" }] } }) };
   };
@@ -70,6 +70,21 @@ test("a failed write stays pending and is retried later; a newer value is never 
   assert.equal(calls.at(-1).body, "2");
   await storage.flush();
   assert.equal(calls.length, 2, "nothing left to send");
+});
+
+test("a body over 32 KB is PUT without keepalive (browsers refuse keepalive bodies past 64 KiB)", async () => {
+  const { fetchFn, calls } = fakeFetch();
+  const storage = createServerStorage(fetchFn, {}, fakeTimers());
+  storage.setItem("habits:v1", "x".repeat(40_000));
+  storage.setItem("habits:hero:v1", "{}");
+  await storage.flush();
+  assert.deepEqual(
+    calls.map((call) => [call.url, call.keepalive]),
+    [
+      ["api/state/habits%3Av1", false],
+      ["api/state/habits%3Ahero%3Av1", true],
+    ],
+  );
 });
 
 test("without a server the browser storage is used", async () => {

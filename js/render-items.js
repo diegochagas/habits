@@ -1,6 +1,6 @@
 // render-items.js: HTML for the item cards and the category tabs. No state here.
 
-import { CATEGORIES, categoryI18nKey, categorySlug, categoryStamp } from "./categories.js";
+import { CATEGORIES, TODAY_FILTER, categoryI18nKey, categorySlug, categoryStamp } from "./categories.js";
 import { translate } from "./i18n.js";
 import { isHabit } from "./items-store.js";
 import { escapeHtml, linkifyDescription } from "./linkify.js";
@@ -32,7 +32,7 @@ export function renderItemCard(item, lang, extras = {}) {
  */
 function renderCardBody(item, lang, extras) {
   const count = extras.pomodoros?.[item.id] ?? 0;
-  return `<h3 class="card-name">${escapeHtml(item.name)}${isHabit(item) ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁 +${item.xp ?? 1} ${trackTag(item.track)}</span>` : ""}</h3>
+  return `<h3 class="card-name">${escapeHtml(item.name)}${isHabit(item) ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁 +${item.xp ?? 1}</span>` : ""}</h3>
   ${isHabit(item) && item.done ? `<p class="card-done-today-note">✓ ${translate(lang, "doneToday")}</p>` : ""}
   ${renderDescription(item.description)}
   <footer class="card-footer">
@@ -91,7 +91,7 @@ export function renderItemGrid(items, lang, extras = {}) {
  * @returns {string}
  */
 export function renderCategoryTabs(counts, active, lang) {
-  const tabs = ["All", ...CATEGORIES].map((category) =>
+  const tabs = ["All", ...CATEGORIES, TODAY_FILTER].map((category) =>
     renderTab(category, counts[category] ?? 0, category === active, lang),
   );
   return tabs.join("");
@@ -105,10 +105,19 @@ export function renderCategoryTabs(counts, active, lang) {
  * @returns {string}
  */
 function renderTab(category, count, active, lang) {
-  const key =
-    category === "All" ? "categoryAll" : categoryI18nKey(/** @type {import("./categories.js").Category} */ (category));
+  const key = tabI18nKey(category);
   const label = translate(lang, key);
   return `<button type="button" role="tab" class="tab${active ? " tab-active" : ""}" aria-selected="${active}" data-category="${escapeHtml(category)}">${label} <b>${count}</b></button>`;
+}
+
+/**
+ * @param {string} tab "All", a category, or the Today filter
+ * @returns {string}
+ */
+function tabI18nKey(tab) {
+  if (tab === "All") return "categoryAll";
+  if (tab === TODAY_FILTER) return "categoryToday";
+  return categoryI18nKey(/** @type {import("./categories.js").Category} */ (tab));
 }
 
 /**

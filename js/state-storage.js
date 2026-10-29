@@ -7,6 +7,10 @@
 const STATE_URL = "api/state";
 const FLUSH_DELAY_MS = 250;
 const RETRY_DELAY_MS = 5000;
+// Browsers cap the bytes in flight for `keepalive` fetches at 64 KiB (all of them together) and
+// refuse a bigger body outright; the list passed that around 315 items on 2026-10-29 and its
+// PUTs never landed. A big write goes without keepalive: it is retried while the page lives.
+const KEEPALIVE_MAX_BYTES = 32_000;
 
 /**
  * @typedef {object} StateStorage
@@ -149,7 +153,7 @@ async function sendOne(fetchFn, key, value) {
             method: "PUT",
             body: value,
             headers: { "Content-Type": "application/json" },
-            keepalive: true,
+            keepalive: new TextEncoder().encode(value).length <= KEEPALIVE_MAX_BYTES,
           });
     return response.ok;
   } catch {

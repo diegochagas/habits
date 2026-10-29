@@ -40,6 +40,7 @@ morning and unticks the row, so no nightly trigger is needed in the sheet. Each 
 +1 XP again. The script lives in the sheet's bound project as `HabitsSync.gs`.
 
 The site syncs on load, every five minutes, and right after each change; changes made while
-offline wait in a queue. Rows whose Source is not Read, Watch, Side Hustle, Today or Personal
-(the old name of Today) are ignored. A Today row gets a checkbox in Done, ticked when the
+offline wait in a queue. Rows whose Source is not Poder, Habilidade or Resistência (or one of the
+old values Read, Watch, Side Hustle, Today, Personal, read as a guess and overridden by the
+site's own category) are ignored. A daily row gets a checkbox in Done, ticked when the
 site marks it done and unticked again the next morning.

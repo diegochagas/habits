@@ -348,12 +348,12 @@ body::before {
   text-transform: uppercase;
 }
 
-.category-watch .card-category {
+.category-habilidade .card-category {
   background: var(--paper);
   color: var(--ink);
 }
 
-.category-side-hustle .card-category {
+.category-resistencia .card-category {
   background: repeating-linear-gradient(-45deg, var(--ink) 0 3px, var(--paper) 3px 5px);
   color: var(--paper);
   text-shadow:
@@ -361,12 +361,6 @@ body::before {
     -1px -1px 0 var(--ink),
     1px -1px 0 var(--ink),
     -1px 1px 0 var(--ink);
-}
-
-.category-today .card-category {
-  background: var(--paper);
-  color: var(--ink);
-  border-style: dashed;
 }
 
 .card-name {

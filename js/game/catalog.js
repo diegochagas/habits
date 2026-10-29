@@ -2,6 +2,8 @@
 // Tracks: "poder" (gym, sport, fights), "habilidade" (reading, study, code, languages),
 // "resistencia" (devotional, food, sleep, finances). Names are the book's own.
 
+import { categoryTrack } from "../categories.js";
+
 /** @typedef {"poder" | "habilidade" | "resistencia"} Track */
 
 /**
@@ -13,8 +15,8 @@
  * @property {number} [pvHit] PV lost today when a bad habit is logged
  */
 
-// Good habits are list items of category "Today" since 2026-10-29 (Diego: edit/remove them
-// like any item); the catalog keeps only the bad ones. The good habits' i18n keys stay so
+// Good habits are the list's daily items since 2026-10-29 (Diego: edit/remove them like any
+// item); the catalog keeps only the bad ones. The good habits' i18n keys stay so
 // older log entries still read well.
 /** @type {HabitDefinition[]} */
 export const DEFAULT_HABITS = [
@@ -26,22 +28,14 @@ export const DEFAULT_HABITS = [
   { id: "sugar", track: "resistencia", xp: -1, good: false, pvHit: 1 },
 ];
 
-/** Track credited when an item of the Habits list is marked done (+1 XP, objetivo menor). */
-export const LIST_CATEGORY_TRACK = {
-  Read: "habilidade",
-  Watch: "habilidade",
-  "Side Hustle": "habilidade",
-};
-
 /**
- * The track an item trains: a Today item says so itself, the others follow their category.
- * @param {{ category: string, track?: string }} item
+ * The track a list item trains: its category is a característica (Habilidade for anything else).
+ * @param {{ category: string }} item
  * @returns {Track}
- * @example trackForItem({ category: "Today", track: "poder" }) // "poder"
+ * @example trackForItem({ category: "Poder" }) // "poder"
  */
 export function trackForItem(item) {
-  if (item.category === "Today") return /** @type {Track} */ (item.track ?? "resistencia");
-  return /** @type {Track} */ (LIST_CATEGORY_TRACK[item.category] ?? "habilidade");
+  return categoryTrack(item.category) ?? "habilidade";
 }
 
 /**

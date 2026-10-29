@@ -161,13 +161,12 @@ function renderHeroArea() {
 }
 
 /**
- * The Today tab's habits: the Today items, to do first.
+ * The Today tab's habits: the daily items (the view hides the ones already done today).
  * @param {import("./items-store.js").HabitItem[]} items
  * @returns {import("./items-store.js").HabitItem[]}
  */
 function todayHabits(items) {
-  const habits = items.filter(isHabit);
-  return [...habits.filter((item) => !item.done), ...habits.filter((item) => item.done)];
+  return items.filter(isHabit);
 }
 
 /** @param {import("./items-store.js").HabitItem[]} items */
@@ -216,11 +215,11 @@ function onAddSubmit(event) {
   commit([result.item, ...state.items]);
 }
 
-/** The category of the add form or an editor changed: track + XP show for Today only. @param {Event} event */
-function onCategoryChange(event) {
-  const select = /** @type {HTMLElement} */ (event.target);
-  if (select.matches("select[name='category']") && select.closest("form")) {
-    toggleHabitFields(/** @type {HTMLFormElement} */ (select.closest("form")));
+/** The Today-habit box of the add form or an editor was ticked: its XP field shows. @param {Event} event */
+function onDailyToggle(event) {
+  const box = /** @type {HTMLElement} */ (event.target);
+  if (box.matches("input[name='daily']") && box.closest("form")) {
+    toggleHabitFields(/** @type {HTMLFormElement} */ (box.closest("form")));
   }
 }
 
@@ -300,7 +299,7 @@ function onHeroClick(event) {
   hero.handleAction(button);
 }
 
-/** A Today habit pressed on the Today tab: done for today (the list card greys out). */
+/** A habit pressed on the Today tab: done for today (it leaves the tab, the list card greys out). */
 function onTodayHabitDone(id) {
   const item = state.items.find((entry) => entry.id === id);
   if (!item || item.done) return;
@@ -323,7 +322,7 @@ async function onReset() {
 
 function bindEvents() {
   form.addEventListener("submit", onAddSubmit);
-  document.addEventListener("change", onCategoryChange);
+  document.addEventListener("change", onDailyToggle);
   grid.addEventListener("click", onGridClick);
   grid.addEventListener("submit", onEditSubmit);
   tabs.addEventListener("click", onTabClick);

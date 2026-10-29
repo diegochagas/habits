@@ -64,7 +64,9 @@ test("the list follows the sheet and pushes Done / Add as ops", async ({ page },
   await page.getByLabel("Name").fill("Read Vagabond");
   await page.getByRole("button", { name: "ADD!" }).click();
   await expect(page.locator("#counter")).toContainText("3 of 3");
-  expect(posted.at(-1)).toMatchObject({ ops: [{ op: "upsert", name: "Read Vagabond", category: "Read" }] });
+  expect(posted.at(-1)).toMatchObject({
+    ops: [{ op: "upsert", name: "Read Vagabond", category: "Poder", daily: false }],
+  });
   expect(rows.map((row) => row.task)).toEqual(["Devotional", "Duolingo", "Read Vagabond"]);
 
   await page.reload();

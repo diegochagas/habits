@@ -1,7 +1,8 @@
-// today-view.js: the daily habit log. Good habits are the list's Today items (once a day each,
-// edited on the List tab); bad habits come from the catalog plus the custom ones and remove XP.
+// today-view.js: the daily habit log. Good habits are the list's daily items (once a day each,
+// edited on the List tab; a done one leaves the tab until tomorrow); bad habits come from the
+// catalog plus the custom ones and remove XP.
 
-import { DEFAULT_HABITS } from "./catalog.js";
+import { DEFAULT_HABITS, trackForItem } from "./catalog.js";
 import { gameText } from "./game-i18n.js";
 import { escapeHtml } from "../linkify.js";
 import { trackTag } from "../render-items.js";
@@ -10,7 +11,7 @@ import { trackTag } from "../render-items.js";
  * @param {import("./hero-sheet.js").Hero} hero
  * @param {"en" | "pt"} lang
  * @param {string} today
- * @param {import("../items-store.js").HabitItem[]} [habits] the list's Today items
+ * @param {import("../items-store.js").HabitItem[]} [habits] the list's daily items
  * @returns {string}
  * @example renderTodayView(hero, "en", "2026-10-29", items.filter(isHabit))
  */
@@ -29,18 +30,19 @@ export function renderTodayView(hero, lang, today, habits = []) {
 }
 
 /**
- * One button per Today item; a done one is greyed and disabled until tomorrow.
+ * One button per daily item still to do; the done ones are in the log until tomorrow.
  * @param {import("../items-store.js").HabitItem[]} items
  * @param {"en" | "pt"} lang
  * @returns {string}
  */
 function renderHabitItems(items, lang) {
   if (items.length === 0) return `<p class="muted">${gameText(lang, "noTodayHabits")}</p>`;
-  const buttons = items.map((item) => {
-    const track = item.track ?? "resistencia";
-    const state = item.done ? `<b>✓ ${gameText(lang, "doneToday")}</b>` : `<b>+${item.xp ?? 1} ${trackTag(track)}</b>`;
-    return `<button type="button" class="habit-button habit-good track-${track}${item.done ? " habit-done" : ""}" data-action="done-item" data-id="${escapeHtml(item.id)}"${item.done ? " disabled" : ""}>
-        <span>${escapeHtml(item.name)}</span>${state}</button>`;
+  const pending = items.filter((item) => !item.done);
+  if (pending.length === 0) return `<p class="muted habits-all-done">✓ ${gameText(lang, "allDoneToday")}</p>`;
+  const buttons = pending.map((item) => {
+    const track = trackForItem(item);
+    return `<button type="button" class="habit-button habit-good track-${track}" data-action="done-item" data-id="${escapeHtml(item.id)}">
+        <span>${escapeHtml(item.name)}</span><b>+${item.xp ?? 1} ${trackTag(track)}</b></button>`;
   });
   return `<div class="habit-buttons">${buttons.join("")}</div>`;
 }
@@ -64,7 +66,8 @@ function renderBadHabitButtons(habits) {
  */
 function renderCustomForm(lang) {
   const options = ["poder", "habilidade", "resistencia"].map(
-    (track) => `<option value="${track}">${gameText(lang, `track${track.charAt(0).toUpperCase()}${track.slice(1)}`)}</option>`,
+    (track) =>
+      `<option value="${track}">${gameText(lang, `track${track.charAt(0).toUpperCase()}${track.slice(1)}`)}</option>`,
   );
   return `<h3 class="panel-title">${gameText(lang, "customHabit")}</h3>
   <form class="custom-habit-form" data-form="custom-habit">

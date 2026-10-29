@@ -14,7 +14,7 @@ test("loads the sheet list, adds an item with a URL, filters and survives a relo
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home.png`, fullPage: false });
 
   await page.getByLabel("Name").fill("Read Vagabond");
-  await page.getByLabel("Category").selectOption("Read");
+  await page.getByLabel("Category").selectOption("Habilidade");
   await page.getByLabel(/Description/).fill("Takehiko Inoue. https://example.com/vagabond vol. 1");
   await page.getByRole("button", { name: "ADD!" }).click();
 
@@ -24,9 +24,9 @@ test("loads the sheet list, adds an item with a URL, filters and survives a relo
   await expect(page.locator("#counter")).toContainText("316 of 316");
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-added.png`, fullPage: false });
 
-  await page.getByRole("tab", { name: /^Watch/ }).click();
+  await page.getByRole("tab", { name: /^Resistência/ }).click();
   await expect(page.locator("#counter")).toContainText("of 316");
-  await expect(page.locator("article.card.category-read")).toHaveCount(0);
+  await expect(page.locator("article.card.category-habilidade")).toHaveCount(0);
 
   await page.getByRole("tab", { name: /^All/ }).click();
   await page.getByPlaceholder("Search...").fill("vagabond");
@@ -48,7 +48,8 @@ test("empty name shows an error and the PT toggle translates the page", async ({
 
   await page.locator("#lang-toggle").click();
   await expect(page.getByRole("button", { name: "ADICIONAR!" })).toBeVisible();
-  await expect(page.getByRole("tab", { name: /^Assistir/ })).toBeVisible();
+  await expect(page.getByRole("tab", { name: /^Todos/ })).toBeVisible();
+  await expect(page.getByLabel("Hábito de hoje (uma vez por dia)")).toBeVisible();
   await expect(page.getByRole("button", { name: "Hoje", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Iniciar", exact: true })).toBeVisible();
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-pt.png`, fullPage: false });

@@ -197,7 +197,8 @@ function drawFrontLegs(p, x, y, colours, frame) {
  */
 function drawFrontFace(p, x, y, look, frame) {
   if (look.headband) p.rect(x + 3, y + 3, 8, 1, RED);
-  if (frame.pose === "hurt" || (look.aura < 0 && frame.pose !== "win")) p.rect(x + 5, y + 7, 4, 1, look.beard ?? look.skin);
+  if (frame.pose === "hurt" || (look.aura < 0 && frame.pose !== "win"))
+    p.rect(x + 5, y + 7, 4, 1, look.beard ?? look.skin);
   if (look.aura <= -2) [4, 9].forEach((dx) => p.rect(x + dx, y + 5, 1, 1, "#8e6f6f"));
 }
 

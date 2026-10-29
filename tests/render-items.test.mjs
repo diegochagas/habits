@@ -5,7 +5,8 @@ import { formatDate, renderCategoryTabs, renderItemCard } from "../js/render-ite
 const item = {
   id: "sheet-001",
   name: "<script>alert(1)</script> Devotional",
-  category: "Read",
+  category: "Habilidade",
+  daily: false,
   description: "Pray. https://bible.com/x",
   date: "2026-10-28",
   done: false,
@@ -18,7 +19,8 @@ test("renderItemCard escapes the name, links the description and shows the sheet
   assert.ok(!html.includes("<script>"));
   assert.ok(html.includes('<a href="https://bible.com/x"'));
   assert.ok(html.includes("28/10/2026"));
-  assert.ok(html.includes('class="card panel category-read"'));
+  assert.ok(html.includes('class="card panel category-habilidade"'));
+  assert.ok(html.includes('<span class="card-stamp" aria-hidden="true">技</span>'));
 });
 
 test("a done card gets the done class and the undo label in PT", () => {
@@ -27,12 +29,12 @@ test("a done card gets the done class and the undo label in PT", () => {
   assert.ok(html.includes(">Desfazer<"));
 });
 
-test("a Today habit done today is greyed out with an 'already done' note", () => {
-  const habit = { ...item, category: "Today", track: "poder", xp: 2, done: true, doneAt: "2026-10-29" };
+test("a daily habit done today is greyed out with an 'already done' note", () => {
+  const habit = { ...item, category: "Poder", daily: true, xp: 2, done: true, doneAt: "2026-10-29" };
   const html = renderItemCard(habit, "en");
   assert.ok(html.includes("card-done card-done-today"));
   assert.ok(html.includes("✓ Already done today"));
-  assert.ok(html.includes("🔁 +2 P"), "a Today card shows its XP and track");
+  assert.ok(html.includes("🔁 +2</span>"), "a daily card shows its XP per day");
   const plain = renderItemCard({ ...item, done: true }, "en");
   assert.ok(!plain.includes("card-done-today"), "a plain done item keeps the DONE stamp");
 });
@@ -42,9 +44,10 @@ test("formatDate leaves non-ISO input untouched but escaped", () => {
 });
 
 test("renderCategoryTabs marks the active tab and shows counts", () => {
-  const html = renderCategoryTabs({ All: 5, Read: 2 }, "Read", "en");
-  assert.ok(html.includes('aria-selected="true" data-category="Read">Read <b>2</b>'));
-  assert.ok(html.includes('data-category="Watch">Watch <b>0</b>'));
+  const html = renderCategoryTabs({ All: 5, Habilidade: 2, Today: 1 }, "Habilidade", "en");
+  assert.ok(html.includes('aria-selected="true" data-category="Habilidade">Habilidade <b>2</b>'));
+  assert.ok(html.includes('data-category="Poder">Poder <b>0</b>'));
+  assert.ok(html.includes('data-category="Today">Today <b>1</b>'), "the Today tab (daily items) comes last");
 });
 
 test("cards get a Pomodoro button while open and show finished Pomodoros", async () => {
@@ -52,7 +55,8 @@ test("cards get a Pomodoro button while open and show finished Pomodoros", async
   const item = {
     id: "a",
     name: "Read",
-    category: "Read",
+    category: "Habilidade",
+    daily: false,
     description: "",
     date: "2026-10-29",
     done: false,

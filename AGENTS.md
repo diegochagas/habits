@@ -4,11 +4,14 @@ Vanilla ES-module pages, no build, plus `server/` (node:http + `pg`, the one run
 dependency, behind `server/state-postgres.js`): it serves the pages and keeps every saved
 document in one PostgreSQL table (`/api/state/<key>`, see `js/state-storage.js`; the pages fall
 back to localStorage when served as plain files). The seed in `data/seed.json` is a snapshot of
-the "ToDo List" Google Sheet (2026-10-28). Items have `doneAt`; the category "Today" (ex
-"Personal", migrated on parse together with the old `daily` flag) marks a habit with its own
-`track` + `xp`: `rollDailyItems` brings them back every morning, the Today tab lists them as the
-good habits (`today-view.js`, action `done-item`) and a done one is greyed on the list; cards
-edit in place (`js/render-item-editor.js`). The hero is drawn by `diego-sprite.js` (string
+the "ToDo List" Google Sheet (2026-10-28). Since 2026-10-29 the categories are the three 3DeT
+características (Poder, Habilidade, Resistência): an item done pays 1 XP on that track, and the
+`daily` flag marks a Today habit with its own `xp` per day (`rollDailyItems` brings them back
+every morning, the Today tab lists the pending ones as the good habits (`today-view.js`, action
+`done-item`), a done one is greyed on the list with "Already done today"). The old Source values
+(Read, Watch, Side Hustle, Today, Personal; the Today items' `track`) are migrated on parse by
+`migrateCategory`, never written. Items have `doneAt`; cards edit in place
+(`js/render-item-editor.js`). The hero is drawn by `diego-sprite.js` (string
 pixel maps traced from Diego's reference), enemies by the generic `chibi-sprite.js`. Deployed on the home server by push (docker compose, see README).
 `game.html` + `js/game/` is the 3DeT Victory game (see README "Architecture"); combat and
 progression are pure functions that take an injected `rollDie`, so tests use scripted dice and
@@ -49,7 +52,7 @@ Language: vanilla JS ES modules. Formatter: prettier; `scripts/check` runs it, d
 - Types explicit: JSDoc `@param`/`@returns` on every exported function.
 - Early returns, max 2 nested levels. Extract duplicated logic the second time it appears.
 - Errors include the offending value and the expected shape
-  (`category "Game": expected Read, Watch, Side Hustle or Today`).
+  (`category "Game": expected Poder, Habilidade or Resistência`).
 - Comments: keep the ones you find, they carry intent. Write WHY, cite issue numbers / SHAs.
   Docstring + one usage example on public functions. Never `// increment i`.
 - Dependencies injected via parameters: `createItemStore(storage)`, `createItem(fields, clock)`;

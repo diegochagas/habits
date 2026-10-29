@@ -14,12 +14,11 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
   await page.getByRole("button", { name: "Today", exact: true }).click();
   await expect(page.locator("#list-section")).toBeHidden();
 
-  // Good habits are the list's Today items: once a day each, then greyed on the list.
+  // Good habits are the list's daily items: once a day each, then gone from the tab and greyed on the list.
   const gym = page.locator(".today-habits button", { hasText: "Gym workout" });
   await expect(gym).toContainText("+2 P");
   await gym.click();
-  await expect(gym).toBeDisabled();
-  await expect(gym).toContainText("Already done today");
+  await expect(gym).toHaveCount(0);
   await expect(page.locator(".pool-poder b")).toHaveText("2");
   await page.getByRole("button", { name: /Junk food/ }).click();
   await expect(page.locator(".pool-poder b")).toHaveText("0", "falls back to the fullest pool");
@@ -28,6 +27,7 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
   await page.locator(".today-habits button", { hasText: "Devotional" }).click();
   await expect(page.locator(".pool-resistencia b")).toHaveText("1");
   await expect(page.locator(".today-log li").first()).toContainText("Devotional");
+  await expect(page.locator(".today-habits button")).toHaveCount(8, "ten daily habits, two done");
   await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-home-today.png` });
   await page.getByRole("button", { name: "List", exact: true }).click();
   await page.getByRole("tab", { name: /^Today/ }).click();
@@ -35,6 +35,17 @@ test("habits move XP, the sheet sells with track XP, and the hero survives a rel
   const card = page.locator("article.card", { hasText: "Gym workout" });
   await expect(card).toHaveClass(/card-done-today/);
   await expect(card.locator(".card-done-today-note")).toHaveText("✓ Already done today");
+  // Done on the list = done for today: the habit leaves the Today tab; a plain item pays 1 XP on its característica.
+  await page.locator("article.card", { hasText: "Duolingo" }).getByRole("button", { name: "Done" }).click();
+  await expect(page.locator(".pool-habilidade b")).toHaveText("1");
+  await page.getByRole("tab", { name: /^Habilidade/ }).click();
+  const plain = page.locator("article.card:not(.card-done):not(:has(.card-daily))").first();
+  await plain.getByRole("button", { name: "Done" }).click();
+  await expect(page.locator(".pool-habilidade b")).toHaveText("2");
+  await page.getByRole("button", { name: "Today", exact: true }).click();
+  await expect(page.locator(".today-habits button")).toHaveCount(7);
+  await expect(page.locator(".today-log li")).toHaveCount(5);
+  await page.getByRole("button", { name: "List", exact: true }).click();
 
   // Ten XP on Poder (as if gym had been logged all week) buys a perícia on the Sheet tab.
   const saved = await (await page.request.get("/api/state")).json();
@@ -93,8 +104,11 @@ test("a Pomodoro on a list item earns free time; the focus music form validates 
   await expect(page.locator("#free-time-bank")).toHaveText("00:01");
   await expect(page.locator(".pomodoro-modes .tab-active")).toHaveText("Short break");
   await expect(card.locator(".card-pomodoros")).toHaveText("🍅 1");
-  // The finished Pomodoro is a good habit: +1 XP on the item's track (Side Hustle → Habilidade).
-  await expect(page.locator(".pool-habilidade b")).toHaveText("1");
+  // The finished Pomodoro is a good habit: +1 XP on the track of the item's característica.
+  const pool = { Poder: "poder", Habilidade: "habilidade", Resistência: "resistencia" }[
+    (await card.locator(".card-category").textContent()) ?? ""
+  ];
+  await expect(page.locator(`.pool-${pool} b`)).toHaveText("1");
   await page.getByRole("button", { name: "Today", exact: true }).click();
   await expect(page.locator(".today-log li").first()).toContainText("🍅");
   expect(errors).toEqual([]);

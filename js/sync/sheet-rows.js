@@ -1,7 +1,7 @@
 // sheet-rows.js: the shape the Apps Script speaks ({ id, date dd/mm/yyyy, task, notes, source })
 // ↔ list items, and the merge that makes the sheet the source of truth.
 
-import { TODAY_CATEGORY, migrateCategory } from "../categories.js";
+import { isLegacyCategory, isLegacyDailyCategory, migrateCategory } from "../categories.js";
 
 /**
  * @typedef {object} SheetRow
@@ -10,10 +10,10 @@ import { TODAY_CATEGORY, migrateCategory } from "../categories.js";
  * @property {string} task
  * @property {string} notes
  * @property {string} source
- * @property {boolean} [daily] the Done cell is a checkbox (a Today row): Done ticks it, the site unticks it each morning
- * @property {boolean} [done] the checkbox's state (Today rows only)
+ * @property {boolean} [daily] the Done cell is a checkbox (a daily row): Done ticks it, the site unticks it each morning
+ * @property {boolean} [done] the checkbox's state (daily rows only)
  */
-/** @typedef {{ op: "delete", id: string } | { op: "upsert", id: string, date: string, name: string, description: string, category: string, daily: boolean, track?: string, xp?: number }} SyncOp */
+/** @typedef {{ op: "delete", id: string } | { op: "upsert", id: string, date: string, name: string, description: string, category: string, daily: boolean }} SyncOp */
 
 /**
  * "29/10/2026" → "2026-10-29"; an ISO date passes through; anything else stays as it is.
@@ -28,28 +28,30 @@ export function sheetDateToIso(text) {
 }
 
 /**
- * A row becomes an item; rows without a valid Source are skipped (null). A "Today" (or old
- * "Personal") row, or one with a checkbox in Done, is a Today item whose checkbox is its `done`
- * (stamped with `today`). The sheet knows no track/XP: a Today row gets the defaults, and
- * mergeSheetRows keeps the local ones.
+ * A row becomes an item; rows without a valid Source are skipped (null). A row with a checkbox
+ * in Done (or an old "Today" / "Personal" Source) is a daily item whose checkbox is its `done`
+ * (stamped with `today`). The sheet knows no XP: a daily row gets 1, and mergeSheetRows keeps
+ * the local amount.
  * @param {SheetRow} row
  * @param {string} [today] yyyy-mm-dd
  * @returns {import("../items-store.js").HabitItem | null}
  */
 export function rowToItem(row, today = "") {
-  const category = migrateCategory(row.source, row.daily === true);
+  const category = migrateCategory(row.source);
   if (!row.id || !row.task.trim() || !category) return null;
-  const done = row.daily === true && row.done === true;
+  const daily = row.daily === true || isLegacyDailyCategory(row.source);
+  const done = daily && row.done === true;
   return {
     id: row.id,
     name: row.task.trim(),
     category,
+    daily,
     description: row.notes ?? "",
     date: sheetDateToIso(row.date ?? ""),
     done,
     doneAt: done ? today : "",
     createdAt: "",
-    ...(category === TODAY_CATEGORY ? { track: "resistencia", xp: 1 } : {}),
+    ...(daily ? { xp: 1 } : {}),
   };
 }
 
@@ -65,7 +67,7 @@ export function upsertOp(item) {
     name: item.name,
     description: item.description,
     category: item.category,
-    daily: item.category === TODAY_CATEGORY,
+    daily: item.daily,
   };
 }
 
@@ -92,9 +94,11 @@ export function opsBetween(before, after) {
 
 /**
  * Sheet wins: the result is the sheet's rows, except that items with a queued op keep their
- * local state (a pending delete stays done, a pending upsert stays present). A Today row's
- * checkbox decides its done state and the local track/XP survive. Local items that match a row
- * by text (the first sync, before ids existed) are replaced by the row's id.
+ * local state (a pending delete stays done, a pending upsert stays present). A daily row's
+ * checkbox decides its done state and the local XP survives; a row whose Source is one of the
+ * sheet's old values (Read, Watch, Side Hustle, Today, Personal) keeps the local category, since
+ * the característica is the site's call. Local items that match a row by text (the first sync,
+ * before ids existed) are replaced by the row's id.
  * @param {import("../items-store.js").HabitItem[]} local
  * @param {SheetRow[]} rows
  * @param {SyncOp[]} pending
@@ -112,11 +116,11 @@ export function mergeSheetRows(local, rows, pending, today = "") {
     if (!fromRow) continue;
     const known = byId.get(row.id) ?? byText.get(textKey(fromRow));
     if (known && known.id !== row.id) renamed[known.id] = row.id;
-    const habit = fromRow.category === TODAY_CATEGORY;
-    const localDone = habit ? fromRow.done : (known?.done ?? false);
+    const localDone = fromRow.daily ? fromRow.done : (known?.done ?? false);
     const done = pendingById.get(row.id)?.op === "delete" || localDone;
-    const habitFields = habit && known?.track ? { track: known.track, xp: known.xp ?? 1 } : {};
-    items.push({ ...fromRow, ...habitFields, done, doneAt: done ? known?.doneAt || today : "" });
+    const category = known && isLegacyCategory(row.source) ? known.category : fromRow.category;
+    const xp = fromRow.daily ? { xp: known?.xp ?? 1 } : {};
+    items.push({ ...fromRow, category, ...xp, done, doneAt: done ? known?.doneAt || today : "" });
   }
   const present = new Set(items.map((item) => item.id));
   for (const op of pending)
@@ -134,6 +138,7 @@ function fieldsChanged(old, item) {
     old.name !== item.name ||
     old.description !== item.description ||
     old.category !== item.category ||
+    old.daily !== item.daily ||
     old.date !== item.date
   );
 }

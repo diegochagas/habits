@@ -32,12 +32,13 @@ class FakeStorage {
 const fixedClock = { id: () => "item-test", now: () => new Date("2026-10-28T12:34:56.000Z") };
 
 test("createItem trims fields and stamps date and id from the clock", () => {
-  const result = createItem({ name: "  Bleach  ", category: "Watch", description: " ep 1 \n" }, fixedClock);
+  const result = createItem({ name: "  Bleach  ", category: "Resistência", description: " ep 1 \n" }, fixedClock);
   assert.ok("item" in result);
   assert.deepEqual(result.item, {
     id: "item-test",
     name: "Bleach",
-    category: "Watch",
+    category: "Resistência",
+    daily: false,
     description: "ep 1",
     date: "2026-10-28",
     done: false,
@@ -45,28 +46,33 @@ test("createItem trims fields and stamps date and id from the clock", () => {
     createdAt: "2026-10-28T12:34:56.000Z",
   });
   const habit = createItem(
-    { name: "Gym", category: "Today", description: "", track: "poder", xp: "2", date: "2026-11-01" },
+    { name: "Gym", category: "Poder", description: "", daily: true, xp: "2", date: "2026-11-01" },
     fixedClock,
   );
   assert.ok("item" in habit);
-  assert.equal(habit.item.track, "poder");
+  assert.equal(habit.item.daily, true);
   assert.equal(habit.item.xp, 2);
   assert.equal(habit.item.date, "2026-11-01", "a chosen date wins over today");
-  const defaults = /** @type {any} */ (createItem({ name: "Pray", category: "Today", description: "" }, fixedClock));
-  assert.deepEqual([defaults.item.track, defaults.item.xp], ["resistencia", 1], "Today items get the default track");
-  const plain = /** @type {any} */ (createItem({ name: "x", category: "Read", description: "", track: "poder" }, fixedClock));
-  assert.equal("track" in plain.item, false, "only Today items carry a track");
-  assert.deepEqual(createItem({ name: "x", category: "Read", description: "", date: "1/2/2026" }, fixedClock), {
+  const defaults = /** @type {any} */ (
+    createItem({ name: "Pray", category: "Resistência", description: "", daily: true, xp: "9" }, fixedClock)
+  );
+  assert.equal(defaults.item.xp, 1, "a daily item outside 1–3 gets 1 XP");
+  const plain = /** @type {any} */ (
+    createItem({ name: "x", category: "Habilidade", description: "", xp: 2 }, fixedClock)
+  );
+  assert.equal("xp" in plain.item, false, "only daily items carry an XP amount");
+  assert.deepEqual(createItem({ name: "x", category: "Habilidade", description: "", date: "1/2/2026" }, fixedClock), {
     error: "errorDate",
   });
 });
 
-test("updateItem replaces the editable fields, keeps id/done, and can turn Today on and off", () => {
+test("updateItem replaces the editable fields, keeps id/done, and can turn the daily flag on and off", () => {
   const items = [
     {
       id: "a",
       name: "Old",
-      category: "Read",
+      category: "Habilidade",
+      daily: false,
       description: "",
       date: "2026-10-01",
       done: true,
@@ -76,41 +82,49 @@ test("updateItem replaces the editable fields, keeps id/done, and can turn Today
     {
       id: "b",
       name: "B",
-      category: "Read",
+      category: "Poder",
+      daily: true,
       description: "",
       date: "2026-10-01",
       done: false,
       doneAt: "",
       createdAt: "",
-      track: "poder",
       xp: 2,
     },
   ];
-  const edited = updateItem(items, "a", { name: " New ", category: "Today", description: " d ", date: "", xp: 3 });
+  const edited = updateItem(items, "a", {
+    name: " New ",
+    category: "Resistência",
+    description: " d ",
+    date: "",
+    daily: true,
+    xp: 3,
+  });
   assert.ok("items" in edited);
   assert.deepEqual(edited.items[0], {
     id: "a",
     name: "New",
-    category: "Today",
+    category: "Resistência",
+    daily: true,
     description: "d",
     date: "2026-10-01",
     done: true,
     doneAt: "2026-10-02",
     createdAt: "",
-    track: "resistencia",
     xp: 3,
   });
-  const noLongerHabit = /** @type {any} */ (updateItem(items, "b", { name: "B", category: "Read", description: "" }));
-  assert.equal("track" in noLongerHabit.items[1], false);
-  assert.deepEqual(updateItem(items, "a", { name: "", category: "Read", description: "" }), { error: "errorName" });
+  const noLongerHabit = /** @type {any} */ (updateItem(items, "b", { name: "B", category: "Poder", description: "" }));
+  assert.equal(noLongerHabit.items[1].daily, false);
+  assert.equal("xp" in noLongerHabit.items[1], false);
+  assert.deepEqual(updateItem(items, "a", { name: "", category: "Poder", description: "" }), { error: "errorName" });
 });
 
-test("rollDailyItems: a Today item done yesterday is to do again, one done today stays done", () => {
+test("rollDailyItems: a daily item done yesterday is to do again, one done today stays done", () => {
   const items = [
-    { id: "a", done: true, doneAt: "2026-10-28", category: "Today" },
-    { id: "b", done: true, doneAt: "2026-10-29", category: "Today" },
-    { id: "c", done: true, doneAt: "2026-10-01", category: "Read" },
-    { id: "d", done: false, doneAt: "", category: "Today" },
+    { id: "a", done: true, doneAt: "2026-10-28", daily: true },
+    { id: "b", done: true, doneAt: "2026-10-29", daily: true },
+    { id: "c", done: true, doneAt: "2026-10-01", daily: false },
+    { id: "d", done: false, doneAt: "", daily: true },
   ];
   const rolled = rollDailyItems(/** @type {any} */ (items), "2026-10-29");
   assert.equal(rolled.changed, 1);
@@ -122,7 +136,7 @@ test("rollDailyItems: a Today item done yesterday is to do again, one done today
 });
 
 test("createItem rejects an empty name and an unknown category with i18n keys", () => {
-  assert.deepEqual(createItem({ name: "   ", category: "Read", description: "" }, fixedClock), { error: "errorName" });
+  assert.deepEqual(createItem({ name: "   ", category: "Poder", description: "" }, fixedClock), { error: "errorName" });
   assert.deepEqual(createItem({ name: "x", category: "Games", description: "" }, fixedClock), {
     error: "errorCategory",
   });
@@ -147,21 +161,22 @@ test("removeItem drops the matching id", () => {
 
 test("parseItem explains what is wrong, with the offending value", () => {
   assert.deepEqual(parseItem(null), { error: "item null: expected an object" });
-  assert.deepEqual(parseItem({ id: "x", name: "", category: "Read" }), {
+  assert.deepEqual(parseItem({ id: "x", name: "", category: "Poder" }), {
     error: 'name "": expected a non-empty string',
   });
   assert.deepEqual(parseItem({ id: "x", name: "y", category: "Game" }), {
-    error: 'category "Game": expected Read, Watch, Side Hustle or Today',
+    error: 'category "Game": expected Poder, Habilidade or Resistência',
   });
 });
 
 test("parseItem fills optional fields with safe defaults", () => {
-  const parsed = parseItem({ id: "x", name: "y", category: "Read", done: "yes" });
+  const parsed = parseItem({ id: "x", name: "y", category: "Habilidade", done: "yes" });
   assert.ok("item" in parsed);
   assert.deepEqual(parsed.item, {
     id: "x",
     name: "y",
-    category: "Read",
+    category: "Habilidade",
+    daily: false,
     description: "",
     date: "",
     done: false,
@@ -170,9 +185,21 @@ test("parseItem fills optional fields with safe defaults", () => {
   });
 });
 
+test("parseItem migrates the sheet's old categories: Read/Watch/Side Hustle and the Today items", () => {
+  const category = (raw) => /** @type {any} */ (parseItem({ id: "x", name: "y", ...raw })).item;
+  assert.equal(category({ category: "Read" }).category, "Habilidade");
+  assert.equal(category({ category: "Watch" }).category, "Resistência");
+  assert.equal(category({ category: "Side Hustle" }).category, "Poder");
+  const gym = category({ category: "Today", track: "poder", xp: 2 });
+  assert.deepEqual([gym.category, gym.daily, gym.xp, "track" in gym], ["Poder", true, 2, false]);
+  const personal = category({ category: "Personal" });
+  assert.deepEqual([personal.category, personal.daily, personal.xp], ["Resistência", true, 1]);
+  assert.equal(category({ category: "Read", daily: true }).daily, true, "the daily flag is read as is");
+});
+
 test("parseItemList fails on the first bad entry", () => {
   assert.deepEqual(parseItemList("nope"), { error: "list string: expected an array of items" });
-  const result = parseItemList([{ id: "a", name: "ok", category: "Read" }, { id: "" }]);
+  const result = parseItemList([{ id: "a", name: "ok", category: "Poder" }, { id: "" }]);
   assert.ok("error" in result);
 });
 
@@ -184,7 +211,8 @@ test("store round-trips a list and returns null for missing or corrupt data", ()
     {
       id: "a",
       name: "A",
-      category: "Read",
+      category: "Habilidade",
+      daily: false,
       description: "",
       date: "2026-01-01",
       done: true,

@@ -8,7 +8,8 @@ import { createSyncStore, enqueueOps } from "../js/sync/sync-store.js";
 const item = (fields) => ({
   id: "x",
   name: "Task",
-  category: "Read",
+  category: "Habilidade",
+  daily: false,
   description: "",
   date: "2026-10-29",
   done: false,
@@ -24,18 +25,20 @@ test("sheet rows become items: dd/mm/yyyy → ISO, unknown Source rows are skipp
   const row = { id: "row-1", date: "29/10/2026", task: " Devotional ", notes: "Pray", source: "Personal" };
   assert.deepEqual(
     rowToItem(row),
-    item({ id: "row-1", name: "Devotional", category: "Today", description: "Pray", track: "resistencia", xp: 1 }),
-    "the sheet's old Personal column is the Today category",
+    item({ id: "row-1", name: "Devotional", category: "Resistência", daily: true, description: "Pray", xp: 1 }),
+    "the sheet's old Personal column is a daily Resistência item",
   );
-  assert.equal(rowToItem({ ...row, source: "Today" })?.category, "Today");
+  assert.equal(rowToItem({ ...row, source: "Today" })?.daily, true);
+  assert.equal(rowToItem({ ...row, source: "Read" })?.category, "Habilidade");
+  assert.equal(rowToItem({ ...row, source: "Poder" })?.category, "Poder");
   assert.equal(rowToItem({ ...row, source: "Legend:" }), null);
   assert.equal(rowToItem({ ...row, task: "" }), null);
   assert.equal(rowToItem({ ...row, id: "" }), null);
-  const daily = rowToItem({ ...row, daily: true, done: true }, "2026-10-29");
-  assert.equal(daily?.category, "Today", "a row with a Done checkbox is a Today item");
+  const daily = rowToItem({ ...row, source: "Poder", daily: true, done: true }, "2026-10-29");
+  assert.equal(daily?.daily, true, "a row with a Done checkbox is a daily item");
   assert.equal(daily?.done, true, "a ticked daily row is done");
   assert.equal(daily?.doneAt, "2026-10-29");
-  assert.equal(rowToItem({ ...row, daily: false, done: true })?.done, false, "only a checkbox counts");
+  assert.equal(rowToItem({ ...row, source: "Poder", daily: false, done: true })?.done, false, "only a checkbox counts");
 });
 
 test("ops between two lists: Done/Remove delete, Undo/Add upsert, untouched items are silent", () => {
@@ -47,16 +50,21 @@ test("ops between two lists: Done/Remove delete, Undo/Add upsert, untouched item
   assert.deepEqual(opsBetween([{ ...a, done: true }], [a]), [upsertOp(a)]);
   assert.deepEqual(opsBetween([a, b], [a, b]), []);
   assert.deepEqual(opsBetween([{ ...a, done: true }], []), [], "removing a done item: the row is already gone");
-  const edited = { ...a, name: "Edited", category: /** @type {const} */ ("Today") };
+  const edited = { ...a, name: "Edited", daily: true };
   assert.deepEqual(opsBetween([a, b], [edited, b]), [upsertOp(edited)], "an edit writes the row back");
-  assert.equal(upsertOp(edited).daily, true, "a Today row gets the Done checkbox");
+  assert.deepEqual(
+    opsBetween([a], [{ ...a, daily: true }]),
+    [upsertOp({ ...a, daily: true })],
+    "so does the daily flag",
+  );
+  assert.equal(upsertOp(edited).daily, true, "a daily row gets the Done checkbox");
   assert.equal(upsertOp(a).daily, false);
   assert.deepEqual(opsBetween([a], [{ ...a, doneAt: "x" }]), [], "doneAt alone is not an edit");
 });
 
 test("merge: the sheet decides which items exist; pending ops keep local state; text matches rename ids", () => {
   const local = [
-    item({ id: "sheet-001", name: "Devotional", category: "Today", track: "resistencia", xp: 1 }),
+    item({ id: "sheet-001", name: "Devotional", category: "Resistência", daily: true, xp: 1 }),
     item({ id: "sheet-002", name: "Gone" }),
   ];
   const rows = [
@@ -79,15 +87,14 @@ test("merge: the sheet decides which items exist; pending ops keep local state; 
   assert.deepEqual(merged.renamed, { "sheet-001": "row-a" });
 });
 
-test("merge: a Today row's checkbox overrides the local done state; the local track and XP survive", () => {
-  const local = [item({ id: "row-d", name: "Devotional", category: "Today", done: true, track: "poder", xp: 2 })];
+test("merge: a daily row's checkbox overrides the local done state; the local XP and category survive", () => {
+  const local = [item({ id: "row-d", name: "Devotional", category: "Poder", daily: true, done: true, xp: 2 })];
   const row = { id: "row-d", date: "29/10/2026", task: "Devotional", notes: "", source: "Personal", daily: true };
   assert.equal(mergeSheetRows(local, [{ ...row, done: false }], []).items[0].done, false);
   assert.equal(mergeSheetRows(local, [{ ...row, done: true }], []).items[0].done, true);
-  assert.deepEqual(
-    [mergeSheetRows(local, [row], []).items[0].track, mergeSheetRows(local, [row], []).items[0].xp],
-    ["poder", 2],
-  );
+  const merged = mergeSheetRows(local, [row], []).items[0];
+  assert.deepEqual([merged.category, merged.xp], ["Poder", 2], "an old Source value keeps the local característica");
+  assert.equal(mergeSheetRows(local, [{ ...row, source: "Habilidade" }], []).items[0].category, "Habilidade");
   const pending = /** @type {any} */ ([{ op: "delete", id: "row-d" }]);
   assert.equal(mergeSheetRows(local, [{ ...row, done: false }], pending).items[0].done, true, "queued Done stays");
   const ticked = mergeSheetRows([], [{ ...row, done: true }], [], "2026-10-30").items[0];

@@ -1,8 +1,10 @@
 // filters.js: which items show, in what order. Pure, so the view is a function of state.
 
+import { TODAY_FILTER } from "./categories.js";
+
 /**
  * @typedef {object} ListFilter
- * @property {"All" | import("./categories.js").Category} category
+ * @property {"All" | "Today" | import("./categories.js").Category} category "Today" = the daily items
  * @property {string} search
  * @property {"all" | "todo" | "done"} status
  */
@@ -16,10 +18,21 @@ export const DEFAULT_FILTER = { category: "All", search: "", status: "all" };
  * @returns {boolean}
  */
 export function matchesFilter(item, filter) {
-  if (filter.category !== "All" && item.category !== filter.category) return false;
+  if (!matchesCategoryTab(item, filter.category)) return false;
   if (filter.status === "todo" && item.done) return false;
   if (filter.status === "done" && !item.done) return false;
   return matchesSearch(item, filter.search);
+}
+
+/**
+ * @param {import("./items-store.js").HabitItem} item
+ * @param {ListFilter["category"]} tab
+ * @returns {boolean}
+ */
+function matchesCategoryTab(item, tab) {
+  if (tab === "All") return true;
+  if (tab === TODAY_FILTER) return item.daily;
+  return item.category === tab;
 }
 
 /**
@@ -55,13 +68,16 @@ export function compareItems(a, b) {
 }
 
 /**
- * How many items each category has (plus "All"), for the tab badges.
+ * How many items each category has (plus "All" and the daily ones under "Today"), for the tab badges.
  * @param {import("./items-store.js").HabitItem[]} items
  * @returns {Record<string, number>}
  */
 export function countByCategory(items) {
   /** @type {Record<string, number>} */
-  const counts = { All: items.length };
-  for (const item of items) counts[item.category] = (counts[item.category] ?? 0) + 1;
+  const counts = { All: items.length, [TODAY_FILTER]: 0 };
+  for (const item of items) {
+    counts[item.category] = (counts[item.category] ?? 0) + 1;
+    if (item.daily) counts[TODAY_FILTER] += 1;
+  }
   return counts;
 }
