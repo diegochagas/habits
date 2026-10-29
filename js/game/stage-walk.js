@@ -1,10 +1,11 @@
 // stage-walk.js: tile-by-tile movement on a stage map, RPG Maker style: the hero faces the
-// pressed direction, slides one tile in 8 ticks, and bumping into an enemy starts its fight.
+// pressed direction, slides one tile in 16 ticks (RPG Maker's normal speed at 60 fps; 2 px/tick
+// felt rushed), and bumping into an enemy starts its fight.
 // Pure transitions over a StageWalk value.
 
 import { SCREEN_W, TILE, isWalkable } from "./stage-maps.js";
 
-export const WALK_SPEED = 2;
+export const WALK_SPEED = 1;
 const STEPS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
 /**
@@ -30,7 +31,7 @@ export function createStageWalk(map) {
  * @param {StageWalk} walk
  * @param {import("./chibi-sprite.js").Facing | null} input
  * @returns {{ walk: StageWalk, contact: number | null }} contact = spawn index bumped into
- * @example stepWalk(map, walk, "right") // walk.offset 2, contact null
+ * @example stepWalk(map, walk, "right") // walk.offset 1, contact null
  */
 export function stepWalk(map, walk, input) {
   if (walk.offset > 0) return { walk: continueSlide(walk), contact: null };

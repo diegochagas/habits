@@ -63,8 +63,8 @@ test("a run: bumping into the first enemy starts its duel, winning awards Poder 
   let run = /** @type {any} */ (startStageRun(hero, "academia")).run;
   assert.equal(run.duel, null);
   assert.deepEqual([run.walk.tx, run.walk.ty], [2, 7]);
-  // walk right 7 tiles (8 ticks each), the 8th press bumps into minion 1 at (10, 7)
-  for (let tick = 0; tick < 7 * 8; tick += 1) run = stepStageWalk(hero, run, "right", scriptedDie([]));
+  // walk right 7 tiles (16 ticks each), the 8th press bumps into minion 1 at (10, 7)
+  for (let tick = 0; tick < 7 * 16; tick += 1) run = stepStageWalk(hero, run, "right", scriptedDie([]));
   assert.deepEqual([run.walk.tx, run.walk.ty, run.duel], [9, 7, null]);
   run = stepStageWalk(hero, run, "right", scriptedDie([4, 1]));
   assert.equal(run.index, 0);

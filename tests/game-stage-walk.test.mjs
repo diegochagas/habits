@@ -5,13 +5,13 @@ import { cameraX, createStageWalk, heroPixel, markBeaten, stepWalk, walkStep } f
 
 const map = buildStageMap("academia");
 
-test("a held direction slides the hero one tile in 8 ticks and faces the way pressed", () => {
+test("a held direction slides the hero one tile in 16 ticks and faces the way pressed", () => {
   let walk = createStageWalk(map);
   assert.deepEqual([walk.tx, walk.ty, walk.dir], [2, 7, "down"]);
   walk = stepWalk(map, walk, "right").walk;
-  assert.deepEqual([walk.dir, walk.offset], ["right", 2]);
-  assert.deepEqual(heroPixel(walk), { x: 2 * TILE + 2, y: 7 * TILE });
-  for (let i = 0; i < 7; i += 1) walk = stepWalk(map, walk, null).walk;
+  assert.deepEqual([walk.dir, walk.offset], ["right", 1]);
+  assert.deepEqual(heroPixel(walk), { x: 2 * TILE + 1, y: 7 * TILE });
+  for (let i = 0; i < 15; i += 1) walk = stepWalk(map, walk, null).walk;
   assert.deepEqual([walk.tx, walk.offset], [3, 0]);
   assert.equal(walkStep(stepWalk(map, walk, "up").walk), 0);
 });
@@ -29,7 +29,7 @@ test("bumping into an unbeaten enemy reports its index; a beaten one is just flo
   const cleared = markBeaten(beside, 0);
   const moved = stepWalk(map, cleared, "right");
   assert.equal(moved.contact, null);
-  assert.equal(moved.walk.offset, 2);
+  assert.equal(moved.walk.offset, 1);
 });
 
 test("the camera follows the hero horizontally and stops at the map edges", () => {

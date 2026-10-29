@@ -234,7 +234,7 @@ function animate() {
     drawPortrait(
       /** @type {CanvasRenderingContext2D} */ (portrait.getContext("2d")),
       heroLook(state.hero, today()),
-      state.hero.current.pv > 0 ? "walk" : "hurt",
+      state.hero.current.pv > 0 ? "stand" : "hurt",
       state.tick,
     );
   if (state.run && state.tab === "battle") tickStage(state.run);

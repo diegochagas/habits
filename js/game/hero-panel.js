@@ -8,7 +8,19 @@ import { createPainter } from "./pixel-painter.js";
 import { escapeHtml } from "../linkify.js";
 
 /**
- * The portrait: the chibi walking in place, facing the player.
+ * The frame the portrait shows: the chibi standing still, facing the player. Walk step 0 always:
+ * cycling the walk steps made the sheet portrait tremble left and right (Diego, 2026-10-29).
+ * @param {import("./chibi-sprite.js").ChibiPose} pose
+ * @param {number} tick only animates the aura sparkles
+ * @returns {import("./chibi-sprite.js").ChibiFrame}
+ * @example portraitFrame("stand", 40) // { dir: "down", pose: "stand", step: 0, tick: 40 }
+ */
+export function portraitFrame(pose, tick) {
+  return { dir: "down", pose, step: 0, tick };
+}
+
+/**
+ * The portrait: the chibi facing the player.
  * @param {CanvasRenderingContext2D} ctx
  * @param {import("./chibi-sprite.js").ChibiLook} look
  * @param {import("./chibi-sprite.js").ChibiPose} pose
@@ -19,7 +31,7 @@ export function drawPortrait(ctx, look, pose, tick) {
   const p = createPainter(ctx, scale);
   p.rect(0, 0, CHIBI_W, CHIBI_H, "#fff");
   p.halftone(0, 0, CHIBI_W, CHIBI_H, "#d8d8d8", 4);
-  drawChibi(p, 0, 0, look, { dir: "down", pose, step: Math.floor(tick / 8) % 4, tick });
+  drawChibi(p, 0, 0, look, portraitFrame(pose, tick));
 }
 
 /**

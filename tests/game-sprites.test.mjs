@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { CHIBI_H, CHIBI_W, drawChibi } from "../js/game/chibi-sprite.js";
 import { ENEMY_LOOKS, enemyLook } from "../js/game/enemy-looks.js";
 import { heroLook } from "../js/game/hero-look.js";
+import { portraitFrame } from "../js/game/hero-panel.js";
 import { createStartingHero } from "../js/game/hero-sheet.js";
 import { faceToward } from "../js/game/map-scene.js";
 import { STAGES, stageEncounters } from "../js/game/stages.js";
@@ -80,4 +81,14 @@ test("map tiles draw for every legend char and enemies turn towards an adjacent 
   assert.equal(faceToward(foe, { tx: 9, ty: 7, dir: "right", offset: 0, beaten: [] }), "left");
   assert.equal(faceToward(foe, { tx: 10, ty: 8, dir: "up", offset: 0, beaten: [] }), "down");
   assert.equal(faceToward(foe, { tx: 2, ty: 7, dir: "right", offset: 0, beaten: [] }), "down");
+});
+
+test("the sheet portrait stands still: the same pixels at every tick, no walk-cycle sway", () => {
+  const look = heroLook(createStartingHero("2026-10-28"), "2026-10-28");
+  const frames = [0, 8, 13, 16, 24].map((tick) => {
+    const p = new FakePainter();
+    drawChibi(p, 0, 0, look, portraitFrame("stand", tick));
+    return p.rects;
+  });
+  for (const rects of frames.slice(1)) assert.deepEqual(rects, frames[0]);
 });
