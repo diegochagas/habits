@@ -28,6 +28,7 @@
       <div class="masthead-tools">
         <a class="stamp" href="game.html" data-i18n="play">Play</a>
         <a class="stamp" href="puzzle.html" data-i18n="puzzles">Puzzles</a>
+        <button type="button" class="stamp" id="sync-toggle" data-i18n="syncButton" aria-expanded="false">Sync</button>
         <button type="button" class="stamp" id="sound-toggle" aria-label="Sound">🔊</button>
         <button type="button" class="stamp" id="lang-toggle" aria-label="Toggle language">PT</button>
         <button type="button" class="stamp" id="export-button" data-i18n="export">Export</button>
@@ -38,6 +39,29 @@
     </header>
 
     <section class="pomodoro-wrap">
+      <div class="panel sync-panel" id="sync-panel" aria-labelledby="sync-title" hidden>
+        <h2 id="sync-title" class="panel-title" data-i18n="syncTitle">Google Sheets sync</h2>
+        <p class="muted" data-i18n="syncHelp">
+          Deploy sheets-sync/Code.gs as a web app (see the README) and paste its URL and secret word.
+        </p>
+        <form class="sync-form" data-form="sync">
+          <label class="field"
+            ><span data-i18n="syncUrl">Web app URL</span>
+            <input type="url" name="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"
+          /></label>
+          <label class="field"
+            ><span data-i18n="syncToken">Secret word</span> <input type="password" name="token" autocomplete="off"
+          /></label>
+          <div class="sync-actions">
+            <button type="submit" class="stamp" data-i18n="syncSave">Save</button>
+            <button type="button" class="stamp" data-sync="now" data-i18n="syncNow">Sync now</button>
+            <button type="button" class="stamp stamp-danger" data-sync="disconnect" data-i18n="syncDisconnect">
+              Disconnect
+            </button>
+          </div>
+        </form>
+        <p class="sync-status" data-sync-status></p>
+      </div>
       <div class="panel pomodoro-panel" aria-labelledby="pomodoro-title">
         <h2 id="pomodoro-title" class="panel-title" data-pomodoro-i18n="pomodoroTitle">Pomodoro</h2>
         <div id="pomodoro-body"></div>

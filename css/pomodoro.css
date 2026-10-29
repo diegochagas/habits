@@ -156,3 +156,28 @@
     grid-template-columns: minmax(0, 1fr) auto;
   }
 }
+
+/* Google Sheets sync panel (toggled by the Sync stamp). */
+.sync-panel {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.sync-form {
+  display: grid;
+  gap: 10px;
+  max-width: 640px;
+}
+
+.sync-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sync-status {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+}

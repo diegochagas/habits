@@ -131,6 +131,16 @@ export function startPomodoro(deps) {
     return iframe;
   }
 
+  /**
+   * After the sheet sync replaces local ids with row ids, keep the counts on the same items.
+   * @param {Record<string, string>} renamed old id → new id
+   */
+  function renameItems(renamed) {
+    if (Object.keys(renamed).length === 0) return;
+    const pomodoros = Object.fromEntries(Object.entries(state.pomodoros).map(([id, n]) => [renamed[id] ?? id, n]));
+    commit({ ...state, pomodoros, itemId: state.itemId ? (renamed[state.itemId] ?? state.itemId) : null });
+  }
+
   /** @param {string} itemId "" clears */
   function workOn(itemId) {
     commit({ ...state, itemId: itemId || null });
@@ -161,6 +171,7 @@ export function startPomodoro(deps) {
   return {
     render,
     startOn,
+    renameItems,
     get state() {
       return state;
     },

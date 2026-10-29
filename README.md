@@ -26,6 +26,12 @@ No build step, no runtime dependencies. Everything is saved in the browser's
 `localStorage`; **Export** downloads a JSON backup and **Import** restores one.
 **Reset to sheet** reloads the original list from `data/seed.json`.
 
+**Sync with the Google Sheet** (optional): deploy [`sheets-sync/Code.gs`](sheets-sync/Code.gs)
+as an Apps Script web app bound to the sheet and paste its URL and secret word under **Sync**.
+The sheet then becomes the source of truth: rows deleted or added there come and go on the site,
+Done / Remove on the site delete the row, an added item is appended. Steps and the sync table
+are in [sheets-sync/README.md](sheets-sync/README.md).
+
 ## Run it
 
 ```bash
@@ -56,6 +62,12 @@ index.html ─── css/ink.css (ink, halftone, speed lines, bubble, stamps) + 
          ├─ i18n.js          EN / PT strings
          ├─ categories.js    Read · Watch · Side Hustle · Personal
          ├─ game/hero-controller.js   the hero's actions (habits, shop, rest, weight), shared with game.html
+         ├─ sync/
+         │    ├─ sheet-rows.js     sheet row ↔ item, ops between two lists, merge (sheet wins, queue kept)
+         │    ├─ sync-store.js     settings + op queue in localStorage ("habits:sync:v1")
+         │    ├─ sheet-client.js   one text/plain POST to the Apps Script /exec URL
+         │    └─ sync-app.js       panel, pull on load / every 5 min / after each change
+sheets-sync/Code.gs   the Apps Script web app (hidden Id column, delete/upsert ops) + README
          └─ pomodoro/
               ├─ pomodoro-clock.js  pure clock: modes, start/pause/tick, free time earned, day roll
               ├─ pomodoro-store.js  localStorage ("habits:pomodoro:v1")

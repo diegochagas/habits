@@ -17,6 +17,8 @@ import { renderTodayView } from "./game/today-view.js";
 import { startPomodoro } from "./pomodoro/pomodoro-app.js";
 import { applyPomodoroTranslations, pomodoroText } from "./pomodoro/pomodoro-i18n.js";
 import { createPomodoroStore } from "./pomodoro/pomodoro-store.js";
+import { startSheetSync } from "./sync/sync-app.js";
+import { createSyncStore } from "./sync/sync-store.js";
 
 const LANG_KEY = "habits:lang";
 const TAB_KEY = "habits:home-tab";
@@ -62,6 +64,20 @@ const pomodoro = startPomodoro({
   onChange: () => render(),
   onWorkDone: (itemId) =>
     hero.commit(creditPomodoro(hero.hero, state.items.find((item) => item.id === itemId) ?? null, today())),
+});
+
+const sync = startSheetSync({
+  store: createSyncStore(localStorage),
+  panel: /** @type {HTMLElement} */ (document.getElementById("sync-panel")),
+  items: () => state.items,
+  lang: () => state.lang,
+  applyItems: (items, renamed) => {
+    pomodoro.renameItems(renamed);
+    state.items = items;
+    store.save(items);
+    hero.creditList(items);
+    render();
+  },
 });
 
 /** @returns {import("./i18n.js").Lang} */
@@ -118,10 +134,12 @@ function renderHeroArea() {
 
 /** @param {import("./items-store.js").HabitItem[]} items */
 function commit(items) {
+  const before = state.items;
   state.items = items;
   store.save(items);
   hero.creditList(items);
   render();
+  sync.afterChange(before, items);
 }
 
 function renderLanguage() {
@@ -259,6 +277,15 @@ function bindToolbar() {
     sounds.play("decision");
     renderSoundToggle();
   });
+  document.getElementById("sync-toggle")?.addEventListener("click", () => {
+    const panel = /** @type {HTMLElement} */ (document.getElementById("sync-panel"));
+    panel.hidden = !panel.hidden;
+    /** @type {HTMLElement} */ (document.getElementById("sync-toggle")).setAttribute(
+      "aria-expanded",
+      String(!panel.hidden),
+    );
+    sync.render();
+  });
   document.getElementById("export-button")?.addEventListener("click", () => downloadItemsJson(state.items, document));
   document.getElementById("import-input")?.addEventListener("change", onImportChange);
   document.getElementById("reset-button")?.addEventListener("click", onReset);
@@ -276,8 +303,10 @@ async function start() {
   renderLanguage();
   state.items = store.load() ?? (await fetchSeed());
   store.save(state.items);
-  commit(state.items);
+  hero.creditList(state.items);
+  render();
   animate();
+  sync.syncNow();
 }
 
 start();

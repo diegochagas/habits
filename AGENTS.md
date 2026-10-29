@@ -10,6 +10,10 @@ are procedural chibis (`chibi-sprite.js`), sounds are synthesised in `sound.js` 
 The hero's Today/Sheet tabs live on `index.html` (shared `js/game/hero-controller.js`); `game.html`
 keeps Arcas + Adventure and `puzzle.html` the sort puzzles, both locked unless the Pomodoro on
 `index.html` earned free time (`js/pomodoro/`, `?fast=1` shrinks a minute to 0.1 s for e2e).
+Optional Google Sheets sync: `sheets-sync/Code.gs` (Apps Script, deployed by Diego, token in a
+script property) + `js/sync/` (sheet wins, op queue; e2e stubs the /exec URL with page.route).
+Optional Google Sheets sync: `sheets-sync/Code.gs` (Apps Script, deployed by Diego, token in a
+script property) + `js/sync/` (sheet wins, op queue; e2e stubs the /exec URL with page.route).
 
 ## Testing and shipping (dev-playbook)
 
