@@ -35,7 +35,7 @@ import { startSheetSync } from "./sync/sync-app.js";
 import { createSyncStore } from "./sync/sync-store.js";
 
 const LANG_KEY = "habits:lang";
-const URLS_BACKFILLED_KEY = "habits:urls-backfilled";
+const URLS_BACKFILLED_KEY = "habits:urls-backfilled:2";
 const TAB_KEY = "habits:home-tab";
 const SEED_URL = "data/seed.json";
 const DAILY_ROLL_MS = 60_000;
