@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   STORAGE_KEY,
   createItem,
+  backfillSeedUrls,
   createItemStore,
   parseItem,
   parseItemList,
@@ -249,4 +250,22 @@ test("an item keeps an http(s) url, drops anything else, and an edit can clear i
     updateItem(items, items[0].id, { name: "Bleach", category: "Poder", description: "" })
   );
   assert.equal("url" in cleared.items[0], false);
+});
+
+test("backfillSeedUrls gives saved items the seed's link by id and leaves the rest alone", () => {
+  const saved = /** @type {any[]} */ ([
+    { id: "a", name: "A" },
+    { id: "b", name: "B", url: "https://mine.io" },
+    { id: "c", name: "C" },
+  ]);
+  const seed = /** @type {any[]} */ ([
+    { id: "a", url: "https://x.io/a" },
+    { id: "b", url: "https://x.io/b" },
+  ]);
+  const result = backfillSeedUrls(saved, seed);
+  assert.deepEqual(
+    result.items.map((item) => item.url),
+    ["https://x.io/a", "https://mine.io", undefined],
+  );
+  assert.equal(result.changed, 1);
 });

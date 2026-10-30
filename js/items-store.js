@@ -209,6 +209,26 @@ export function toggleDone(items, id, today = "") {
 }
 
 /**
+ * Items saved before links existed lack a `url`; give them the seed's link (matched by id) when
+ * the seed has one. Run once per browser/server state, so a link cleared later stays cleared.
+ * @param {HabitItem[]} saved
+ * @param {HabitItem[]} seed
+ * @returns {{ items: HabitItem[], changed: number }}
+ * @example backfillSeedUrls([{ id: "a" }], [{ id: "a", url: "https://x.io" }]).changed // 1
+ */
+export function backfillSeedUrls(saved, seed) {
+  const seedUrls = new Map(seed.filter((item) => item.url).map((item) => [item.id, item.url]));
+  let changed = 0;
+  const items = saved.map((item) => {
+    const url = seedUrls.get(item.id);
+    if (item.url || !url) return item;
+    changed += 1;
+    return { ...item, url };
+  });
+  return { items, changed };
+}
+
+/**
  * @param {HabitItem[]} items
  * @param {string} id
  * @returns {HabitItem[]}

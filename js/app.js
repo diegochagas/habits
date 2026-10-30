@@ -8,6 +8,7 @@ import { DEFAULT_FILTER, countByCategory, visibleItems } from "./filters.js";
 import { applyTranslations, nextLang, translate } from "./i18n.js";
 import { bindHomeToolbar, toggleSyncPanel } from "./home-toolbar.js";
 import {
+  backfillSeedUrls,
   createItem,
   createItemStore,
   isHabit,
@@ -34,6 +35,7 @@ import { startSheetSync } from "./sync/sync-app.js";
 import { createSyncStore } from "./sync/sync-store.js";
 
 const LANG_KEY = "habits:lang";
+const URLS_BACKFILLED_KEY = "habits:urls-backfilled";
 const TAB_KEY = "habits:home-tab";
 const SEED_URL = "data/seed.json";
 const DAILY_ROLL_MS = 60_000;
@@ -374,11 +376,19 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+/** Items saved before links existed get the seed's links, once (flag in the same storage). */
+async function backfillUrlsOnce() {
+  if (storage.getItem(URLS_BACKFILLED_KEY)) return;
+  state.items = backfillSeedUrls(state.items, await fetchSeed()).items;
+  storage.setItem(URLS_BACKFILLED_KEY, "1");
+}
+
 async function start() {
   bindEvents();
   if (storage.kind === "server") document.querySelector(".colophon span")?.setAttribute("data-i18n", "footerServer");
   renderLanguage();
   state.items = store.load() ?? (await fetchSeed());
+  await backfillUrlsOnce();
   store.save(state.items);
   hero.creditList(state.items);
   render();
