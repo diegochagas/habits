@@ -381,6 +381,17 @@ body::before {
   overflow-wrap: anywhere;
 }
 
+.card-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+.card-link::after {
+  content: " ↗";
+  font-size: 0.7em;
+}
+
 .card-description a {
   color: var(--ink);
   font-weight: 700;

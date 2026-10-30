@@ -1,6 +1,7 @@
 // sheet-rows.js: the shape the Apps Script speaks ({ id, date dd/mm/yyyy, task, notes, source })
 // ↔ list items, and the merge that makes the sheet the source of truth.
 
+import { isWebUrl } from "../items-store.js";
 import { isLegacyCategory, isLegacyDailyCategory, migrateCategory } from "../categories.js";
 
 /**
@@ -10,10 +11,11 @@ import { isLegacyCategory, isLegacyDailyCategory, migrateCategory } from "../cat
  * @property {string} task
  * @property {string} notes
  * @property {string} source
+ * @property {string} [url] hyperlink on the Task (or Notes) cell; undefined from an older Apps Script
  * @property {boolean} [daily] the Done cell is a checkbox (a daily row): Done ticks it, the site unticks it each morning
  * @property {boolean} [done] the checkbox's state (daily rows only)
  */
-/** @typedef {{ op: "delete", id: string } | { op: "upsert", id: string, date: string, name: string, description: string, category: string, daily: boolean }} SyncOp */
+/** @typedef {{ op: "delete", id: string } | { op: "upsert", id: string, date: string, name: string, description: string, category: string, daily: boolean, url: string }} SyncOp */
 
 /**
  * "29/10/2026" → "2026-10-29"; an ISO date passes through; anything else stays as it is.
@@ -47,6 +49,7 @@ export function rowToItem(row, today = "") {
     category,
     daily,
     description: row.notes ?? "",
+    ...(isWebUrl(row.url) ? { url: String(row.url).trim() } : {}),
     date: sheetDateToIso(row.date ?? ""),
     done,
     doneAt: done ? today : "",
@@ -68,6 +71,7 @@ export function upsertOp(item) {
     description: item.description,
     category: item.category,
     daily: item.daily,
+    url: item.url ?? "",
   };
 }
 
@@ -120,12 +124,23 @@ export function mergeSheetRows(local, rows, pending, today = "") {
     const done = pendingById.get(row.id)?.op === "delete" || localDone;
     const category = known && isLegacyCategory(row.source) ? known.category : fromRow.category;
     const xp = fromRow.daily ? { xp: known?.xp ?? 1 } : {};
-    items.push({ ...fromRow, category, ...xp, done, doneAt: done ? known?.doneAt || today : "" });
+    const url = keepLocalUrl(row, known);
+    items.push({ ...fromRow, category, ...xp, ...url, done, doneAt: done ? known?.doneAt || today : "" });
   }
   const present = new Set(items.map((item) => item.id));
   for (const op of pending)
     if (op.op === "upsert" && !present.has(op.id) && byId.has(op.id)) items.push(byId.get(op.id));
   return { items, renamed };
+}
+
+/**
+ * An older Apps Script sends no `url` at all: keep the local link then, instead of wiping it.
+ * @param {SheetRow} row
+ * @param {import("../items-store.js").HabitItem | undefined} known
+ * @returns {{ url?: string }}
+ */
+function keepLocalUrl(row, known) {
+  return row.url === undefined && known?.url ? { url: known.url } : {};
 }
 
 /**
@@ -138,6 +153,7 @@ function fieldsChanged(old, item) {
     old.name !== item.name ||
     old.description !== item.description ||
     old.category !== item.category ||
+    (old.url ?? "") !== (item.url ?? "") ||
     old.daily !== item.daily ||
     old.date !== item.date
   );

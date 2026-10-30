@@ -227,3 +227,26 @@ test("store round-trips a list and returns null for missing or corrupt data", ()
   store.clear();
   assert.equal(storage.getItem(STORAGE_KEY), null);
 });
+
+test("an item keeps an http(s) url, drops anything else, and an edit can clear it", () => {
+  const withLink = createItem(
+    { name: "Bleach", category: "Resistência", description: "", url: " https://x.io/a " },
+    fixedClock,
+  );
+  assert.equal(/** @type {any} */ (withLink).item.url, "https://x.io/a");
+  assert.deepEqual(
+    createItem({ name: "x", category: "Poder", description: "", url: "javascript:alert(1)" }, fixedClock),
+    {
+      error: "errorUrl",
+    },
+  );
+  assert.equal(
+    "url" in /** @type {any} */ (parseItem({ id: "a", name: "A", category: "Poder", url: "ftp://x" })).item,
+    false,
+  );
+  const items = [/** @type {any} */ (withLink).item];
+  const cleared = /** @type {any} */ (
+    updateItem(items, items[0].id, { name: "Bleach", category: "Poder", description: "" })
+  );
+  assert.equal("url" in cleared.items[0], false);
+});

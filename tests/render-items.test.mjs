@@ -69,3 +69,13 @@ test("cards get a Pomodoro button while open and show finished Pomodoros", async
   assert.doesNotMatch(done, /data-action="pomodoro"/);
   assert.doesNotMatch(renderItemCard(item, "en"), /data-action="pomodoro"/);
 });
+
+test("an item with a url gets a safe link on its title; without one the title is plain text", () => {
+  const linked = renderItemCard({ ...item, name: "One Piece", url: 'https://x.io/?a=1&b="2"' }, "en");
+  assert.ok(
+    linked.includes(
+      '<a class="card-link" href="https://x.io/?a=1&amp;b=&quot;2&quot;" target="_blank" rel="noopener noreferrer">One Piece</a>',
+    ),
+  );
+  assert.ok(!renderItemCard({ ...item, name: "One Piece" }, "en").includes("card-link"));
+});

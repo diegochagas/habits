@@ -25,14 +25,14 @@ edit → version: New version → Deploy** (the URL stays the same).
 
 ## What syncs
 
-| On the site           | In the sheet                                                              |
-| --------------------- | ------------------------------------------------------------------------- |
-| Done or Remove        | the row is deleted                                                        |
-| Undo before next sync | the row is written back                                                   |
-| Add or edit an item   | a row is appended / rewritten (Date, Task, Notes, Source, daily checkbox) |
-| Row deleted in sheet  | the item disappears on next sync                                          |
-| Row added or edited   | the item appears / updates on next sync                                   |
-| Done on a daily row   | its Done checkbox is ticked (row kept)                                    |
+| On the site           | In the sheet                                                                                              |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| Done or Remove        | the row is deleted                                                                                        |
+| Undo before next sync | the row is written back                                                                                   |
+| Add or edit an item   | a row is appended / rewritten (Date, Task, Notes, Source, daily checkbox; the link goes on the Task cell) |
+| Row deleted in sheet  | the item disappears on next sync                                                                          |
+| Row added or edited   | the item appears / updates on next sync                                                                   |
+| Done on a daily row   | its Done checkbox is ticked (row kept)                                                                    |
 
 A **daily row** is one whose Done cell is a checkbox: the site's "every day" flag puts it there
 (and removes it when the flag is cleared). Done ticks it; the site brings the item back the next

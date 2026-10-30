@@ -51,7 +51,7 @@ function sheet_() {
   return sheet;
 }
 
-/** Every task row as { id, date (dd/mm/yyyy), task, notes, source, daily, done }, assigning missing ids. */
+/** Every task row as { id, date (dd/mm/yyyy), task, notes, source, url, daily, done }, assigning missing ids. */
 function listRows_() {
   var sheet = sheet_();
   var last = sheet.getLastRow();
@@ -62,6 +62,7 @@ function listRows_() {
     return row[DONE_COLUMN - 1];
   });
   var ids = assignIds_(sheet, values);
+  var urls = linkUrls_(sheet, values.length);
   return values
     .map(function (row, i) {
       var daily = typeof doneCells[i] === "boolean";
@@ -71,6 +72,7 @@ function listRows_() {
         task: row[1],
         notes: row[2],
         source: row[3],
+        url: urls[i],
         daily: daily,
         done: daily && doneCells[i],
       };
@@ -78,6 +80,14 @@ function listRows_() {
     .filter(function (row) {
       return row.task;
     });
+}
+
+/** The hyperlink of every row: the one on its Task cell (B), else the one on its Notes cell (C), else "". */
+function linkUrls_(sheet, count) {
+  var cells = sheet.getRange(HEADER_ROW + 1, 2, count, 2).getRichTextValues();
+  return cells.map(function (pair) {
+    return (pair[0] && pair[0].getLinkUrl()) || (pair[1] && pair[1].getLinkUrl()) || "";
+  });
 }
 
 /** The id of every row (column F), writing a fresh one on rows that have a task but no id yet. */
@@ -105,7 +115,7 @@ function newId_() {
   return "row-" + Utilities.getUuid().replace(/-/g, "").slice(0, 10);
 }
 
-/** ops: [{ op: "delete", id }, { op: "upsert", id, date (yyyy-mm-dd), name, description, category }] */
+/** ops: [{ op: "delete", id }, { op: "upsert", id, date (yyyy-mm-dd), name, description, category, daily, url }] */
 function applyOps_(ops) {
   ops.forEach(function (op) {
     if (op.op === "delete") deleteRow_(op.id);
@@ -146,7 +156,15 @@ function upsertRow_(op) {
   }
   sheet.getRange(row, 1, 1, 4).setValues(values);
   sheet.getRange(row, 1).setNumberFormat("dd/mm/yyyy");
+  setLink_(sheet, row, op.name || "", op.url || "");
   setDaily_(sheet, row, op.daily === true);
+}
+
+/** The url becomes the hyperlink of the Task cell (setValues above already cleared any old link). */
+function setLink_(sheet, row, name, url) {
+  if (!url) return;
+  var link = SpreadsheetApp.newRichTextValue().setText(name).setLinkUrl(url).build();
+  sheet.getRange(row, 2).setRichTextValue(link);
 }
 
 /** A daily row has a checkbox in Done (unticked after an upsert); any other row has nothing there. */

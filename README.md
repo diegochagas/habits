@@ -83,7 +83,7 @@ index.html ─── css/ink.css (ink, halftone, speed lines, bubble, stamps) + 
          ├─ items-store.js   parse/create/toggle/remove + localStorage wrapper
          ├─ filters.js       category / search / status, sort order, counts
          ├─ render-items.js  cards (with the 🍅 button and count), tabs, select options
-         ├─ linkify.js       escape text, http(s) URLs → <a>, newlines → <br>
+         ├─ linkify.js       escape text, http(s) URLs → <a>, newlines → <br>; items also carry an optional `url` (the title becomes a link; a hyperlink on the sheet's Task or Notes cell)
          ├─ export-import.js JSON download / upload
          ├─ i18n.js          EN / PT strings
          ├─ categories.js    Poder · Habilidade · Resistência (= XP track), old Source values migrated

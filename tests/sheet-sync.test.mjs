@@ -167,3 +167,14 @@ test("the client posts text/plain JSON to a script.google.com /exec URL and pars
   const failing = createSheetClient(/** @type {any} */ (async () => ({ ok: false, status: 500 })));
   assert.deepEqual(await failing.exchange(settings, []), { error: "HTTP 500" });
 });
+
+test("the sheet's hyperlink becomes the item's url; an older script without url keeps the local one", () => {
+  const row = { id: "row-1", date: "29/10/2026", task: "One Piece", notes: "", source: "Read" };
+  assert.equal(rowToItem({ ...row, url: "https://x.io/1" })?.url, "https://x.io/1");
+  assert.equal("url" in /** @type {object} */ (rowToItem({ ...row, url: "" })), false);
+  const local = [item({ id: "row-1", name: "One Piece", url: "https://old.io" })];
+  assert.equal(mergeSheetRows(local, [row], []).items[0].url, "https://old.io", "no url key: keep local");
+  assert.equal("url" in mergeSheetRows(local, [{ ...row, url: "" }], []).items[0], false, "empty url: sheet wins");
+  assert.equal(upsertOp(item({ url: "https://x.io" })).url, "https://x.io");
+  assert.equal(opsBetween([item({})], [item({ url: "https://x.io" })]).length, 1);
+});

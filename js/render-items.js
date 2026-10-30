@@ -32,7 +32,7 @@ export function renderItemCard(item, lang, extras = {}) {
  */
 function renderCardBody(item, lang, extras) {
   const count = extras.pomodoros?.[item.id] ?? 0;
-  return `<h3 class="card-name">${escapeHtml(item.name)}${isHabit(item) ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁 +${item.xp ?? 1}</span>` : ""}</h3>
+  return `<h3 class="card-name">${renderName(item)}${isHabit(item) ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁 +${item.xp ?? 1}</span>` : ""}</h3>
   ${isHabit(item) && item.done ? `<p class="card-done-today-note">✓ ${translate(lang, "doneToday")}</p>` : ""}
   ${renderDescription(item.description)}
   <footer class="card-footer">
@@ -44,6 +44,16 @@ function renderCardBody(item, lang, extras) {
       <button type="button" class="stamp stamp-small stamp-danger" data-action="remove">${translate(lang, "remove")}</button>
     </span>
   </footer>`;
+}
+
+/**
+ * The card title: a link to the item's url when it has one (opens in a new tab).
+ * @param {import("./items-store.js").HabitItem} item
+ * @returns {string}
+ */
+function renderName(item) {
+  if (!item.url) return escapeHtml(item.name);
+  return `<a class="card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)}</a>`;
 }
 
 /**

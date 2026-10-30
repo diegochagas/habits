@@ -12,6 +12,7 @@ import { isCategory, isLegacyDailyCategory, migrateCategory } from "./categories
  * @property {import("./categories.js").Category} category the característica it trains (its XP track)
  * @property {boolean} daily a Today habit: on the Today tab, once a day, back every morning
  * @property {string} description
+ * @property {string} [url] an http(s) link the card opens (a hyperlink on the sheet's Task cell); absent when none
  * @property {string} date  ISO yyyy-mm-dd (sheet queue date, or the day it was added)
  * @property {boolean} done
  * @property {string} doneAt yyyy-mm-dd of the last Done ("" while to do); daily items reset the next day
@@ -19,7 +20,7 @@ import { isCategory, isLegacyDailyCategory, migrateCategory } from "./categories
  * @property {number} [xp] daily items: XP per day (1–3); any other item pays 1 once
  */
 
-/** @typedef {{ name: string, category: string, description: string, date?: string, daily?: boolean, xp?: number | string }} ItemFields */
+/** @typedef {{ name: string, category: string, description: string, url?: string, date?: string, daily?: boolean, xp?: number | string }} ItemFields */
 
 export const STORAGE_KEY = "habits:v1";
 
@@ -60,7 +61,26 @@ function normalizeItem(candidate, category) {
   };
   // Items saved before 2026-10-29 said "Today" (or "Personal") as their category instead.
   const daily = candidate.daily === true || isLegacyDailyCategory(candidate.category);
-  return withHabitFields(base, daily, candidate.xp);
+  return withHabitFields(withUrl(base, candidate.url), daily, candidate.xp);
+}
+
+/**
+ * Keep a link only when it is an http(s) URL (the card renders it as an href, so nothing else may in).
+ * @template {object} T
+ * @param {T} item
+ * @param {unknown} url
+ * @returns {T & { url?: string }}
+ */
+function withUrl(item, url) {
+  return isWebUrl(url) ? { ...item, url: String(url).trim() } : item;
+}
+
+/**
+ * @param {unknown} text
+ * @returns {boolean} true for a non-blank text starting with http:// or https://
+ */
+export function isWebUrl(text) {
+  return typeof text === "string" && /^https?:\/\/\S+$/.test(text.trim());
 }
 
 /**
@@ -104,7 +124,7 @@ export function parseItemList(raw) {
 /**
  * The add/edit form's fields, trimmed and checked.
  * @param {ItemFields} fields
- * @returns {{ fields: ItemFields } | { error: "errorName" | "errorCategory" | "errorDate" }}
+ * @returns {{ fields: ItemFields } | { error: "errorName" | "errorCategory" | "errorDate" | "errorUrl" }}
  */
 export function checkItemFields(fields) {
   const name = fields.name.trim();
@@ -112,15 +132,17 @@ export function checkItemFields(fields) {
   if (!isCategory(fields.category)) return { error: "errorCategory" };
   const date = (fields.date ?? "").trim();
   if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "errorDate" };
+  const url = (fields.url ?? "").trim();
+  if (url && !isWebUrl(url)) return { error: "errorUrl" };
   const checked = { name, category: fields.category, description: fields.description.trim(), date };
-  return { fields: withHabitFields(checked, fields.daily === true, fields.xp) };
+  return { fields: withHabitFields(withUrl(checked, url), fields.daily === true, fields.xp) };
 }
 
 /**
  * Build a new item from the add form.
  * @param {ItemFields} fields
  * @param {{ id: () => string, now: () => Date }} clock injected so tests are deterministic
- * @returns {{ item: HabitItem } | { error: "errorName" | "errorCategory" | "errorDate" }}
+ * @returns {{ item: HabitItem } | { error: "errorName" | "errorCategory" | "errorDate" | "errorUrl" }}
  * @example createItem({ name: "Bleach", category: "Resistência", description: "" }, { id: () => "x", now: () => new Date() })
  */
 export function createItem(fields, clock) {
@@ -140,11 +162,11 @@ export function createItem(fields, clock) {
 }
 
 /**
- * Replace an item's editable fields (name, category, description, date, daily and its XP).
+ * Replace an item's editable fields (name, category, description, link, date, daily and its XP).
  * @param {HabitItem[]} items
  * @param {string} id
  * @param {ItemFields} fields
- * @returns {{ items: HabitItem[] } | { error: "errorName" | "errorCategory" | "errorDate" }}
+ * @returns {{ items: HabitItem[] } | { error: "errorName" | "errorCategory" | "errorDate" | "errorUrl" }}
  * @example updateItem(items, "a", { name: "Gym", category: "Poder", description: "", daily: true, xp: 2 })
  */
 export function updateItem(items, id, fields) {
@@ -153,7 +175,7 @@ export function updateItem(items, id, fields) {
   return {
     items: items.map((item) => {
       if (item.id !== id) return item;
-      const { xp: _xp, ...rest } = item;
+      const { xp: _xp, url: _url, ...rest } = item;
       return /** @type {HabitItem} */ ({ ...rest, ...checked.fields, date: checked.fields.date || item.date });
     }),
   };

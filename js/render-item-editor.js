@@ -21,6 +21,8 @@ export function renderItemEditor(item, lang) {
   ${renderHabitFields(lang, item.daily, item.xp)}
   <label class="field"><span>${translate(lang, "fieldDescription")}</span>
     <textarea name="description" rows="3" maxlength="2000">${escapeHtml(item.description)}</textarea></label>
+  <label class="field"><span>${translate(lang, "fieldUrl")}</span>
+    <input type="url" name="url" maxlength="2000" value="${escapeHtml(item.url ?? "")}" /></label>
   <label class="field"><span>${translate(lang, "fieldDate")}</span>
     <input type="date" name="date" value="${escapeHtml(item.date)}" /></label>
   <p class="form-error" data-edit-error role="alert" hidden></p>
@@ -67,6 +69,7 @@ export function itemFieldsFromForm(form) {
     name: String(fields.get("name") ?? ""),
     category: String(fields.get("category") ?? ""),
     description: String(fields.get("description") ?? ""),
+    url: String(fields.get("url") ?? ""),
     date: String(fields.get("date") ?? ""),
     daily: fields.get("daily") === "on",
     xp: String(fields.get("xp") ?? ""),
