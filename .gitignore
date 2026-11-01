@@ -5,3 +5,4 @@ e2e/screenshots/*.png
 !e2e/screenshots/.gitkeep
 .env
 .env.docker
+state/

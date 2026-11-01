@@ -122,6 +122,16 @@ export function parseItemList(raw) {
 }
 
 /**
+ * A fresh item id: the prefix says where the item came from (the page's form, a CSV row).
+ * @param {string} prefix
+ * @returns {string}
+ * @example newItemId("item") // "item-mvxugmht-nym0a"
+ */
+export function newItemId(prefix) {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+/**
  * The add/edit form's fields, trimmed and checked.
  * @param {ItemFields} fields
  * @returns {{ fields: ItemFields } | { error: "errorName" | "errorCategory" | "errorDate" | "errorUrl" }}

@@ -3,7 +3,12 @@
 Vanilla ES-module pages, no build, plus `server/` (node:http + `pg`, the one runtime
 dependency, behind `server/state-postgres.js`): it serves the pages and keeps every saved
 document in one PostgreSQL table (`/api/state/<key>`, see `js/state-storage.js`; the pages fall
-back to localStorage when served as plain files). The seed in `data/seed.json` is a snapshot of
+back to localStorage when served as plain files), except the list itself: since 2026-11-01 the key
+`habits:v1` is the CSV file `state/items.csv` (`HABITS_ITEMS_CSV`), read on every load and
+rewritten on every save by `server/state-items-csv.js` (rows ↔ items in `items-csv.js`, the
+RFC 4180 reader/writer in `csv-text.js`; the file is the one Diego edits by hand, columns in
+README "The list file"). The page re-reads it once a minute and on tab return
+(`storage.reload`, `GET /api/state/<key>`). The seed in `data/seed.json` is a snapshot of
 the "ToDo List" Google Sheet (2026-10-28). Since 2026-10-29 the categories are the three 3DeT
 características (Poder, Habilidade, Resistência): an item done pays 1 XP on that track, and the
 `daily` flag marks a Today habit with its own `xp` per day (`rollDailyItems` brings them back
@@ -36,7 +41,7 @@ This repo follows the dev-playbook (`~/.claude/skills/dev-playbook/PLAYBOOK.md`)
 - Never weaken, skip or delete a test to make it pass.
 - UI changes: run `npm run e2e` and attach desktop (1280) + mobile (375)
   screenshots of every changed screen to the PR or final message.
-- Risk class for this repo: low (the server's PostgreSQL holds the state; Export is the manual backup).
+- Risk class for this repo: low (the server's PostgreSQL holds the state, the list is `state/items.csv`; Export is the manual backup).
 - e2e runs the real server with `HABITS_STORE=memory` (one worker, state wiped per spec via
   `DELETE /api/state`, which only the memory store allows).
 - No real paths, IPs, passwords or tokens in code, tests, fixtures or docs.

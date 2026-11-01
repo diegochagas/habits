@@ -18,6 +18,8 @@ const KEEPALIVE_MAX_BYTES = 32_000;
  * @property {(key: string, value: string) => void} setItem
  * @property {(key: string) => void} removeItem
  * @property {() => Promise<void>} flush send every pending write now
+ * @property {(key: string) => Promise<boolean>} reload read one document from the server again (the list
+ *   file may have been edited by hand); true when the cached value changed
  * @property {"server" | "browser"} kind
  */
 
@@ -64,6 +66,7 @@ function browserStorage(storage) {
     setItem: (key, value) => storage.setItem(key, value),
     removeItem: (key) => storage.removeItem(key),
     flush: async () => {},
+    reload: async () => false,
   };
 }
 
@@ -117,7 +120,61 @@ export function createServerStorage(fetchFn, initial, timers = {}) {
       queueFlush(FLUSH_DELAY_MS);
     },
     flush,
+    async reload(key) {
+      // A write of ours still on its way (or queued during the GET) wins over the server's copy.
+      if (pending.has(key)) return false;
+      const fresh = await loadOneDocument(fetchFn, key);
+      if (fresh === null || pending.has(key) || sameDocument(fresh, cache.get(key))) return false;
+      cache.set(key, fresh);
+      return true;
+    },
   };
+}
+
+/**
+ * @param {typeof fetch} fetchFn
+ * @param {string} key
+ * @returns {Promise<string | null>} the document as JSON text; null when missing or unreachable
+ */
+async function loadOneDocument(fetchFn, key) {
+  try {
+    const response = await fetchFn(`${STATE_URL}/${encodeURIComponent(key)}`, {
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) return null;
+    const payload = await response.json();
+    return payload?.value === undefined ? null : JSON.stringify(payload.value);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The page and the server order an item's properties differently; only the values matter.
+ * @param {string} left JSON text
+ * @param {string | null | undefined} right JSON text
+ * @returns {boolean}
+ */
+function sameDocument(left, right) {
+  if (typeof right !== "string") return false;
+  try {
+    return JSON.stringify(JSON.parse(left), sortedKeys) === JSON.stringify(JSON.parse(right), sortedKeys);
+  } catch {
+    return left === right;
+  }
+}
+
+/**
+ * JSON.stringify replacer that writes an object's keys in sorted order.
+ * @param {string} _key
+ * @param {unknown} value
+ * @returns {unknown}
+ */
+function sortedKeys(_key, value) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return value;
+  const sorted = /** @type {Record<string, unknown>} */ ({});
+  for (const name of Object.keys(value).sort()) sorted[name] = /** @type {Record<string, unknown>} */ (value)[name];
+  return sorted;
 }
 
 /**

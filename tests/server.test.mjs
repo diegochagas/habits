@@ -15,12 +15,28 @@ test("config: memory store needs no database, postgres needs a postgresql:// URL
     port: 4180,
     store: "memory",
     databaseUrl: "",
+    itemsCsv: "",
     siteRoot: "/site",
   });
   assert.throws(() => readServerConfig({}, "/site"), /DATABASE_URL ""/);
   assert.throws(() => readServerConfig({ HABITS_STORE: "redis" }, "/site"), /HABITS_STORE "redis"/);
   assert.throws(() => readServerConfig({ HABITS_STORE: "memory", PORT: "http" }, "/site"), /PORT "http"/);
   assert.equal(readServerConfig({ DATABASE_URL: "postgresql://u:p@h:5432/d", PORT: "3010" }, "/s").port, 3010);
+});
+
+test("config: the postgres store keeps the list in state/items.csv unless HABITS_ITEMS_CSV says otherwise", () => {
+  const postgres = { DATABASE_URL: "postgresql://u:p@h:5432/d" };
+  assert.equal(readServerConfig(postgres, "/site").itemsCsv, "/site/state/items.csv");
+  assert.equal(readServerConfig({ ...postgres, HABITS_ITEMS_CSV: "/srv/list.csv" }, "/site").itemsCsv, "/srv/list.csv");
+  assert.equal(
+    readServerConfig({ ...postgres, HABITS_ITEMS_CSV: "lists/a.csv" }, "/site").itemsCsv,
+    "/site/lists/a.csv",
+  );
+  assert.equal(readServerConfig({ ...postgres, HABITS_ITEMS_CSV: " " }, "/site").itemsCsv, "", "opt out");
+  assert.equal(
+    readServerConfig({ HABITS_STORE: "memory", HABITS_ITEMS_CSV: "x.csv" }, "/site").itemsCsv,
+    "/site/x.csv",
+  );
 });
 
 test("static files: only the site's own files, never dotfiles, server/ or parent folders", () => {
@@ -62,6 +78,8 @@ test("the HTTP app serves the site and keeps one JSON document per key", async (
     const put = await fetch(app.base + "/api/state/habits%3Av1", { method: "PUT", body: '[{"id":"a"}]' });
     assert.equal(put.status, 204);
     assert.deepEqual(await (await fetch(app.base + "/api/state")).json(), { state: { "habits:v1": [{ id: "a" }] } });
+    assert.deepEqual(await (await fetch(app.base + "/api/state/habits:v1")).json(), { value: [{ id: "a" }] });
+    assert.equal((await fetch(app.base + "/api/state/habits:none")).status, 404);
     const bad = await fetch(app.base + "/api/state/habits:v1", { method: "PUT", body: "{oops" });
     assert.equal(bad.status, 400);
     assert.match((await bad.json()).error, /expected JSON/);

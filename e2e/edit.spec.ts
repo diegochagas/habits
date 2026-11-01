@@ -1,6 +1,7 @@
 // e2e/edit.spec.ts: a card's Edit button opens an inline form; saving changes name, category,
-// the Today-habit flag and its XP, survives a reload (the server keeps it), and a daily item
-// done on an earlier day comes back as to do.
+// the Today-habit flag and its XP, survives a reload (the server keeps it), a daily item
+// done on an earlier day comes back as to do, and a list changed on the server (the CSV edited
+// by hand) shows up when the tab comes back.
 import { test, expect } from "@playwright/test";
 import { collectErrors, freshStateBeforeEach, putState } from "./helpers";
 
@@ -67,5 +68,33 @@ test("a daily item done yesterday is to do again today; one done today stays don
   const doneToday = page.locator("article.card", { hasText: "Today's habit" });
   await expect(doneToday).toHaveClass(/card-done-today/);
   await expect(doneToday.locator(".card-done-today-note")).toHaveText("✓ Already done today");
+  expect(errors).toEqual([]);
+});
+
+test("a list changed on the server shows up when the tab comes back, without a reload", async ({ page }) => {
+  const errors = collectErrors(page);
+  const base = {
+    category: "Poder",
+    daily: false,
+    description: "",
+    date: "2026-10-01",
+    done: false,
+    doneAt: "",
+    createdAt: "",
+  };
+  await putState(page, "habits:v1", [{ id: "a", name: "Before the edit", ...base }]);
+  // The page saves the list once at start: let that PUT land before changing the server's copy.
+  const startupSave = page.waitForResponse((r) => r.request().method() === "PUT" && r.url().endsWith("habits%3Av1"));
+  await page.goto("/");
+  await expect(page.locator("#counter")).toContainText("1 of 1");
+  await startupSave;
+  await putState(page, "habits:v1", [
+    { id: "a", name: "Renamed in the file", ...base },
+    { id: "csv-1", name: "Typed in the file", ...base, category: "Habilidade" },
+  ]);
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect(page.locator("#counter")).toContainText("2 of 2");
+  await expect(page.locator("article.card", { hasText: "Renamed in the file" })).toBeVisible();
+  await expect(page.locator("article.card", { hasText: "Typed in the file" })).toHaveClass(/category-habilidade/);
   expect(errors).toEqual([]);
 });

@@ -1,6 +1,7 @@
-// http-app.js: the request handler: /api/state (one JSON document per key) and the site's
-// static files. No framework; the state store is injected (Postgres in production, memory in
-// tests). Responses are JSON or files, errors carry the offending value.
+// http-app.js: the request handler: /api/state (one JSON document per key; GET on one key lets
+// the page pick up a list file edited by hand without reloading) and the site's static files.
+// No framework; the state store is injected (Postgres in production, memory in tests).
+// Responses are JSON or files, errors carry the offending value.
 
 import { readFile } from "node:fs/promises";
 import { contentTypeFor, resolveSitePath } from "./static-files.js";
@@ -61,12 +62,24 @@ async function handleState(deps, req, res, key) {
   }
   if (key === "") return sendJson(res, 404, { error: `${req.method} ${STATE_PREFIX}: expected GET` });
   if (!KEY_PATTERN.test(key)) return sendJson(res, 400, { error: `key "${key}": expected habits:<name>` });
+  if (req.method === "GET") return sendDocument(deps, res, key);
   if (req.method === "PUT") return saveState(deps, req, res, key);
   if (req.method === "DELETE") {
     await deps.state.remove(key);
     return sendEmpty(res, 204);
   }
-  return sendJson(res, 405, { error: `${req.method} ${STATE_PREFIX}/${key}: expected PUT or DELETE` });
+  return sendJson(res, 405, { error: `${req.method} ${STATE_PREFIX}/${key}: expected GET, PUT or DELETE` });
+}
+
+/**
+ * @param {HabitsAppDeps} deps
+ * @param {import("node:http").ServerResponse} res
+ * @param {string} key
+ */
+async function sendDocument(deps, res, key) {
+  const all = await deps.state.loadAll();
+  if (!(key in all)) return sendJson(res, 404, { error: `${STATE_PREFIX}/${key}: no such document` });
+  sendJson(res, 200, { value: all[key] });
 }
 
 /**

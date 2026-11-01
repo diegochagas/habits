@@ -2,14 +2,15 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { connectStateStorage, createServerStorage } from "../js/state-storage.js";
 
-/** A fetch that records calls and answers with the given status per method. */
-function fakeFetch(statusByMethod = {}) {
+/** A fetch that records calls and answers with the given status per method; GET answers hold `serverList`. */
+function fakeFetch(statusByMethod = {}, serverList = [{ id: "a" }]) {
   const calls = [];
   const fetchFn = async (url, init = {}) => {
     const method = init.method ?? "GET";
     calls.push({ url, method, body: init.body, keepalive: init.keepalive });
     const status = statusByMethod[method] ?? 200;
-    return { ok: status < 400, status, json: async () => ({ state: { "habits:v1": [{ id: "a" }] } }) };
+    const payload = url === "api/state" ? { state: { "habits:v1": serverList } } : { value: serverList };
+    return { ok: status < 400, status, json: async () => payload };
   };
   return { fetchFn, calls };
 }
@@ -107,4 +108,36 @@ test("without a server the browser storage is used", async () => {
   const connected = await connectStateStorage({ fetchFn, fallback: /** @type {any} */ (fake) });
   assert.equal(connected.kind, "server");
   assert.equal(connected.getItem("habits:v1"), JSON.stringify([{ id: "a" }]));
+});
+
+test("reload: a document edited on the server replaces the cache, unless a write of ours is still pending", async () => {
+  const serverList = [{ id: "a" }];
+  const { fetchFn, calls } = fakeFetch({}, serverList);
+  const timers = fakeTimers();
+  const storage = createServerStorage(fetchFn, { "habits:v1": [{ id: "a" }] }, timers);
+  assert.equal(await storage.reload("habits:v1"), false, "same list: nothing changed");
+  assert.equal(calls.at(-1).url, "api/state/habits%3Av1");
+  storage.setItem("habits:v1", '[{"name":"x","id":"a"}]');
+  await timers.tick();
+  serverList[0] = { id: "a", name: "x" };
+  assert.equal(await storage.reload("habits:v1"), false, "same values in another key order: nothing changed");
+  serverList.push({ id: "typed-by-hand" });
+  storage.setItem("habits:v1", "[]");
+  assert.equal(await storage.reload("habits:v1"), false, "our write has not landed yet");
+  assert.equal(storage.getItem("habits:v1"), "[]");
+  await timers.tick();
+  assert.equal(await storage.reload("habits:v1"), true);
+  assert.equal(storage.getItem("habits:v1"), JSON.stringify(serverList));
+  /** A GET during which the page writes the same key (the user pressed Done). */
+  const racingFetch = async (url, init = {}) => {
+    if (!init.method) racing.setItem("habits:v1", "[]");
+    return { ok: true, status: 200, json: async () => ({ value: [{ id: "later" }] }) };
+  };
+  const racing = createServerStorage(racingFetch, { "habits:v1": [] }, timers);
+  assert.equal(await racing.reload("habits:v1"), false, "a write queued during the GET is kept");
+  assert.equal(racing.getItem("habits:v1"), "[]");
+  const gone = await createServerStorage(async () => ({ ok: false, status: 404 }), { "habits:v1": [] }).reload(
+    "habits:v1",
+  );
+  assert.equal(gone, false, "a missing or unreachable document changes nothing");
 });

@@ -8,10 +8,12 @@ import { DEFAULT_FILTER, countByCategory, visibleItems } from "./filters.js";
 import { applyTranslations, nextLang, translate } from "./i18n.js";
 import { bindHomeToolbar, toggleSyncPanel } from "./home-toolbar.js";
 import {
+  STORAGE_KEY,
   backfillSeedUrls,
   createItem,
   createItemStore,
   isHabit,
+  newItemId,
   parseItemList,
   removeItem,
   rollDailyItems,
@@ -205,10 +207,7 @@ function renderSoundToggle() {
 /** @param {SubmitEvent} event */
 function onAddSubmit(event) {
   event.preventDefault();
-  const result = createItem(itemFieldsFromForm(form), {
-    id: () => `item-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
-    now: () => new Date(),
-  });
+  const result = createItem(itemFieldsFromForm(form), { id: () => newItemId("item"), now: () => new Date() });
   if ("error" in result) return showFormError(translate(state.lang, result.error));
   showFormError("");
   form.reset();
@@ -246,6 +245,21 @@ function onEditSubmit(event) {
 function rollDaily() {
   const rolled = rollDailyItems(state.items, today());
   if (rolled.changed > 0) commit(rolled.items);
+}
+
+/** The list file on the server may have been edited by hand: take the server's list when it changed. */
+async function reloadItemsFromServer() {
+  if (!(await storage.reload(STORAGE_KEY))) return;
+  state.items = store.load() ?? state.items;
+  state.editingId = null;
+  hero.creditList(state.items);
+  render();
+}
+
+/** Every minute and whenever the tab comes back: the file's edits, then the daily roll. */
+async function refreshList() {
+  await reloadItemsFromServer();
+  rollDaily();
 }
 
 /** @param {string} message empty string hides the error */
@@ -393,8 +407,8 @@ async function start() {
   hero.creditList(state.items);
   render();
   rollDaily();
-  setInterval(rollDaily, DAILY_ROLL_MS);
-  document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && rollDaily());
+  setInterval(refreshList, DAILY_ROLL_MS);
+  document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && refreshList());
   animate();
   sync.syncNow();
   // The play pages' "Back to Habits" lands on the Pomodoro panel so the next block starts at once.
