@@ -21,7 +21,7 @@ import {
   updateItem,
 } from "./items-store.js";
 import { itemFieldsFromForm, renderHabitFields, renderItemEditor, toggleHabitFields } from "./render-item-editor.js";
-import { renderCategoryOptions, renderCategoryTabs, renderItemGrid } from "./render-items.js";
+import { renderCategoryOptions, renderCategoryTabs, renderCounter, renderItemGrid } from "./render-items.js";
 import { connectStateStorage } from "./state-storage.js";
 import { applyGameTranslations, gameText } from "./game/game-i18n.js";
 import { createHeroController } from "./game/hero-controller.js";
@@ -146,7 +146,7 @@ function render() {
   });
   tabs.innerHTML = renderCategoryTabs(countByCategory(state.items), state.filter.category, state.lang);
   emptyState.hidden = shown.length > 0;
-  counter.textContent = translate(state.lang, "counter", { shown: shown.length, total: state.items.length });
+  counter.textContent = renderCounter(shown.length, state.items.length, state.filter.search, state.lang);
   renderHeroArea();
   pomodoro.render();
 }
@@ -348,10 +348,7 @@ function bindEvents() {
   document.addEventListener("submit", (event) => {
     if (hero.handleSubmit(/** @type {HTMLFormElement} */ (event.target))) event.preventDefault();
   });
-  document.getElementById("search-input")?.addEventListener("input", (event) => {
-    state.filter.search = /** @type {HTMLInputElement} */ (event.target).value;
-    render();
-  });
+  bindSearch();
   document.getElementById("status-select")?.addEventListener("change", (event) => {
     state.filter.status = /** @type {import("./filters.js").ListFilter["status"]} */ (
       /** @type {HTMLSelectElement} */ (event.target).value
@@ -359,6 +356,24 @@ function bindEvents() {
     render();
   });
   bindToolbar();
+}
+
+function bindSearch() {
+  const input = document.getElementById("search-input");
+  if (!(input instanceof HTMLInputElement)) return;
+  input.addEventListener("input", () => {
+    state.filter.search = input.value;
+    render();
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    // Enter keeps the matches and empties the box, ready for the next search (Diego, 2026-11-01);
+    // Enter on an empty box shows the whole list again. The counter names the term meanwhile.
+    if (input.value === "") state.filter.search = "";
+    input.value = "";
+    render();
+  });
 }
 
 function bindToolbar() {

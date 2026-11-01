@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { formatDate, renderCategoryTabs, renderItemCard } from "../js/render-items.js";
+import { formatDate, renderCategoryTabs, renderCounter, renderItemCard } from "../js/render-items.js";
 
 const item = {
   id: "sheet-001",
@@ -78,4 +78,10 @@ test("an item with a url gets a safe link on its title; without one the title is
     ),
   );
   assert.ok(!renderItemCard({ ...item, name: "One Piece" }, "en").includes("card-link"));
+});
+
+test("renderCounter names the search term only while one is active", () => {
+  assert.equal(renderCounter(3, 10, "", "en"), "3 of 10 items");
+  assert.equal(renderCounter(0, 318, " manga ", "en"), "0 of 318 items for “manga”");
+  assert.equal(renderCounter(2, 5, "anime", "pt"), "2 de 5 itens para “anime”");
 });

@@ -31,8 +31,17 @@ test("loads the sheet list, adds an item with a URL, filters and survives a relo
   await page.getByRole("tab", { name: /^All/ }).click();
   await page.getByPlaceholder("Search...").fill("vagabond");
   await expect(page.locator("article.card")).toHaveCount(1);
+  // Enter keeps the matches and empties the box for the next search; Enter on the empty box resets.
+  await page.getByPlaceholder("Search...").press("Enter");
+  await expect(page.getByPlaceholder("Search...")).toHaveValue("");
+  await expect(page.locator("article.card")).toHaveCount(1);
+  await expect(page.locator("#counter")).toContainText("1 of 316 items for “vagabond”");
+  await page.screenshot({ path: `e2e/screenshots/${testInfo.project.name}-search-submitted.png`, fullPage: false });
   await card.getByRole("button", { name: "Done" }).click();
   await expect(card).toHaveClass(/card-done/);
+
+  await page.getByPlaceholder("Search...").press("Enter");
+  await expect(page.locator("#counter")).toContainText("316 of 316 items");
 
   await page.reload();
   await page.getByPlaceholder("Search...").fill("vagabond");

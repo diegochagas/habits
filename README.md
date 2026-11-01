@@ -3,8 +3,9 @@
 A black-and-white, ink-styled list of the things I want to read, watch, build and keep
 doing. It started as the "ToDo List" Google Sheet (Date, Task, Notes, Source, Done) and
 now lives on the home server: add an item with a name, a category, a description where
-URLs become links and a date; edit it in place; mark it done; filter by category, search, export
-or import JSON. The categories are the three 3DeT **características** (Poder, Habilidade,
+URLs become links and a date; edit it in place; mark it done; filter by category and search
+(Enter keeps the matches and empties the box for the next search; Enter on the empty box shows
+everything again), export or import JSON. The categories are the three 3DeT **características** (Poder, Habilidade,
 Resistência): an item done pays 1 XP on that track, and a **Today habit** (any item with the
 flag ticked) pays its own XP per day, is done once a day and comes back every morning.
 

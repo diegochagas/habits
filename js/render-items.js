@@ -108,6 +108,22 @@ export function renderCategoryTabs(counts, active, lang) {
 }
 
 /**
+ * The "shown of total" line under the filters; it names the search term so a list filtered by a
+ * submitted search (Enter empties the box, the matches stay) still says why it is short.
+ * @param {number} shown
+ * @param {number} total
+ * @param {string} search the active search filter, "" when none
+ * @param {import("./i18n.js").Lang} lang
+ * @returns {string} plain text
+ * @example renderCounter(0, 318, "manga", "en") // "0 of 318 items for “manga”"
+ */
+export function renderCounter(shown, total, search, lang) {
+  const term = search.trim();
+  if (term === "") return translate(lang, "counter", { shown, total });
+  return translate(lang, "counterSearch", { shown, total, search: term });
+}
+
+/**
  * @param {string} category
  * @param {number} count
  * @param {boolean} active
