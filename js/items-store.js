@@ -219,6 +219,22 @@ export function toggleDone(items, id, today = "") {
 }
 
 /**
+ * Mark one item done, stamping `doneAt`; an item already done (or an unknown id) is left as is, so
+ * a finished Pomodoro never un-does what the card already shows. Used by the Pomodoro: the item in
+ * "Working on" counts as executed today (Diego, 2026-11-03).
+ * @param {HabitItem[]} items
+ * @param {string | null} id
+ * @param {string} today yyyy-mm-dd stamped as doneAt
+ * @returns {HabitItem[]} the same array when nothing changes
+ * @example markDone([{ id: "a", done: false }], "a", "2026-11-03")[0].done // true
+ */
+export function markDone(items, id, today) {
+  const target = items.find((item) => item.id === id);
+  if (!target || target.done) return items;
+  return toggleDone(items, target.id, today);
+}
+
+/**
  * Items saved before links existed lack a `url`; give them the seed's link (matched by id) when
  * the seed has one. Run once per browser/server state, so a link cleared later stays cleared.
  * @param {HabitItem[]} saved

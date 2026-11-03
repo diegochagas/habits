@@ -109,9 +109,10 @@ test("a Pomodoro on a list item earns free time; the focus music form validates 
   await page.getByRole("button", { name: /Mute/ }).click();
   await expect(page.getByRole("button", { name: /Unmute/ })).toBeVisible();
 
-  const card = page.locator("article.card").first();
-  const itemName = (await card.locator(".card-name").textContent()) ?? "";
-  await card.getByRole("button", { name: /Pomodoro/ }).click();
+  const firstCard = page.locator("article.card").first();
+  const itemName = (await firstCard.locator(".card-name").textContent()) ?? "";
+  const itemId = (await firstCard.getAttribute("data-id")) ?? "";
+  await firstCard.getByRole("button", { name: /Pomodoro/ }).click();
   await expect(page.locator("[data-pomodoro-select='item']")).toContainText(itemName);
   await expect(page.locator("[data-error='pomodoro-item']")).toBeHidden();
   await expect(page.getByRole("button", { name: "Pause", exact: true })).toBeVisible();
@@ -119,15 +120,21 @@ test("a Pomodoro on a list item earns free time; the focus music form validates 
 
   await expect(page.locator("#game-notice")).toContainText("Pomodoro done!", { timeout: 10_000 });
   await expect(page.locator(".pomodoro-count")).toContainText("1 today");
+  // Done items sort after the pending ones, so find the card again by its id.
+  const card = page.locator(`article.card[data-id="${itemId}"]`);
   await expect(page.locator("#free-time-bank")).toHaveText("00:01");
   await expect(page.locator(".pomodoro-modes .tab-active")).toHaveText("Short break");
+  // The item in "Working on" is executed today: its card shows as done.
+  await expect(card).toHaveClass(/card-done/);
   await expect(card.locator(".card-pomodoros")).toHaveText("🍅 1");
-  // The finished Pomodoro is a good habit: +1 XP on the track of the item's característica.
+  // The finished Pomodoro is a good habit: +1 XP on the track of the item's característica,
+  // and the item done pays its own +1 on the same track.
   const pool = { Poder: "poder", Habilidade: "habilidade", Resistência: "resistencia" }[
     (await card.locator(".card-category").textContent()) ?? ""
   ];
-  await expect(page.locator(`.pool-${pool} b`)).toHaveText("1");
+  await expect(page.locator(`.pool-${pool} b`)).toHaveText("2");
   await page.getByRole("button", { name: "Today", exact: true }).click();
-  await expect(page.locator(".today-log li").first()).toContainText("🍅");
+  await expect(page.locator(".today-log li").filter({ hasText: "🍅" })).toHaveCount(1);
+  await expect(page.locator(".today-log li").filter({ hasText: itemName.trim() })).toHaveCount(2);
   expect(errors).toEqual([]);
 });

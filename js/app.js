@@ -17,6 +17,7 @@ import {
   parseItemList,
   removeItem,
   rollDailyItems,
+  markDone,
   toggleDone,
   updateItem,
 } from "./items-store.js";
@@ -89,8 +90,7 @@ const pomodoro = startPomodoro({
   secondsPerMinute: params.get("fast") ? 0.1 : 60,
   say,
   onChange: () => render(),
-  onWorkDone: (itemId) =>
-    hero.commit(creditPomodoro(hero.hero, state.items.find((item) => item.id === itemId) ?? null, today())),
+  onWorkDone: onPomodoroWorkDone,
 });
 
 const sync = startSheetSync({
@@ -107,6 +107,17 @@ const sync = startSheetSync({
     render();
   },
 });
+
+/**
+ * A work block ran out: the Pomodoro's +1 XP, then its item is done for today (the list card
+ * greys out and the Today log shows the item), unless it was already done.
+ * @param {string | null} itemId
+ */
+function onPomodoroWorkDone(itemId) {
+  hero.commit(creditPomodoro(hero.hero, state.items.find((item) => item.id === itemId) ?? null, today()));
+  const items = markDone(state.items, itemId, today());
+  if (items !== state.items) commit(items);
+}
 
 /** @returns {import("./i18n.js").Lang} */
 function loadLang() {
