@@ -16,7 +16,7 @@ the catalog's bad habits (XP out of three tracks, Poder / Habilidade / Resistên
 atributos, perícias, vantagens and items, and the hero card shows the chibi whose body follows
 the logged weight and height (the BMI). A **Pomodoro** panel sits on top: pick a list item (or press 🍅 on its card; a work
 block does not start without one), work 25 minutes with an optional YouTube focus video (saved
-link, mute button), rest 5 (15 every 4th). Each finished Pomodoro is a good habit (+1 XP on the item's track) and earns its break as
+link, mute button), rest 5 (15 every 4th). Each finished Pomodoro is a good habit (+1 XP on the item's track), marks its item done for today (a pending one only; it shows in the Today log, paying the item's own XP) and earns its break as
 **free time**, which is the only time the play
 pages are open; they count it down while you play and lock when it runs out, putting the clock
 back on the Pomodoro mode so "Back to Habits" (`index.html#pomodoro`) lands on the picker for the

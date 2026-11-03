@@ -5,6 +5,7 @@ import {
   createItem,
   backfillSeedUrls,
   createItemStore,
+  markDone,
   parseItem,
   parseItemList,
   removeItem,
@@ -154,6 +155,23 @@ test("toggleDone flips only the matching item and keeps order", () => {
     [false, true],
   );
   assert.notEqual(next, items);
+});
+
+test("markDone marks a pending item done with today's date", () => {
+  const items = [
+    { id: "a", done: false, doneAt: "" },
+    { id: "b", done: false, doneAt: "" },
+  ];
+  const next = markDone(items, "b", "2026-11-03");
+  assert.deepEqual(next[1], { id: "b", done: true, doneAt: "2026-11-03" });
+  assert.equal(next[0], items[0]);
+});
+
+test("markDone keeps an already done item and ignores an unknown or empty id", () => {
+  const items = [{ id: "a", done: true, doneAt: "2026-11-01" }];
+  assert.equal(markDone(items, "a", "2026-11-03"), items);
+  assert.equal(markDone(items, "missing", "2026-11-03"), items);
+  assert.equal(markDone(items, null, "2026-11-03"), items);
 });
 
 test("removeItem drops the matching id", () => {
