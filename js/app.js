@@ -15,7 +15,6 @@ import {
   isHabit,
   newItemId,
   parseItemList,
-  removeItem,
   rollDailyItems,
   markDone,
   toggleDone,
@@ -30,6 +29,8 @@ import { createHeroStore } from "./game/hero-store.js";
 import { renderSheetView } from "./game/sheet-view.js";
 import { creditPomodoro } from "./game/progression.js";
 import { createSoundBoard } from "./game/sound.js";
+import { createAddDateField } from "./add-date-field.js";
+import { removeAndCloseGap } from "./date-sequence.js";
 import { renderTodayView } from "./game/today-view.js";
 import { startPomodoro } from "./pomodoro/pomodoro-app.js";
 import { applyPomodoroTranslations, pomodoroText } from "./pomodoro/pomodoro-i18n.js";
@@ -67,6 +68,7 @@ const emptyState = /** @type {HTMLElement} */ (document.getElementById("empty-st
 const counter = /** @type {HTMLElement} */ (document.getElementById("counter"));
 const form = /** @type {HTMLFormElement} */ (document.getElementById("add-form"));
 const formError = /** @type {HTMLElement} */ (document.getElementById("form-error"));
+const addDateField = createAddDateField(form);
 const categorySelect = /** @type {HTMLSelectElement} */ (document.getElementById("category-select"));
 const notice = /** @type {HTMLElement} */ (document.getElementById("game-notice"));
 const heroMain = /** @type {HTMLElement} */ (document.getElementById("hero-main"));
@@ -159,6 +161,7 @@ function render() {
   tabs.innerHTML = renderCategoryTabs(countByCategory(state.items), state.filter.category, state.lang);
   emptyState.hidden = shown.length > 0;
   counter.textContent = renderCounter(shown.length, state.items.length, state.filter.search, state.lang);
+  addDateField.refresh(state.items, today());
   renderHeroArea();
   pomodoro.render();
 }
@@ -294,7 +297,8 @@ function onGridClick(event) {
     sounds.play("cursor");
     return render();
   }
-  if (action === "remove" && confirm(translate(state.lang, "removeConfirm"))) commit(removeItem(state.items, id));
+  if (action === "remove" && confirm(translate(state.lang, "removeConfirm")))
+    commit(removeAndCloseGap(state.items, id));
 }
 
 /** @param {MouseEvent} event */

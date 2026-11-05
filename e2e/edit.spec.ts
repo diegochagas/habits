@@ -125,3 +125,29 @@ test("the list is ordered by date and a Today habit always shows today and can't
   await expect(editor.getByLabel("Date")).toBeDisabled();
   expect(errors).toEqual([]);
 });
+
+test("a new item defaults to 14 days after the latest one, and removing one closes the gap", async ({ page }) => {
+  const errors = collectErrors(page);
+  const base = { category: "Poder", description: "", createdAt: "", done: false, doneAt: "", daily: false };
+  await putState(page, "habits:v1", [
+    { id: "a", name: "First", date: "2026-11-05", ...base },
+    { id: "b", name: "Second", date: "2026-11-19", ...base },
+    { id: "c", name: "Third", date: "2026-12-03", ...base },
+  ]);
+  await page.goto("/");
+  await expect(page.locator("#counter")).toContainText("3 of 3");
+  const addDate = page.locator("#add-form input[name='date']");
+  await expect(addDate).toHaveValue("2026-12-17");
+  await page.locator("#add-form input[name='name']").fill("Fourth");
+  await page.locator("#add-form").getByRole("button", { name: "ADD!" }).click();
+  await expect(page.locator("article.card", { hasText: "Fourth" }).locator(".card-date")).toHaveText("17/12/2026");
+  await expect(addDate).toHaveValue("2026-12-31");
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.locator("article.card", { hasText: "Second" }).getByRole("button", { name: "Remove" }).click();
+  await expect(page.locator("article.card", { hasText: "Third" }).locator(".card-date")).toHaveText("19/11/2026");
+  await expect(page.locator("article.card", { hasText: "Fourth" }).locator(".card-date")).toHaveText("03/12/2026");
+  await expect(page.locator("article.card", { hasText: "First" }).locator(".card-date")).toHaveText("05/11/2026");
+  await expect(addDate).toHaveValue("2026-12-17");
+  expect(errors).toEqual([]);
+});
