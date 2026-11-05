@@ -54,7 +54,7 @@ test("createItem trims fields and stamps date and id from the clock", () => {
   assert.ok("item" in habit);
   assert.equal(habit.item.daily, true);
   assert.equal(habit.item.xp, 2);
-  assert.equal(habit.item.date, "2026-11-01", "a chosen date wins over today");
+  assert.equal(habit.item.date, "2026-10-28", "a Today habit always takes today, never a chosen date");
   const defaults = /** @type {any} */ (
     createItem({ name: "Pray", category: "Resistência", description: "", daily: true, xp: "9" }, fixedClock)
   );
@@ -124,9 +124,9 @@ test("updateItem replaces the editable fields, keeps id/done, and can turn the d
 test("rollDailyItems: a daily item done yesterday is to do again, one done today stays done", () => {
   const items = [
     { id: "a", done: true, doneAt: "2026-10-28", daily: true },
-    { id: "b", done: true, doneAt: "2026-10-29", daily: true },
+    { id: "b", done: true, doneAt: "2026-10-29", daily: true, date: "2026-10-29" },
     { id: "c", done: true, doneAt: "2026-10-01", daily: false },
-    { id: "d", done: false, doneAt: "", daily: true },
+    { id: "d", done: false, doneAt: "", daily: true, date: "2026-10-29" },
   ];
   const rolled = rollDailyItems(/** @type {any} */ (items), "2026-10-29");
   assert.equal(rolled.changed, 1);
@@ -135,6 +135,16 @@ test("rollDailyItems: a daily item done yesterday is to do again, one done today
     [false, true, true, false],
   );
   assert.equal(rolled.items[0].doneAt, "");
+});
+
+test("rollDailyItems and updateItem keep a Today habit's date at today", () => {
+  const items = /** @type {any} */ ([
+    { id: "a", name: "A", category: "Poder", description: "", daily: true, date: "2026-10-01" },
+  ]);
+  assert.equal(rollDailyItems(items, "2026-11-05").items[0].date, "2026-11-05");
+  const fields = { name: "A", category: "Poder", description: "", daily: true, date: "2026-01-01" };
+  const edited = /** @type {any} */ (updateItem(items, "a", fields, "2026-11-05"));
+  assert.equal(edited.items[0].date, "2026-11-05");
 });
 
 test("createItem rejects an empty name and an unknown category with i18n keys", () => {

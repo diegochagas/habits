@@ -149,6 +149,17 @@ export function checkItemFields(fields) {
 }
 
 /**
+ * The date an item gets: a Today habit always takes `today`, any other item the date typed.
+ * @param {ItemFields} fields
+ * @param {string} today yyyy-mm-dd
+ * @returns {string} "" when neither applies (the caller falls back)
+ * @example lockedDate({ daily: true, date: "2026-01-01" }, "2026-11-05") // "2026-11-05"
+ */
+function lockedDate(fields, today) {
+  return (fields.daily ? today : fields.date) ?? "";
+}
+
+/**
  * Build a new item from the add form.
  * @param {ItemFields} fields
  * @param {{ id: () => string, now: () => Date }} clock injected so tests are deterministic
@@ -163,7 +174,7 @@ export function createItem(fields, clock) {
     id: clock.id(),
     ...checked.fields,
     category: /** @type {import("./categories.js").Category} */ (checked.fields.category),
-    date: checked.fields.date || now.toISOString().slice(0, 10),
+    date: lockedDate(checked.fields, now.toLocaleDateString("en-CA")) || now.toLocaleDateString("en-CA"),
     done: false,
     doneAt: "",
     createdAt: now.toISOString(),
@@ -176,23 +187,25 @@ export function createItem(fields, clock) {
  * @param {HabitItem[]} items
  * @param {string} id
  * @param {ItemFields} fields
+ * @param {string} [today] yyyy-mm-dd; a Today habit always takes it as its date (Diego, 2026-11-05)
  * @returns {{ items: HabitItem[] } | { error: "errorName" | "errorCategory" | "errorDate" | "errorUrl" }}
  * @example updateItem(items, "a", { name: "Gym", category: "Poder", description: "", daily: true, xp: 2 })
  */
-export function updateItem(items, id, fields) {
+export function updateItem(items, id, fields, today = "") {
   const checked = checkItemFields(fields);
   if ("error" in checked) return checked;
   return {
     items: items.map((item) => {
       if (item.id !== id) return item;
       const { xp: _xp, url: _url, ...rest } = item;
-      return /** @type {HabitItem} */ ({ ...rest, ...checked.fields, date: checked.fields.date || item.date });
+      const date = lockedDate(checked.fields, today) || item.date;
+      return /** @type {HabitItem} */ ({ ...rest, ...checked.fields, date });
     }),
   };
 }
 
 /**
- * Daily items marked done on an earlier day come back as to do.
+ * Daily items marked done on an earlier day come back as to do; every daily item's date is today.
  * @param {HabitItem[]} items
  * @param {string} today yyyy-mm-dd
  * @returns {{ items: HabitItem[], changed: number }}
@@ -201,9 +214,11 @@ export function updateItem(items, id, fields) {
 export function rollDailyItems(items, today) {
   let changed = 0;
   const rolled = items.map((item) => {
-    if (!isHabit(item) || !item.done || item.doneAt === today) return item;
+    if (!isHabit(item)) return item;
+    const stale = item.done && item.doneAt !== today;
+    if (!stale && item.date === today) return item;
     changed += 1;
-    return { ...item, done: false, doneAt: "" };
+    return { ...item, date: today, ...(stale && { done: false, doneAt: "" }) };
   });
   return { items: rolled, changed };
 }

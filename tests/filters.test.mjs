@@ -33,10 +33,10 @@ const sample = [
   },
 ];
 
-test("default filter shows everything, to-do first, then by date and name", () => {
+test("default filter shows everything, by date then name, done or not", () => {
   assert.deepEqual(
     visibleItems(sample, DEFAULT_FILTER).map((item) => item.id),
-    ["4", "3", "1", "2"],
+    ["4", "3", "2", "1"],
   );
 });
 

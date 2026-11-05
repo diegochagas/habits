@@ -98,3 +98,30 @@ test("a list changed on the server shows up when the tab comes back, without a r
   await expect(page.locator("article.card", { hasText: "Typed in the file" })).toHaveClass(/category-habilidade/);
   expect(errors).toEqual([]);
 });
+
+test("the list is ordered by date and a Today habit always shows today and can't be given another date", async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  const today = new Date().toLocaleDateString("en-CA");
+  const base = { category: "Poder", description: "", createdAt: "" };
+  await putState(page, "habits:v1", [
+    { id: "late", name: "Late", date: "2999-01-01", done: false, doneAt: "", daily: false, ...base },
+    { id: "old-done", name: "Old done", date: "2000-01-01", done: true, doneAt: "2000-01-02", daily: false, ...base },
+    { id: "habit", name: "Habit", date: "2000-02-02", done: false, doneAt: "", daily: true, xp: 1, ...base },
+  ]);
+  await page.goto("/");
+  await expect(page.locator("#counter")).toContainText("3 of 3");
+  const names = page.locator("article.card .card-name");
+  await expect(names).toHaveText(["Old done", "Habit 🔁 +1", "Late"]);
+  const habit = page.locator("article.card", { hasText: "Habit" });
+  await expect(habit.locator(".card-date")).toHaveAttribute("datetime", today);
+  await habit.getByRole("button", { name: "Edit" }).click();
+  const editor = habit.locator("form[data-form='edit-item']");
+  await expect(editor.getByLabel("Date")).toBeDisabled();
+  await editor.getByLabel("Today habit (once a day)").uncheck();
+  await expect(editor.getByLabel("Date")).toBeEnabled();
+  await editor.getByLabel("Today habit (once a day)").check();
+  await expect(editor.getByLabel("Date")).toBeDisabled();
+  expect(errors).toEqual([]);
+});

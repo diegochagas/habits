@@ -47,7 +47,7 @@ function matchesSearch(item, search) {
 }
 
 /**
- * Items to show: filtered, to-do before done, then by date, then by name.
+ * Items to show: filtered, by date (done or not), then by name.
  * @param {import("./items-store.js").HabitItem[]} items
  * @param {ListFilter} filter
  * @returns {import("./items-store.js").HabitItem[]}
@@ -62,7 +62,6 @@ export function visibleItems(items, filter) {
  * @returns {number}
  */
 export function compareItems(a, b) {
-  if (a.done !== b.done) return a.done ? 1 : -1;
   if (a.date !== b.date) return a.date < b.date ? -1 : 1;
   return a.name.localeCompare(b.name);
 }

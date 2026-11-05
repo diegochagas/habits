@@ -24,7 +24,7 @@ export function renderItemEditor(item, lang) {
   <label class="field"><span>${translate(lang, "fieldUrl")}</span>
     <input type="url" name="url" maxlength="2000" value="${escapeHtml(item.url ?? "")}" /></label>
   <label class="field"><span>${translate(lang, "fieldDate")}</span>
-    <input type="date" name="date" value="${escapeHtml(item.date)}" /></label>
+    <input type="date" name="date" value="${escapeHtml(item.date)}"${item.daily ? " disabled" : ""} /></label>
   <p class="form-error" data-edit-error role="alert" hidden></p>
   <span class="card-actions">
     <button type="submit" class="stamp stamp-small">${translate(lang, "editSave")}</button>
@@ -56,6 +56,8 @@ export function toggleHabitFields(form) {
   const daily = /** @type {HTMLInputElement | null} */ (form.querySelector("input[name='daily']"));
   const xpField = /** @type {HTMLElement | null} */ (form.querySelector("[data-xp-field]"));
   if (daily && xpField) xpField.hidden = !daily.checked;
+  const dateInput = /** @type {HTMLInputElement | null} */ (form.querySelector("input[name='date']"));
+  if (daily && dateInput) dateInput.disabled = daily.checked;
 }
 
 /**

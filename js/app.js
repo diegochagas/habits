@@ -49,7 +49,8 @@ const storage = await connectStateStorage({ document });
 const store = createItemStore(storage);
 const sounds = createSoundBoard(() => new AudioContext(), localStorage);
 /** @returns {string} */
-const today = () => new Date().toISOString().slice(0, 10);
+// Local calendar day (not UTC): after 21:00 in UTC-3 the UTC date is already tomorrow.
+const today = () => new Date().toLocaleDateString("en-CA");
 /** @type {{ items: import("./items-store.js").HabitItem[], filter: import("./filters.js").ListFilter, lang: import("./i18n.js").Lang, tab: string, notice: string, editingId: string | null }} */
 const state = {
   items: [],
@@ -240,7 +241,7 @@ function onEditSubmit(event) {
   const editor = /** @type {HTMLFormElement} */ (event.target);
   if (editor.dataset.form !== "edit-item" || !state.editingId) return;
   event.preventDefault();
-  const result = updateItem(state.items, state.editingId, itemFieldsFromForm(editor));
+  const result = updateItem(state.items, state.editingId, itemFieldsFromForm(editor), today());
   const error = /** @type {HTMLElement | null} */ (editor.querySelector("[data-edit-error]"));
   if ("error" in result) {
     if (error) error.textContent = translate(state.lang, result.error);
