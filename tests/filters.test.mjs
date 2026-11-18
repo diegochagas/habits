@@ -67,3 +67,32 @@ test("search is case-insensitive and looks at name and description", () => {
 test("countByCategory includes the total under All", () => {
   assert.deepEqual(countByCategory(sample), { All: 4, Today: 1, Habilidade: 2, Resistência: 1, Poder: 1 });
 });
+
+test("visibleItems puts a Today habit done for the day after the other items of its date", () => {
+  const day = "2026-11-17";
+  const base = { category: "Poder", description: "", date: day };
+  const items = [
+    { ...base, id: "a", name: "Aaa", daily: true, done: true },
+    { ...base, id: "b", name: "Bbb", daily: true, done: false },
+    { ...base, id: "c", name: "Ccc", daily: false, done: false },
+  ];
+  const names = visibleItems(items, DEFAULT_FILTER).map((item) => item.name);
+  assert.deepEqual(names, ["Bbb", "Ccc", "Aaa"]);
+});
+
+test("the Pomodoro picker lists no Today habit done for the day, even when it was selected", async () => {
+  const { renderPomodoroPanel } = await import("../js/pomodoro/pomodoro-view.js");
+  const habit = {
+    id: "h",
+    name: "Gym",
+    category: "Poder",
+    description: "",
+    date: "2026-11-17",
+    daily: true,
+    done: true,
+  };
+  const { createPomodoro } = await import("../js/pomodoro/pomodoro-clock.js");
+  const state = { ...createPomodoro("2026-11-17"), itemId: "h" };
+  const html = renderPomodoroPanel(state, [habit], "en", 0);
+  assert.ok(!html.includes("Gym"));
+});

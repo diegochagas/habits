@@ -5,6 +5,7 @@
 import { formatClock, remainingSeconds } from "./pomodoro-clock.js";
 import { pomodoroText } from "./pomodoro-i18n.js";
 import { escapeHtml } from "../linkify.js";
+import { isDoneHabit } from "../filters.js";
 
 /**
  * @param {import("./pomodoro-clock.js").PomodoroState} state
@@ -48,7 +49,7 @@ function renderModes(state, lang) {
  * @returns {string}
  */
 function renderItemPicker(state, items, lang, notice) {
-  const open = items.filter((item) => !item.done || item.id === state.itemId);
+  const open = items.filter((item) => !isDoneHabit(item) && (!item.done || item.id === state.itemId));
   const options = open.map(
     (item) =>
       `<option value="${escapeHtml(item.id)}"${item.id === state.itemId ? " selected" : ""}>${escapeHtml(item.name)}</option>`,

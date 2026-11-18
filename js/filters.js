@@ -47,7 +47,7 @@ function matchesSearch(item, search) {
 }
 
 /**
- * Items to show: filtered, by date (done or not), then by name.
+ * Items to show: filtered, by date, today's finished habits last within their date, then by name.
  * @param {import("./items-store.js").HabitItem[]} items
  * @param {ListFilter} filter
  * @returns {import("./items-store.js").HabitItem[]}
@@ -57,12 +57,23 @@ export function visibleItems(items, filter) {
 }
 
 /**
+ * A Today habit already done for the day: it sinks to the end of its date's group on the list.
+ * @param {import("./items-store.js").HabitItem} item
+ * @returns {boolean}
+ */
+export function isDoneHabit(item) {
+  return item.daily === true && item.done;
+}
+
+/**
  * @param {import("./items-store.js").HabitItem} a
  * @param {import("./items-store.js").HabitItem} b
  * @returns {number}
  */
 export function compareItems(a, b) {
   if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+  const doneToday = Number(isDoneHabit(a)) - Number(isDoneHabit(b));
+  if (doneToday) return doneToday;
   return a.name.localeCompare(b.name);
 }
 
