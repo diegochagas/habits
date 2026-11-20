@@ -431,6 +431,52 @@ body::before {
   align-items: end;
 }
 
+.image-thumbs,
+.card-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.image-thumb {
+  position: relative;
+  display: inline-block;
+}
+
+.image-thumb img,
+.card-images img {
+  display: block;
+  max-height: 96px;
+  max-width: 100%;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+}
+
+.card-images {
+  margin: 8px 0;
+}
+
+.card-images img {
+  max-height: 180px;
+  object-fit: cover;
+}
+
+.image-thumb-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .field-check {
   display: flex;
   flex-direction: row;

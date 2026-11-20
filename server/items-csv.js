@@ -16,6 +16,7 @@ export const ITEMS_CSV_COLUMNS = [
   "doneAt",
   "url",
   "description",
+  "images",
   "id",
   "createdAt",
 ];
@@ -81,6 +82,7 @@ function rawItemFromRow(columns, row) {
   return {
     ...text,
     description: row[columns.indexOf("description")] ?? "",
+    images: (text.images ?? "").split(/[\s|]+/).filter(Boolean),
     daily: isTrueWord(text.daily),
     done: isTrueWord(text.done),
     xp: text.xp ? Number(text.xp) : undefined,
@@ -121,7 +123,7 @@ function isTrueWord(word) {
 /**
  * @param {HabitItem[]} items
  * @returns {string} the canonical file: header + one row per item
- * @example itemsToCsv([]) // "name,category,daily,xp,date,done,doneAt,url,description,id,createdAt\n"
+ * @example itemsToCsv([]) // "name,category,daily,xp,date,done,doneAt,url,description,images,id,createdAt\n"
  */
 export function itemsToCsv(items) {
   return formatCsv([ITEMS_CSV_COLUMNS, ...items.map(itemRow)]);
@@ -142,6 +144,7 @@ function itemRow(item) {
     item.doneAt,
     item.url ?? "",
     item.description,
+    (item.images ?? []).join(" "),
     item.id,
     item.createdAt,
   ];

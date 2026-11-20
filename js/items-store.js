@@ -13,6 +13,7 @@ import { isCategory, isLegacyDailyCategory, migrateCategory } from "./categories
  * @property {boolean} daily a Today habit: on the Today tab, once a day, back every morning
  * @property {string} description
  * @property {string} [url] an http(s) link the card opens (a hyperlink on the sheet's Task cell); absent when none
+ * @property {string[]} [images] names of the pictures attached to the card (served by /api/images/<name>); absent when none
  * @property {string} date  ISO yyyy-mm-dd (sheet queue date, or the day it was added)
  * @property {boolean} done
  * @property {string} doneAt yyyy-mm-dd of the last Done ("" while to do); daily items reset the next day
@@ -20,7 +21,7 @@ import { isCategory, isLegacyDailyCategory, migrateCategory } from "./categories
  * @property {number} [xp] daily items: XP per day (1–3); any other item pays 1 once
  */
 
-/** @typedef {{ name: string, category: string, description: string, url?: string, date?: string, daily?: boolean, xp?: number | string }} ItemFields */
+/** @typedef {{ name: string, category: string, description: string, url?: string, images?: string[], date?: string, daily?: boolean, xp?: number | string }} ItemFields */
 
 export const STORAGE_KEY = "habits:v1";
 
@@ -61,7 +62,28 @@ function normalizeItem(candidate, category) {
   };
   // Items saved before 2026-10-29 said "Today" (or "Personal") as their category instead.
   const daily = candidate.daily === true || isLegacyDailyCategory(candidate.category);
-  return withHabitFields(withUrl(base, candidate.url), daily, candidate.xp);
+  return withHabitFields(withImages(withUrl(base, candidate.url), candidate.images), daily, candidate.xp);
+}
+
+/**
+ * @param {unknown} name
+ * @returns {boolean} true for a picture name the server hands out (random hex + png/jpg/webp/gif)
+ * @example isImageName("0123456789abcdef01.jpg") // true
+ */
+export function isImageName(name) {
+  return typeof name === "string" && /^[a-f0-9]{18}\.(png|jpg|webp|gif)$/.test(name);
+}
+
+/**
+ * Keep only valid picture names (they end up in an img src); no picture leaves the field out.
+ * @template {object} T
+ * @param {T} item
+ * @param {unknown} images
+ * @returns {T & { images?: string[] }}
+ */
+function withImages(item, images) {
+  const names = Array.isArray(images) ? images.filter(isImageName) : [];
+  return names.length > 0 ? { ...item, images: [...new Set(names)] } : item;
 }
 
 /**
@@ -145,7 +167,9 @@ export function checkItemFields(fields) {
   const url = (fields.url ?? "").trim();
   if (url && !isWebUrl(url)) return { error: "errorUrl" };
   const checked = { name, category: fields.category, description: fields.description.trim(), date };
-  return { fields: withHabitFields(withUrl(checked, url), fields.daily === true, fields.xp) };
+  return {
+    fields: withHabitFields(withImages(withUrl(checked, url), fields.images), fields.daily === true, fields.xp),
+  };
 }
 
 /**
@@ -183,7 +207,7 @@ export function createItem(fields, clock) {
 }
 
 /**
- * Replace an item's editable fields (name, category, description, link, date, daily and its XP).
+ * Replace an item's editable fields (name, category, description, link, pictures, date, daily and its XP).
  * @param {HabitItem[]} items
  * @param {string} id
  * @param {ItemFields} fields
@@ -197,7 +221,7 @@ export function updateItem(items, id, fields, today = "") {
   return {
     items: items.map((item) => {
       if (item.id !== id) return item;
-      const { xp: _xp, url: _url, ...rest } = item;
+      const { xp: _xp, url: _url, images: _images, ...rest } = item;
       const date = lockedDate(checked.fields, today) || item.date;
       return /** @type {HabitItem} */ ({ ...rest, ...checked.fields, date });
     }),

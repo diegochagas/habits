@@ -20,6 +20,7 @@ import {
   toggleDone,
   updateItem,
 } from "./items-store.js";
+import { bindImageAttach, renderAddImages } from "./image-attach.js";
 import { itemFieldsFromForm, renderHabitFields, renderItemEditor, toggleHabitFields } from "./render-item-editor.js";
 import { renderCategoryOptions, renderCategoryTabs, renderCounter, renderItemGrid } from "./render-items.js";
 import { connectStateStorage } from "./state-storage.js";
@@ -210,6 +211,7 @@ function renderLanguage() {
   if (chosen) categorySelect.value = chosen;
   /** @type {HTMLElement} */ (document.getElementById("add-habit-fields")).innerHTML = renderHabitFields(state.lang);
   toggleHabitFields(form);
+  renderAddImages(/** @type {HTMLElement} */ (document.getElementById("add-images")), state.lang);
   render();
 }
 
@@ -227,6 +229,7 @@ function onAddSubmit(event) {
   showFormError("");
   form.reset();
   toggleHabitFields(form);
+  renderAddImages(/** @type {HTMLElement} */ (document.getElementById("add-images")), state.lang, false);
   sounds.play("decision");
   commit([result.item, ...state.items]);
 }
@@ -354,6 +357,7 @@ async function onReset() {
 
 function bindEvents() {
   form.addEventListener("submit", onAddSubmit);
+  bindImageAttach(() => state.lang);
   document.addEventListener("change", onDailyToggle);
   grid.addEventListener("click", onGridClick);
   grid.addEventListener("submit", onEditSubmit);

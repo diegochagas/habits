@@ -5,9 +5,10 @@
 // Usage: node --env-file=.env server/main.js   (see .env.example)
 
 import { createServer } from "node:http";
-import { dirname, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHabitsApp } from "./http-app.js";
+import { createFileImageStore, createMemoryImageStore } from "./image-store.js";
 import { readServerConfig } from "./server-config.js";
 import { createItemsCsvState } from "./state-items-csv.js";
 import { createMemoryState } from "./state-memory.js";
@@ -23,7 +24,11 @@ const documents =
     ? createMemoryState()
     : await createPostgresState(config.databaseUrl, { retrySeconds: 60, log });
 const state = config.itemsCsv ? await createItemsCsvState(documents, config.itemsCsv, { log }) : documents;
-const app = createHabitsApp({ state, siteRoot, allowWipe: config.store === "memory", log });
+// Pictures sit in an images/ folder beside the list's CSV (the mounted state folder) so one volume holds both.
+const images = config.itemsCsv
+  ? createFileImageStore(join(dirname(config.itemsCsv), "images"))
+  : createMemoryImageStore();
+const app = createHabitsApp({ state, images, siteRoot, allowWipe: config.store === "memory", log });
 const server = createServer(app);
 server.listen(config.port, () =>
   log({ event: "listening", port: config.port, store: config.store, itemsCsv: config.itemsCsv || null }),

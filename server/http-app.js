@@ -4,16 +4,20 @@
 // Responses are JSON or files, errors carry the offending value.
 
 import { readFile } from "node:fs/promises";
+import { imageExtensionFor, imageTypeFor } from "./image-store.js";
 import { contentTypeFor, resolveSitePath } from "./static-files.js";
 
 const STATE_PREFIX = "/api/state";
 const KEY_PATTERN = /^habits:[a-z0-9:_-]+$/i;
+const IMAGES_PREFIX = "/api/images";
 const MAX_BODY_BYTES = 1_000_000;
+const MAX_IMAGE_BYTES = 8_000_000;
 
 /**
  * @typedef {object} HabitsAppDeps
  * @property {import("./state-memory.js").StateStore} state
  * @property {string} siteRoot
+ * @property {import("./image-store.js").ImageStore} [images] the pictures attached to items; without it /api/images is a 404
  * @property {boolean} allowWipe DELETE /api/state (every key) is only for the memory store (e2e)
  * @property {(line: Record<string, unknown>) => void} [log]
  */
@@ -41,11 +45,62 @@ export function createHabitsApp(deps) {
 async function handle(deps, req, res) {
   const url = new URL(req.url ?? "/", "http://habits.local");
   if (url.pathname === "/api/health") return sendJson(res, 200, { ok: true });
+  if (url.pathname === IMAGES_PREFIX || url.pathname.startsWith(IMAGES_PREFIX + "/"))
+    return handleImages(deps, req, res, url.pathname.slice(IMAGES_PREFIX.length + 1));
   if (url.pathname === STATE_PREFIX || url.pathname.startsWith(STATE_PREFIX + "/"))
     return handleState(deps, req, res, decodeURIComponent(url.pathname.slice(STATE_PREFIX.length + 1)));
   if (req.method !== "GET" && req.method !== "HEAD")
     return sendJson(res, 405, { error: `${req.method}: expected GET` });
   return sendFile(deps.siteRoot, url.pathname, res);
+}
+
+/**
+ * POST /api/images (raw picture bytes, Content-Type image/png|jpeg|webp|gif) → { name };
+ * GET /api/images/<name> → the picture.
+ * @param {HabitsAppDeps} deps
+ * @param {import("node:http").IncomingMessage} req
+ * @param {import("node:http").ServerResponse} res
+ * @param {string} name "" for the collection
+ */
+async function handleImages(deps, req, res, name) {
+  if (!deps.images) return sendJson(res, 404, { error: `${IMAGES_PREFIX}: pictures are not enabled` });
+  if (name === "" && req.method === "POST") return saveImage(deps.images, req, res);
+  if (name !== "" && (req.method === "GET" || req.method === "HEAD")) return sendImage(deps.images, name, res);
+  return sendJson(res, 405, { error: `${req.method} ${IMAGES_PREFIX}/${name}: expected POST or GET <name>` });
+}
+
+/**
+ * @param {import("./image-store.js").ImageStore} images
+ * @param {import("node:http").IncomingMessage} req
+ * @param {import("node:http").ServerResponse} res
+ */
+async function saveImage(images, req, res) {
+  const extension = imageExtensionFor(req.headers["content-type"]);
+  if (!extension)
+    return sendJson(res, 415, {
+      error: `Content-Type "${req.headers["content-type"]}": expected image/png, image/jpeg, image/webp or image/gif`,
+    });
+  const bytes = await readBytes(req, MAX_IMAGE_BYTES);
+  if (bytes === null) return sendJson(res, 413, { error: `picture over ${MAX_IMAGE_BYTES} bytes` });
+  if (bytes.length === 0) return sendJson(res, 400, { error: "picture: expected a non-empty body" });
+  sendJson(res, 201, { name: await images.save(bytes, extension) });
+}
+
+/**
+ * @param {import("./image-store.js").ImageStore} images
+ * @param {string} name
+ * @param {import("node:http").ServerResponse} res
+ */
+async function sendImage(images, name, res) {
+  const bytes = await images.read(name);
+  if (!bytes) return sendJson(res, 404, { error: `${IMAGES_PREFIX}/${name}: no such picture` });
+  // The name is random and the bytes never change, so a browser may keep it for good.
+  res.writeHead(200, {
+    "Content-Type": imageTypeFor(name),
+    "Cache-Control": "public, max-age=31536000, immutable",
+    "X-Content-Type-Options": "nosniff",
+  });
+  res.end(bytes);
 }
 
 /**
@@ -105,20 +160,26 @@ async function saveState(deps, req, res, key) {
  * @param {import("node:http").IncomingMessage} req
  * @returns {Promise<string | null>} null when over the size limit
  */
-function readBody(req) {
+async function readBody(req) {
+  const bytes = await readBytes(req, MAX_BODY_BYTES);
+  return bytes === null ? null : bytes.toString("utf8");
+}
+
+/**
+ * @param {import("node:http").IncomingMessage} req
+ * @param {number} limit
+ * @returns {Promise<Buffer | null>} null when the body is over `limit` bytes
+ */
+function readBytes(req, limit) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
     req.on("data", (chunk) => {
       size += chunk.length;
-      if (size > MAX_BODY_BYTES) {
-        resolve(null);
-        req.destroy();
-        return;
-      }
-      chunks.push(chunk);
+      // Keep reading (and dropping) after the limit: cutting the connection would hide the 413 from the client.
+      if (size <= limit) chunks.push(chunk);
     });
-    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("end", () => resolve(size > limit ? null : Buffer.concat(chunks)));
     req.on("error", reject);
   });
 }

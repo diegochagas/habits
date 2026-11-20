@@ -53,14 +53,26 @@ test("items to csv: the canonical header, booleans as words, xp only on daily it
   ]);
   assert.deepEqual(text.split("\n"), [
     HEADER,
-    "Gym workout,Poder,true,2,2026-10-29,false,,,,habit-gym,2026-10-29T00:00:00.000Z",
-    '"Bleach, ep 1",Poder,false,,2026-10-29,false,,https://x.io,,b,2026-10-29T00:00:00.000Z',
+    "Gym workout,Poder,true,2,2026-10-29,false,,,,,habit-gym,2026-10-29T00:00:00.000Z",
+    '"Bleach, ep 1",Poder,false,,2026-10-29,false,,https://x.io,,,b,2026-10-29T00:00:00.000Z',
     "",
   ]);
   const back = itemsFromCsv(text, fixedClock);
   assert.ok("items" in back);
   assert.deepEqual(back.items[0], gymItem());
   assert.equal(back.completed, 0);
+});
+
+test("items csv: pictures are a space-separated list of names; unknown names are dropped", () => {
+  const names = ["0123456789abcdef01.jpg", "fedcba987654321012.png"];
+  const text = itemsToCsv([{ ...gymItem(), images: names }]);
+  assert.match(text.split("\n")[1], /,,0123456789abcdef01\.jpg fedcba987654321012\.png,habit-gym,/);
+  const back = itemsFromCsv(text, fixedClock);
+  assert.ok("items" in back);
+  assert.deepEqual(back.items[0].images, names);
+  const typed = itemsFromCsv("name,category,images\nGym,Poder,../etc/passwd x.jpg\n", fixedClock);
+  assert.ok("items" in typed);
+  assert.equal(typed.items[0].images, undefined);
 });
 
 test("items from csv: any column order, yes/x/1 mean true, a hand-typed row gets id, date and createdAt", () => {
@@ -147,7 +159,7 @@ test("csv state: an edit made to the file by hand shows on the next load, a save
   await state.save("habits:v1", [gymItem()]);
   await writeFile(
     csvPath,
-    `${HEADER}\nGym workout,Poder,true,2,2026-10-29,true,2026-11-01,,,habit-gym,x\nSwim,Poder\n`,
+    `${HEADER}\nGym workout,Poder,true,2,2026-10-29,true,2026-11-01,,,,habit-gym,x\nSwim,Poder\n`,
   );
   const loaded = /** @type {any} */ (await state.loadAll())["habits:v1"];
   assert.deepEqual(
@@ -160,7 +172,7 @@ test("csv state: an edit made to the file by hand shows on the next load, a save
   const rewritten = (await readFile(csvPath, "utf8")).split("\n");
   assert.match(
     rewritten[2],
-    /^Swim,Poder,false,,2026-11-01,false,,,,csv-test,2026-11-01T/,
+    /^Swim,Poder,false,,2026-11-01,false,,,,,csv-test,2026-11-01T/,
     "the completed row is written back",
   );
   await writeFile(csvPath, `${HEADER}\nGym,Game\nRun,Poder\n`);

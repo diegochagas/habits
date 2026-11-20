@@ -2,6 +2,7 @@
 
 import { CATEGORIES, TODAY_FILTER, categoryI18nKey, categorySlug, categoryStamp } from "./categories.js";
 import { translate } from "./i18n.js";
+import { renderCardImages } from "./image-attach.js";
 import { isHabit } from "./items-store.js";
 import { escapeHtml, linkifyDescription } from "./linkify.js";
 
@@ -35,6 +36,7 @@ function renderCardBody(item, lang, extras) {
   return `<h3 class="card-name">${renderName(item)}${isHabit(item) ? ` <span class="card-daily" title="${translate(lang, "daily")}">🔁 +${item.xp ?? 1}</span>` : ""}</h3>
   ${isHabit(item) && item.done ? `<p class="card-done-today-note">✓ ${translate(lang, "doneToday")}</p>` : ""}
   ${renderDescription(item.description)}
+  ${renderCardImages(item.images, lang)}
   <footer class="card-footer">
     <time class="card-date" datetime="${escapeHtml(item.date)}">${formatDate(item.date)}</time>${count > 0 ? `<span class="card-pomodoros" title="Pomodoros">🍅 ${count}</span>` : ""}
     <span class="card-actions">

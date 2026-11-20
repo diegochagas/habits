@@ -4,6 +4,7 @@
 
 import { renderCategoryOptions } from "./render-items.js";
 import { translate } from "./i18n.js";
+import { renderImageField } from "./image-attach.js";
 import { escapeHtml } from "./linkify.js";
 
 /**
@@ -23,6 +24,7 @@ export function renderItemEditor(item, lang) {
     <textarea name="description" rows="3" maxlength="2000">${escapeHtml(item.description)}</textarea></label>
   <label class="field"><span>${translate(lang, "fieldUrl")}</span>
     <input type="url" name="url" maxlength="2000" value="${escapeHtml(item.url ?? "")}" /></label>
+  ${renderImageField(lang, item.images)}
   <label class="field"><span>${translate(lang, "fieldDate")}</span>
     <input type="date" name="date" value="${escapeHtml(item.date)}"${item.daily ? " disabled" : ""} /></label>
   <p class="form-error" data-edit-error role="alert" hidden></p>
@@ -72,6 +74,7 @@ export function itemFieldsFromForm(form) {
     category: String(fields.get("category") ?? ""),
     description: String(fields.get("description") ?? ""),
     url: String(fields.get("url") ?? ""),
+    images: fields.getAll("images").map(String),
     date: String(fields.get("date") ?? ""),
     daily: fields.get("daily") === "on",
     xp: String(fields.get("xp") ?? ""),
