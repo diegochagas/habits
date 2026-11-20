@@ -102,6 +102,7 @@ sudo bash /DATA/Projects/habits/scripts/zimaos-first-deploy.sh   # database, sta
 
 Backups: the PostgreSQL app's data folder is part of the nightly server backup; the list is the
 file `state/items.csv` in the deployed clone (copy it, or keep **Export** on the page as the manual copy).
+Export holds the pictures' names only: copy `state/images/` along with the CSV, or restored cards show broken pictures.
 
 Or open the folder with GitHub Pages: the repo root is the site.
 

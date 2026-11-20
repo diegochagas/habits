@@ -125,7 +125,9 @@ export function mergeSheetRows(local, rows, pending, today = "") {
     const category = known && isLegacyCategory(row.source) ? known.category : fromRow.category;
     const xp = fromRow.daily ? { xp: known?.xp ?? 1 } : {};
     const url = keepLocalUrl(row, known);
-    items.push({ ...fromRow, category, ...xp, ...url, done, doneAt: done ? known?.doneAt || today : "" });
+    // The sheet has no pictures column: the local ones stay.
+    const images = known?.images ? { images: known.images } : {};
+    items.push({ ...fromRow, category, ...xp, ...url, ...images, done, doneAt: done ? known?.doneAt || today : "" });
   }
   const present = new Set(items.map((item) => item.id));
   for (const op of pending)

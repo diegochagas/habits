@@ -4,7 +4,7 @@
 // Responses are JSON or files, errors carry the offending value.
 
 import { readFile } from "node:fs/promises";
-import { imageExtensionFor, imageTypeFor } from "./image-store.js";
+import { imageExtensionFor, imageTypeFor, looksLikeImage } from "./image-store.js";
 import { contentTypeFor, resolveSitePath } from "./static-files.js";
 
 const STATE_PREFIX = "/api/state";
@@ -12,6 +12,7 @@ const KEY_PATTERN = /^habits:[a-z0-9:_-]+$/i;
 const IMAGES_PREFIX = "/api/images";
 const MAX_BODY_BYTES = 1_000_000;
 const MAX_IMAGE_BYTES = 8_000_000;
+const OVERSHOOT_BYTES = 1_000_000;
 
 /**
  * @typedef {object} HabitsAppDeps
@@ -66,7 +67,11 @@ async function handleImages(deps, req, res, name) {
   if (!deps.images) return sendJson(res, 404, { error: `${IMAGES_PREFIX}: pictures are not enabled` });
   if (name === "" && req.method === "POST") return saveImage(deps.images, req, res);
   if (name !== "" && (req.method === "GET" || req.method === "HEAD")) return sendImage(deps.images, name, res);
-  return sendJson(res, 405, { error: `${req.method} ${IMAGES_PREFIX}/${name}: expected POST or GET <name>` });
+  if (name !== "" && req.method === "DELETE") {
+    await deps.images.remove(name);
+    return sendEmpty(res, 204);
+  }
+  return sendJson(res, 405, { error: `${req.method} ${IMAGES_PREFIX}/${name}: expected POST, or GET / DELETE <name>` });
 }
 
 /**
@@ -83,6 +88,8 @@ async function saveImage(images, req, res) {
   const bytes = await readBytes(req, MAX_IMAGE_BYTES);
   if (bytes === null) return sendJson(res, 413, { error: `picture over ${MAX_IMAGE_BYTES} bytes` });
   if (bytes.length === 0) return sendJson(res, 400, { error: "picture: expected a non-empty body" });
+  if (!looksLikeImage(bytes, extension))
+    return sendJson(res, 415, { error: `picture body: expected the bytes of a ${extension} file` });
   sendJson(res, 201, { name: await images.save(bytes, extension) });
 }
 
@@ -176,10 +183,12 @@ function readBytes(req, limit) {
     let size = 0;
     req.on("data", (chunk) => {
       size += chunk.length;
-      // Keep reading (and dropping) after the limit: cutting the connection would hide the 413 from the client.
       if (size <= limit) chunks.push(chunk);
+      // Past the limit keep reading a little (cutting at once would hide the 413 from the client), then cut.
+      else if (size > limit + OVERSHOOT_BYTES) req.destroy();
     });
     req.on("end", () => resolve(size > limit ? null : Buffer.concat(chunks)));
+    req.on("close", () => resolve(size > limit ? null : Buffer.concat(chunks)));
     req.on("error", reject);
   });
 }

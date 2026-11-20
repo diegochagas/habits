@@ -100,3 +100,23 @@ test("api: a wrong type is a 415, an empty body a 400, an oversized one a 413, n
     off.close();
   }
 });
+
+test("api: bytes that are not the declared format are a 415; DELETE forgets a picture", async () => {
+  const { base, close } = await listen(true);
+  try {
+    const fake = await fetch(`${base}/api/images`, {
+      method: "POST",
+      headers: { "Content-Type": "image/png" },
+      body: "<script>alert(1)</script>",
+    });
+    assert.equal(fake.status, 415);
+    const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+    const { name } = await (
+      await fetch(`${base}/api/images`, { method: "POST", headers: { "Content-Type": "image/png" }, body: png })
+    ).json();
+    assert.equal((await fetch(`${base}/api/images/${name}`, { method: "DELETE" })).status, 204);
+    assert.equal((await fetch(`${base}/api/images/${name}`)).status, 404);
+  } finally {
+    close();
+  }
+});

@@ -20,7 +20,7 @@ import {
   toggleDone,
   updateItem,
 } from "./items-store.js";
-import { bindImageAttach, renderAddImages } from "./image-attach.js";
+import { bindImageAttach, deleteImages, discardNewImages, renderAddImages } from "./image-attach.js";
 import { itemFieldsFromForm, renderHabitFields, renderItemEditor, toggleHabitFields } from "./render-item-editor.js";
 import { renderCategoryOptions, renderCategoryTabs, renderCounter, renderItemGrid } from "./render-items.js";
 import { connectStateStorage } from "./state-storage.js";
@@ -267,6 +267,8 @@ function rollDaily() {
 
 /** The list file on the server may have been edited by hand: take the server's list when it changed. */
 async function reloadItemsFromServer() {
+  // An editor holding pictures not saved yet would be rebuilt without them: wait for Save or Cancel.
+  if (document.querySelector(".image-thumb[data-new]")) return;
   if (!(await storage.reload(STORAGE_KEY))) return;
   state.items = store.load() ?? state.items;
   state.editingId = null;
@@ -296,12 +298,15 @@ function onGridClick(event) {
   if (action === "pomodoro") return pomodoro.startOn(id);
   if (action === "toggle") return commit(toggleDone(state.items, id, today()));
   if (action === "edit" || action === "cancel-edit") {
+    if (action === "cancel-edit") discardNewImages(card);
     state.editingId = action === "edit" ? id : null;
     sounds.play("cursor");
     return render();
   }
-  if (action === "remove" && confirm(translate(state.lang, "removeConfirm")))
+  if (action === "remove" && confirm(translate(state.lang, "removeConfirm"))) {
+    deleteImages(state.items.find((item) => item.id === id)?.images);
     commit(removeAndCloseGap(state.items, id));
+  }
 }
 
 /** @param {MouseEvent} event */

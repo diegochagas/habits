@@ -28,21 +28,31 @@ export function imageUrl(name) {
  */
 export function renderImageField(lang, images = []) {
   return `<div class="field image-field" data-image-field>
-    <span>${translate(lang, "fieldImages")}</span>
     <div class="image-thumbs" data-image-thumbs>${images.map((name) => renderThumb(name, lang)).join("")}</div>
-    <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple data-image-input />
+    <label class="field"><span>${translate(lang, "fieldImages")}</span>
+      <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple data-image-input /></label>
     <p class="form-error" data-image-error role="alert" hidden></p>
   </div>`;
 }
 
 /**
  * @param {string} name
+ * @param {string} [extra] more attributes for the <img>
+ * @returns {string}
+ */
+function imgTag(name, extra = "") {
+  return `<img src="${imageUrl(name)}" alt=""${extra} />`;
+}
+
+/**
+ * @param {string} name
  * @param {import("./i18n.js").Lang} lang
+ * @param {boolean} [uploaded] picked in this editor and not saved on the item yet (data-new)
  * @returns {string} a thumbnail with its hidden input and remove button
  */
-export function renderThumb(name, lang) {
+function renderThumb(name, lang, uploaded = false) {
   const label = escapeHtml(translate(lang, "imageRemove"));
-  return `<span class="image-thumb"><img src="${imageUrl(name)}" alt="" />
+  return `<span class="image-thumb"${uploaded ? " data-new" : ""}>${imgTag(name)}
     <input type="hidden" name="images" value="${escapeHtml(name)}" />
     <button type="button" class="image-thumb-remove" data-action="remove-image" aria-label="${label}" title="${label}">×</button></span>`;
 }
@@ -58,7 +68,7 @@ export function renderCardImages(images, lang) {
   const title = escapeHtml(translate(lang, "imageOpen"));
   const links = images.map(
     (name) =>
-      `<a href="${imageUrl(name)}" target="_blank" rel="noopener noreferrer" title="${title}"><img src="${imageUrl(name)}" alt="" loading="lazy" /></a>`,
+      `<a href="${imageUrl(name)}" target="_blank" rel="noopener noreferrer" title="${title}">${imgTag(name, ' loading="lazy"')}</a>`,
   );
   return `<div class="card-images">${links.join("")}</div>`;
 }
@@ -70,12 +80,29 @@ export function renderCardImages(images, lang) {
  */
 async function shrinkImage(file) {
   if (file.size <= SHRINK_ABOVE_BYTES || file.type === "image/gif") return file;
+  try {
+    return await drawAsJpeg(file);
+  } catch {
+    return file; // a format this browser cannot decode: the server judges the original
+  }
+}
+
+/**
+ * @param {File} file
+ * @returns {Promise<Blob>}
+ */
+async function drawAsJpeg(file) {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, LONGEST_SIDE_PX / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const context = canvas.getContext("2d");
+  if (context) {
+    context.fillStyle = "#fff"; // JPEG has no alpha: transparent pixels would turn black
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  }
   const jpeg = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
   return jpeg ?? file;
 }
@@ -104,8 +131,29 @@ export function bindImageAttach(currentLang) {
   });
   document.addEventListener("click", (event) => {
     const button = /** @type {HTMLElement} */ (event.target).closest?.("[data-action='remove-image']");
-    button?.closest(".image-thumb")?.remove();
+    const thumb = button?.closest(".image-thumb");
+    if (thumb instanceof HTMLElement && "new" in thumb.dataset) discardNewImages(thumb);
+    thumb?.remove();
   });
+}
+
+/**
+ * Delete from the server the pictures that were uploaded under `root` and never saved on an item
+ * (a cancelled editor or a removed thumbnail), so abandoned uploads do not pile up.
+ * @param {ParentNode} root
+ */
+export function discardNewImages(root) {
+  const thumbs =
+    root instanceof HTMLElement && "new" in root.dataset ? [root] : root.querySelectorAll(".image-thumb[data-new]");
+  deleteImages([...thumbs].map((thumb) => thumb.querySelector("input[name='images']")?.getAttribute("value") ?? ""));
+}
+
+/**
+ * Best-effort DELETE of pictures (a leftover file is harmless, so failures are ignored).
+ * @param {string[] | undefined} names
+ */
+export function deleteImages(names = []) {
+  for (const name of names.filter(Boolean)) void fetch(imageUrl(name), { method: "DELETE" }).catch(() => {});
 }
 
 /**
@@ -123,12 +171,17 @@ async function attachFiles(input, lang) {
   };
   const files = [...(input.files ?? [])];
   input.value = "";
+  // Save/ADD stays off until the uploads end, or the item would be saved without the picture.
+  const submit = /** @type {HTMLButtonElement | null} */ (input.form?.querySelector("button[type='submit']") ?? null);
+  if (submit) submit.disabled = true;
   try {
-    for (const file of files) thumbs?.insertAdjacentHTML("beforeend", renderThumb(await uploadImage(file), lang));
+    const names = await Promise.all(files.map(uploadImage));
+    for (const name of names) thumbs?.insertAdjacentHTML("beforeend", renderThumb(name, lang, true));
     showError("");
-  } catch (error) {
-    console.warn(String(error));
+  } catch {
     showError(translate(lang, "errorImageUpload"));
+  } finally {
+    if (submit) submit.disabled = false;
   }
 }
 

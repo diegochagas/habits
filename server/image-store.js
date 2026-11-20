@@ -4,7 +4,7 @@
 // never guessable and never carries a path.
 
 import { randomBytes } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { isImageName } from "../js/items-store.js";
 
@@ -20,7 +20,27 @@ const TYPE_BY_EXTENSION = new Map([...EXTENSION_BY_TYPE].map(([type, extension])
  * @typedef {object} ImageStore
  * @property {(bytes: Buffer, extension: string) => Promise<string>} save returns the new name
  * @property {(name: string) => Promise<Buffer | null>} read null when there is no such picture
+ * @property {(name: string) => Promise<void>} remove forgets a picture (a name that is not one, or is gone, is ignored)
  */
+
+const SIGNATURES = {
+  png: (/** @type {Buffer} */ b) => b.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47])),
+  jpg: (/** @type {Buffer} */ b) => b.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff])),
+  gif: (/** @type {Buffer} */ b) => b.subarray(0, 4).toString("latin1") === "GIF8",
+  webp: (/** @type {Buffer} */ b) =>
+    b.subarray(0, 4).toString("latin1") === "RIFF" && b.subarray(8, 12).toString("latin1") === "WEBP",
+};
+
+/**
+ * @param {Buffer} bytes
+ * @param {string} extension from imageExtensionFor
+ * @returns {boolean} true when the first bytes are those of that picture format
+ * @example looksLikeImage(Buffer.from("GIF89a"), "gif") // true
+ */
+export function looksLikeImage(bytes, extension) {
+  const check = SIGNATURES[/** @type {keyof typeof SIGNATURES} */ (extension)];
+  return check ? check(bytes) : false;
+}
 
 /**
  * @param {string | undefined} contentType a Content-Type header, parameters allowed
@@ -62,6 +82,9 @@ export function createFileImageStore(folder) {
       if (!isImageName(name)) return null;
       return readFile(join(folder, name)).catch(() => null);
     },
+    async remove(name) {
+      if (isImageName(name)) await rm(join(folder, name), { force: true });
+    },
   };
 }
 
@@ -79,6 +102,9 @@ export function createMemoryImageStore() {
     },
     async read(name) {
       return pictures.get(name) ?? null;
+    },
+    async remove(name) {
+      pictures.delete(name);
     },
   };
 }
