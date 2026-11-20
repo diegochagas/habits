@@ -62,19 +62,20 @@ start after the change writes the file from the list the database held and drops
 
 One row per item, in this order:
 
-| column        | value                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| `name`        | the title (required)                                                                       |
-| `category`    | `Poder`, `Habilidade` or `Resistência` (the old `Read`, `Watch`, `Side Hustle` still load) |
-| `daily`       | `true` for a Today habit (`yes`, `x`, `1` also count), anything else is not                |
-| `xp`          | 1–3 XP per day for a daily item (blank = 1); ignored on other items                        |
-| `date`        | `yyyy-mm-dd`; blank = the day the server first reads the row                               |
-| `done`        | `true` / `false`                                                                           |
-| `doneAt`      | `yyyy-mm-dd` of the last Done (blank while to do)                                          |
-| `url`         | an http(s) link the title opens, or blank                                                  |
-| `description` | free text; commas, quotes and line breaks go inside double quotes (a spreadsheet does it)  |
-| `id`          | leave blank on a row you type: the server fills it in and writes the file back             |
-| `createdAt`   | ISO timestamp; blank on a typed row, filled in like `id`                                   |
+| column        | value                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| `name`        | the title (required)                                                                               |
+| `category`    | `Poder`, `Habilidade` or `Resistência` (the old `Read`, `Watch`, `Side Hustle` still load)         |
+| `daily`       | `true` for a Today habit (`yes`, `x`, `1` also count), anything else is not                        |
+| `xp`          | 1–3 XP per day for a daily item (blank = 1); ignored on other items                                |
+| `date`        | `yyyy-mm-dd`; blank = the day the server first reads the row                                       |
+| `done`        | `true` / `false`                                                                                   |
+| `doneAt`      | `yyyy-mm-dd` of the last Done (blank while to do)                                                  |
+| `url`         | an http(s) link the title opens, or blank                                                          |
+| `description` | free text; commas, quotes and line breaks go inside double quotes (a spreadsheet does it)          |
+| `images`      | names of the pictures attached to the card, separated by spaces (the files are in `state/images/`) |
+| `id`          | leave blank on a row you type: the server fills it in and writes the file back                     |
+| `createdAt`   | ISO timestamp; blank on a typed row, filled in like `id`                                           |
 
 The page reads the file when it loads, once a minute while open, and when its tab comes back to
 the front, so an edit shows up without a reload. Every change made on the page (add, edit, done,
@@ -101,6 +102,7 @@ sudo bash /DATA/Projects/habits/scripts/zimaos-first-deploy.sh   # database, sta
 
 Backups: the PostgreSQL app's data folder is part of the nightly server backup; the list is the
 file `state/items.csv` in the deployed clone (copy it, or keep **Export** on the page as the manual copy).
+Export holds the pictures' names only: copy `state/images/` along with the CSV, or restored cards show broken pictures.
 
 Or open the folder with GitHub Pages: the repo root is the site.
 
@@ -140,6 +142,9 @@ sheets-sync/Code.gs   the Apps Script web app (hidden Id column, delete/upsert o
               ├─ free-time-gate.js  play pages: spend 1 s/s while visible, lock at zero
               └─ pomodoro-i18n.js   EN / PT
 data/seed.json  snapshot of the sheet (310 items), copied into the store on first visit
+state/images/   the pictures attached to items (one file per picture, random name): the card's
+                editor uploads them to POST /api/images (js/image-attach.js, big photos shrunk
+                first), server/image-store.js keeps them, GET /api/images/<name> serves them.
 state/items.csv the list as a CSV (postgres store): server/state-items-csv.js reads it on every
                 load and writes it on every save of habits:v1; items-csv.js maps rows ↔ items,
                 csv-text.js is the RFC 4180 reader/writer. Other keys go to state-postgres.js.
