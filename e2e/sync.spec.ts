@@ -25,8 +25,20 @@ test("the list follows the sheet and pushes Done / Add as ops", async ({ page },
       const index = rows.findIndex((row) => row.id === op.id);
       if (op.op === "delete" && index >= 0 && rows[index].daily) rows[index].done = true;
       else if (op.op === "delete" && index >= 0) rows.splice(index, 1);
-      if (op.op === "upsert")
-        rows.push({ id: op.id, date: op.date, task: op.name, notes: op.description, source: op.category });
+      // Like Code.gs upsertRow_: a known id updates its row in place, an unknown one adds a row. (A daily
+      // row older than today is rolled forward on every load and pushed again, so appending duplicated it.)
+      if (op.op === "upsert") {
+        const row = {
+          ...rows[index],
+          id: op.id,
+          date: op.date,
+          task: op.name,
+          notes: op.description,
+          source: op.category,
+        };
+        if (index >= 0) rows[index] = row;
+        else rows.push(row);
+      }
     }
     return route.fulfill({ json: { rows } });
   });
